@@ -1,0 +1,381 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>main</name>
+    <events>
+        <variable constant="0" name="maxId" sid="5243444864770607" static="0" type="number">0</variable>
+        <variable constant="0" name="play" sid="2569782605053793" static="0" type="number">0</variable>
+        <variable constant="0" name="cMarker" sid="9724346976153994" static="0" type="number">0</variable>
+        <event-block sid="8108148922257605">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="9586894918963988" type="System" />
+            </conditions>
+            <actions>
+                <action id="-9" name="Destroy" sid="446090924207179" type="Sprite" />
+            </actions>
+        </event-block>
+        <comment>Use the down arrow to allow the player to deliberately drop down through a jump-thru platform.</comment>
+        <comment>If the player falls off the bottom of the layout, restart the level.</comment>
+        <event-block sid="7540901440760406">
+            <conditions>
+                <condition id="-2" name="Compare Y" sid="4174276448241139" type="Player">
+                    <param id="0" name="Comparison">4</param>
+                    <param id="1" name="Y co-ordinate">LayoutHeight</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-26" name="Restart layout" sid="9067646929768267" type="System" />
+            </actions>
+        </event-block>
+        <event-block sid="7524303417323834">
+            <conditions>
+                <condition id="0" name="On click" sid="657966252722935" type="Mouse">
+                    <param id="0" name="Mouse button">0</param>
+                    <param id="1" name="Click type">0</param>
+                </condition>
+                <condition id="-8" name="Compare two values" sid="172817356104203" type="System">
+                    <param id="0" name="First value">int(runToCounter.Text)</param>
+                    <param id="1" name="Comparison">4</param>
+                    <param id="2" name="Second value">0</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="0" name="Call function" sid="5010124243363046" type="Function">
+                    <param id="0" name="Name">&quot;placeMarker&quot;</param>
+                    <param id="1" name="Parameter {n}">&quot;&quot;</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="8301003565959143">
+            <conditions>
+                <condition id="0" name="On click" sid="4045086023291715" type="Mouse">
+                    <param id="0" name="Mouse button">2</param>
+                    <param id="1" name="Click type">0</param>
+                </condition>
+                <condition id="-8" name="Compare two values" sid="1826048742483267" type="System">
+                    <param id="0" name="First value">int(jumpCounter.Text)</param>
+                    <param id="1" name="Comparison">4</param>
+                    <param id="2" name="Second value">0</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="0" name="Call function" sid="5950870964452608" type="Function">
+                    <param id="0" name="Name">&quot;placeMarker&quot;</param>
+                    <param id="1" name="Parameter {n}">&quot;jump&quot;</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="9126252563479522">
+            <conditions>
+                <condition id="0" name="On clicked" sid="2080205700683569" type="Button" />
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="1159530623337639" type="System">
+                    <param id="0" name="Variable">play</param>
+                    <param id="1" name="Value">1</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block collapsed="1" sid="8827902258940329">
+            <conditions>
+                <condition id="-1" name="Every tick" sid="6819702379296129" type="System" />
+                <condition id="-14" name="Compare variable" sid="9704594586135598" type="System">
+                    <param id="0" name="Variable">play</param>
+                    <param id="1" name="Comparison">0</param>
+                    <param id="2" name="Value">1</param>
+                </condition>
+                <condition id="-34" name="Pick by evaluate" sid="8331188349916884" type="System">
+                    <param id="0" name="Object">Sprite</param>
+                    <param id="1" name="Expression">Sprite.id =cMarker</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <event-block sid="3925471550621446">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="6465290242286087" type="System">
+                            <param id="0" name="First value">distance(Player.X,Player.Y,Sprite.X,Sprite.Y)</param>
+                            <param id="1" name="Comparison">5</param>
+                            <param id="2" name="Second value">10</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="7239588741758209">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="6615916404430188" type="System">
+                                    <param id="0" name="First value">Player.X</param>
+                                    <param id="1" name="Comparison">3</param>
+                                    <param id="2" name="Second value">Sprite.X</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action behavior="Platform" id="7" name="Simulate control" sid="3395767632683846" type="Player">
+                                    <param id="0" name="Control">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3091827653640933">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="1181402568985427" type="System" />
+                            </conditions>
+                            <actions>
+                                <action behavior="Platform" id="7" name="Simulate control" sid="3048535294936274" type="Player">
+                                    <param id="0" name="Control">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="654227381483116">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="6861281814924974" type="System" />
+                    </conditions>
+                    <actions />
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block collapsed="1" sid="9682832708785598">
+            <conditions>
+                <condition id="0" name="On collision with another object" sid="6741122540066685" type="Player">
+                    <param id="0" name="Object">Sprite</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <event-block sid="3578717252265481">
+                    <conditions>
+                        <condition id="-7" name="Compare instance variable" sid="1688299916517013" type="Sprite">
+                            <param id="0" name="Instance variable">action</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Value">&quot;jump&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action behavior="Platform" id="7" name="Simulate control" sid="200549864366595" type="Player">
+                            <param id="0" name="Control">2</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="6423275209820769">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="6610870860857841" type="System" />
+                    </conditions>
+                    <actions />
+                </event-block>
+                <event-block sid="5089956119351885">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="2412364595117755" type="System">
+                            <param id="0" name="First value">Player.X</param>
+                            <param id="1" name="Comparison">3</param>
+                            <param id="2" name="Second value">Sprite.X</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action behavior="Platform" id="7" name="Simulate control" sid="182994409514394" type="Player">
+                            <param id="0" name="Control">1</param>
+                        </action>
+                        <action behavior="Platform" id="7" name="Simulate control" sid="7264897848382883" type="Player">
+                            <param id="0" name="Control">1</param>
+                        </action>
+                        <action behavior="Platform" id="7" name="Simulate control" sid="9821286956386463" type="Player">
+                            <param id="0" name="Control">1</param>
+                        </action>
+                        <action behavior="Platform" id="7" name="Simulate control" sid="7102469015187696" type="Player">
+                            <param id="0" name="Control">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="840133905874142">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="868367277403058" type="System" />
+                    </conditions>
+                    <actions>
+                        <action behavior="Platform" id="7" name="Simulate control" sid="998478421027735" type="Player">
+                            <param id="0" name="Control">0</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="3469043729391893">
+                    <conditions />
+                    <actions>
+                        <action id="-9" name="Destroy" sid="8476168046212616" type="Sprite" />
+                        <action id="-10" name="Add to" sid="8150206651769657" type="System">
+                            <param id="0" name="Variable">cMarker</param>
+                            <param id="1" name="Value">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block sid="1135643317916084">
+            <conditions>
+                <condition id="-8" name="Compare two values" sid="7457610202866728" type="System">
+                    <param id="0" name="First value">cMarker</param>
+                    <param id="1" name="Comparison">5</param>
+                    <param id="2" name="Second value">maxId</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="8519382818291935" type="System">
+                    <param id="0" name="Variable">cMarker</param>
+                    <param id="1" name="Value">0</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block collapsed="1" sid="5219001097164774">
+            <conditions>
+                <condition id="0" name="On clicked" sid="4390623347030904" type="Undo" />
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="6647037135459937" type="System">
+                    <param id="0" name="Variable">maxId</param>
+                    <param id="1" name="Value">maxId-1</param>
+                </action>
+            </actions>
+            <sub-events>
+                <event-block sid="5168034360988981">
+                    <conditions />
+                    <actions />
+                </event-block>
+                <event-block sid="913655810865797">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="7070039501382693" type="System">
+                            <param id="0" name="First value">play</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block collapsed="1" sid="1125931618486108">
+                            <conditions>
+                                <condition id="-34" name="Pick by evaluate" sid="8243538163571837" type="System">
+                                    <param id="0" name="Object">Sprite</param>
+                                    <param id="1" name="Expression">Sprite.id=maxId</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <event-block sid="6304504684403958">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="5156710105840489" type="System">
+                                            <param id="0" name="First value">Sprite.action</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">&quot;jump&quot;</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="0" name="Set text" sid="3166257183083118" type="jumpCounter">
+                                            <param id="0" name="Text">str(int(jumpCounter.Text)+1)</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="1664603303409896">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="4962588548726639" type="System" />
+                                    </conditions>
+                                    <actions>
+                                        <action id="0" name="Set text" sid="6737898872407703" type="runToCounter">
+                                            <param id="0" name="Text">str(int(runToCounter.Text)+1)</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="5100328395213183">
+                                    <conditions />
+                                    <actions>
+                                        <action id="-9" name="Destroy" sid="6917106204586886" type="Sprite" />
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="4103523355432079">
+                            <conditions />
+                            <actions />
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="6781449157301769">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="8182487514660399" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="-26" name="Restart layout" sid="1304279708327636" type="System" />
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block collapsed="1" sid="479838664316745">
+            <conditions>
+                <condition id="0" name="On function" sid="4139816251166738" type="Function">
+                    <param id="0" name="Name">&quot;placeMarker&quot;</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-3" name="Create object" sid="3783801119860993" type="System">
+                    <param id="0" name="Object to create">Sprite</param>
+                    <param id="1" name="Layer">1</param>
+                    <param id="2" name="X">Mouse.X</param>
+                    <param id="3" name="Y">Mouse.Y</param>
+                </action>
+                <action id="-10" name="Set value" sid="4806472524906027" type="Sprite">
+                    <param id="0" name="Instance variable">id</param>
+                    <param id="1" name="Value">maxId</param>
+                </action>
+                <action id="-10" name="Add to" sid="4594148976930849" type="System">
+                    <param id="0" name="Variable">maxId</param>
+                    <param id="1" name="Value">1</param>
+                </action>
+                <action id="0" name="Set text" sid="3055168514792386" type="Text2">
+                    <param id="0" name="Text">str(Sprite.id)</param>
+                </action>
+                <action id="0" name="Set text" sid="7144708881801278" type="runToCounter">
+                    <param id="0" name="Text">str(int(runToCounter.Text)-1)</param>
+                </action>
+            </actions>
+            <sub-events>
+                <event-block sid="6589062706508949">
+                    <conditions>
+                        <condition id="1" name="Compare parameter" sid="7052664568331449" type="Function">
+                            <param id="0" name="Index">0</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Value">&quot;jump&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="925786082957503" type="Sprite">
+                            <param id="0" name="Instance variable">action</param>
+                            <param id="1" name="Value">&quot;jump&quot;</param>
+                        </action>
+                        <action id="5" name="Set frame" sid="4577204153544001" type="Sprite">
+                            <param id="0" name="Frame number">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block sid="6732344872942024">
+            <conditions>
+                <condition id="10" name="On Nth touch start" sid="9880601928187893" type="Touch">
+                    <param id="0" name="Touch number">0</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="0" name="Call function" sid="2299346272493035" type="Function">
+                    <param id="0" name="Name">&quot;placeMarker&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="3479185510858068">
+            <conditions>
+                <condition id="7" name="Compare touch speed" sid="9290195260581115" type="Touch">
+                    <param id="0" name="Touch index">0</param>
+                    <param id="1" name="Comparison">3</param>
+                    <param id="2" name="Speed">2</param>
+                </condition>
+            </conditions>
+            <actions />
+        </event-block>
+    </events>
+</c2eventsheet>
