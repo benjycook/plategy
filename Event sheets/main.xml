@@ -3,6 +3,10 @@
     <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
     <name>main</name>
     <events>
+        <include>locomotion</include>
+        <variable constant="1" name="timeToMarker" sid="2222258325444094" static="0" type="number">10</variable>
+        <variable constant="0" name="currentAction" sid="2010925221260692" static="0" type="text"></variable>
+        <include>pan</include>
         <variable constant="0" name="maxId" sid="5243444864770607" static="0" type="number">0</variable>
         <variable constant="0" name="play" sid="2569782605053793" static="0" type="number">0</variable>
         <variable constant="0" name="cMarker" sid="9724346976153994" static="0" type="number">0</variable>
@@ -11,7 +15,19 @@
                 <condition id="-2" name="On start of layout" sid="9586894918963988" type="System" />
             </conditions>
             <actions>
-                <action id="-9" name="Destroy" sid="446090924207179" type="Sprite" />
+                <action id="-9" name="Destroy" sid="446090924207179" type="Marker" />
+                <action id="-9" name="Set value" sid="8244644872036826" type="System">
+                    <param id="0" name="Variable">cMarker</param>
+                    <param id="1" name="Value">0</param>
+                </action>
+                <action id="-9" name="Set value" sid="8350279809547477" type="System">
+                    <param id="0" name="Variable">maxId</param>
+                    <param id="1" name="Value">0</param>
+                </action>
+                <action id="-9" name="Set value" sid="4894720701215268" type="System">
+                    <param id="0" name="Variable">play</param>
+                    <param id="1" name="Value">0</param>
+                </action>
             </actions>
         </event-block>
         <comment>Use the down arrow to allow the player to deliberately drop down through a jump-thru platform.</comment>
@@ -67,16 +83,24 @@
         </event-block>
         <event-block sid="9126252563479522">
             <conditions>
-                <condition id="0" name="On clicked" sid="2080205700683569" type="Button" />
+                <condition id="0" name="On clicked" sid="2080205700683569" type="PlayButton" />
             </conditions>
             <actions>
                 <action id="-9" name="Set value" sid="1159530623337639" type="System">
                     <param id="0" name="Variable">play</param>
                     <param id="1" name="Value">1</param>
                 </action>
+                <action behavior="ScrollTo" id="1" name="Set enabled" sid="2553555130682246" type="Player">
+                    <param id="0" name="State">1</param>
+                </action>
+                <action behavior="Timer" id="0" name="Start timer" sid="9210836394171702" type="Player">
+                    <param id="0" name="Duration">TIMETOMARKER</param>
+                    <param id="1" name="Type">0</param>
+                    <param id="2" name="Tag">&quot;&quot;</param>
+                </action>
             </actions>
         </event-block>
-        <event-block collapsed="1" sid="8827902258940329">
+        <event-block sid="8827902258940329">
             <conditions>
                 <condition id="-1" name="Every tick" sid="6819702379296129" type="System" />
                 <condition id="-14" name="Compare variable" sid="9704594586135598" type="System">
@@ -85,8 +109,8 @@
                     <param id="2" name="Value">1</param>
                 </condition>
                 <condition id="-34" name="Pick by evaluate" sid="8331188349916884" type="System">
-                    <param id="0" name="Object">Sprite</param>
-                    <param id="1" name="Expression">Sprite.id =cMarker</param>
+                    <param id="0" name="Object">Marker</param>
+                    <param id="1" name="Expression">Marker.id =cMarker</param>
                 </condition>
             </conditions>
             <actions />
@@ -94,7 +118,7 @@
                 <event-block sid="3925471550621446">
                     <conditions>
                         <condition id="-8" name="Compare two values" sid="6465290242286087" type="System">
-                            <param id="0" name="First value">distance(Player.X,Player.Y,Sprite.X,Sprite.Y)</param>
+                            <param id="0" name="First value">distance(Player.X,Player.Y,Marker.X,Marker.Y)</param>
                             <param id="1" name="Comparison">5</param>
                             <param id="2" name="Second value">10</param>
                         </condition>
@@ -106,7 +130,7 @@
                                 <condition id="-8" name="Compare two values" sid="6615916404430188" type="System">
                                     <param id="0" name="First value">Player.X</param>
                                     <param id="1" name="Comparison">3</param>
-                                    <param id="2" name="Second value">Sprite.X</param>
+                                    <param id="2" name="Second value">Marker.X</param>
                                 </condition>
                             </conditions>
                             <actions>
@@ -135,17 +159,17 @@
                 </event-block>
             </sub-events>
         </event-block>
-        <event-block collapsed="1" sid="9682832708785598">
+        <event-block sid="9682832708785598">
             <conditions>
                 <condition id="0" name="On collision with another object" sid="6741122540066685" type="Player">
-                    <param id="0" name="Object">Sprite</param>
+                    <param id="0" name="Object">Marker</param>
                 </condition>
             </conditions>
             <actions />
             <sub-events>
                 <event-block sid="3578717252265481">
                     <conditions>
-                        <condition id="-7" name="Compare instance variable" sid="1688299916517013" type="Sprite">
+                        <condition id="-7" name="Compare instance variable" sid="1688299916517013" type="Marker">
                             <param id="0" name="Instance variable">action</param>
                             <param id="1" name="Comparison">0</param>
                             <param id="2" name="Value">&quot;jump&quot;</param>
@@ -168,7 +192,7 @@
                         <condition id="-8" name="Compare two values" sid="2412364595117755" type="System">
                             <param id="0" name="First value">Player.X</param>
                             <param id="1" name="Comparison">3</param>
-                            <param id="2" name="Second value">Sprite.X</param>
+                            <param id="2" name="Second value">Marker.X</param>
                         </condition>
                     </conditions>
                     <actions>
@@ -199,12 +223,38 @@
                 <event-block sid="3469043729391893">
                     <conditions />
                     <actions>
-                        <action id="-9" name="Destroy" sid="8476168046212616" type="Sprite" />
+                        <action id="-9" name="Destroy" sid="8476168046212616" type="Marker" />
                         <action id="-10" name="Add to" sid="8150206651769657" type="System">
                             <param id="0" name="Variable">cMarker</param>
                             <param id="1" name="Value">1</param>
                         </action>
+                        <action behavior="Timer" id="0" name="Start timer" sid="8522937246478802" type="Player">
+                            <param id="0" name="Duration">TIMETOMARKER</param>
+                            <param id="1" name="Type">0</param>
+                            <param id="2" name="Tag">&quot;&quot;</param>
+                        </action>
                     </actions>
+                    <sub-events>
+                        <event-block disabled="1" sid="6437153618253364">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="7436661805567887" type="System">
+                                    <param id="0" name="First value">cMarker</param>
+                                    <param id="1" name="Comparison">5</param>
+                                    <param id="2" name="Second value">maxId</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Alert" sid="9023474885936576" type="Browser">
+                                    <param id="0" name="Message">&quot;fail!&quot;</param>
+                                </action>
+                                <action id="-26" name="Restart layout" sid="2800008405043248" type="System" />
+                            </actions>
+                        </event-block>
+                        <event-block sid="3827619488023732">
+                            <conditions />
+                            <actions />
+                        </event-block>
+                    </sub-events>
                 </event-block>
             </sub-events>
         </event-block>
@@ -223,9 +273,14 @@
                 </action>
             </actions>
         </event-block>
-        <event-block collapsed="1" sid="5219001097164774">
+        <event-block sid="5219001097164774">
             <conditions>
-                <condition id="0" name="On clicked" sid="4390623347030904" type="Undo" />
+                <condition id="0" name="On clicked" sid="4390623347030904" type="UndoButton" />
+                <condition id="-14" name="Compare variable" sid="2268783877116483" type="System">
+                    <param id="0" name="Variable">maxId</param>
+                    <param id="1" name="Comparison">4</param>
+                    <param id="2" name="Value">0</param>
+                </condition>
             </conditions>
             <actions>
                 <action id="-9" name="Set value" sid="6647037135459937" type="System">
@@ -248,11 +303,11 @@
                     </conditions>
                     <actions />
                     <sub-events>
-                        <event-block collapsed="1" sid="1125931618486108">
+                        <event-block sid="1125931618486108">
                             <conditions>
                                 <condition id="-34" name="Pick by evaluate" sid="8243538163571837" type="System">
-                                    <param id="0" name="Object">Sprite</param>
-                                    <param id="1" name="Expression">Sprite.id=maxId</param>
+                                    <param id="0" name="Object">Marker</param>
+                                    <param id="1" name="Expression">Marker.id=maxId</param>
                                 </condition>
                             </conditions>
                             <actions />
@@ -260,7 +315,7 @@
                                 <event-block sid="6304504684403958">
                                     <conditions>
                                         <condition id="-8" name="Compare two values" sid="5156710105840489" type="System">
-                                            <param id="0" name="First value">Sprite.action</param>
+                                            <param id="0" name="First value">Marker.action</param>
                                             <param id="1" name="Comparison">0</param>
                                             <param id="2" name="Second value">&quot;jump&quot;</param>
                                         </condition>
@@ -284,7 +339,7 @@
                                 <event-block sid="5100328395213183">
                                     <conditions />
                                     <actions>
-                                        <action id="-9" name="Destroy" sid="6917106204586886" type="Sprite" />
+                                        <action id="-9" name="Destroy" sid="6917106204586886" type="Marker" />
                                     </actions>
                                 </event-block>
                             </sub-events>
@@ -305,50 +360,93 @@
                 </event-block>
             </sub-events>
         </event-block>
-        <event-block collapsed="1" sid="479838664316745">
+        <event-block sid="479838664316745">
             <conditions>
                 <condition id="0" name="On function" sid="4139816251166738" type="Function">
                     <param id="0" name="Name">&quot;placeMarker&quot;</param>
                 </condition>
             </conditions>
-            <actions>
-                <action id="-3" name="Create object" sid="3783801119860993" type="System">
-                    <param id="0" name="Object to create">Sprite</param>
-                    <param id="1" name="Layer">1</param>
-                    <param id="2" name="X">Mouse.X</param>
-                    <param id="3" name="Y">Mouse.Y</param>
-                </action>
-                <action id="-10" name="Set value" sid="4806472524906027" type="Sprite">
-                    <param id="0" name="Instance variable">id</param>
-                    <param id="1" name="Value">maxId</param>
-                </action>
-                <action id="-10" name="Add to" sid="4594148976930849" type="System">
-                    <param id="0" name="Variable">maxId</param>
-                    <param id="1" name="Value">1</param>
-                </action>
-                <action id="0" name="Set text" sid="3055168514792386" type="Text2">
-                    <param id="0" name="Text">str(Sprite.id)</param>
-                </action>
-                <action id="0" name="Set text" sid="7144708881801278" type="runToCounter">
-                    <param id="0" name="Text">str(int(runToCounter.Text)-1)</param>
-                </action>
-            </actions>
+            <actions />
             <sub-events>
                 <event-block sid="6589062706508949">
                     <conditions>
-                        <condition id="1" name="Compare parameter" sid="7052664568331449" type="Function">
-                            <param id="0" name="Index">0</param>
+                        <condition id="-14" name="Compare variable" sid="737282710385984" type="System">
+                            <param id="0" name="Variable">currentAction</param>
                             <param id="1" name="Comparison">0</param>
                             <param id="2" name="Value">&quot;jump&quot;</param>
                         </condition>
                     </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="2684933745232263">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="921476196724946" type="System">
+                                    <param id="0" name="First value">int(jumpCounter.Text)</param>
+                                    <param id="1" name="Comparison">4</param>
+                                    <param id="2" name="Second value">0</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-3" name="Create object" sid="3783801119860993" type="System">
+                                    <param id="0" name="Object to create">Marker</param>
+                                    <param id="1" name="Layer">&quot;Game&quot;</param>
+                                    <param id="2" name="X">Touch.X</param>
+                                    <param id="3" name="Y">Touch.Y</param>
+                                </action>
+                                <action id="-10" name="Set value" sid="4806472524906027" type="Marker">
+                                    <param id="0" name="Instance variable">id</param>
+                                    <param id="1" name="Value">maxId</param>
+                                </action>
+                                <action id="-10" name="Add to" sid="4594148976930849" type="System">
+                                    <param id="0" name="Variable">maxId</param>
+                                    <param id="1" name="Value">1</param>
+                                </action>
+                                <action id="0" name="Set text" sid="3055168514792386" type="markerCounter">
+                                    <param id="0" name="Text">str(Marker.id)</param>
+                                </action>
+                                <action id="-10" name="Set value" sid="925786082957503" type="Marker">
+                                    <param id="0" name="Instance variable">action</param>
+                                    <param id="1" name="Value">&quot;jump&quot;</param>
+                                </action>
+                                <action id="5" name="Set frame" sid="4577204153544001" type="Marker">
+                                    <param id="0" name="Frame number">1</param>
+                                </action>
+                                <action id="0" name="Set text" sid="4982624400368029" type="jumpCounter">
+                                    <param id="0" name="Text">str(int(jumpCounter.Text)-1)</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="8654282488386833">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="767299859109356" type="System" />
+                        <condition id="-8" name="Compare two values" sid="9041547364479973" type="System">
+                            <param id="0" name="First value">int(runToCounter.Text)</param>
+                            <param id="1" name="Comparison">4</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
                     <actions>
-                        <action id="-10" name="Set value" sid="925786082957503" type="Sprite">
-                            <param id="0" name="Instance variable">action</param>
-                            <param id="1" name="Value">&quot;jump&quot;</param>
+                        <action id="-3" name="Create object" sid="5863032560798569" type="System">
+                            <param id="0" name="Object to create">Marker</param>
+                            <param id="1" name="Layer">&quot;Game&quot;</param>
+                            <param id="2" name="X">Touch.X</param>
+                            <param id="3" name="Y">Touch.Y</param>
                         </action>
-                        <action id="5" name="Set frame" sid="4577204153544001" type="Sprite">
-                            <param id="0" name="Frame number">1</param>
+                        <action id="-10" name="Set value" sid="127791555446356" type="Marker">
+                            <param id="0" name="Instance variable">id</param>
+                            <param id="1" name="Value">maxId</param>
+                        </action>
+                        <action id="-10" name="Add to" sid="8977351277474616" type="System">
+                            <param id="0" name="Variable">maxId</param>
+                            <param id="1" name="Value">1</param>
+                        </action>
+                        <action id="0" name="Set text" sid="597892041118422" type="markerCounter">
+                            <param id="0" name="Text">str(Marker.id)</param>
+                        </action>
+                        <action id="0" name="Set text" sid="7144708881801278" type="runToCounter">
+                            <param id="0" name="Text">str(int(runToCounter.Text)-1)</param>
                         </action>
                     </actions>
                 </event-block>
@@ -356,26 +454,175 @@
         </event-block>
         <event-block sid="6732344872942024">
             <conditions>
-                <condition id="10" name="On Nth touch start" sid="9880601928187893" type="Touch">
+                <condition id="11" name="On Nth touch end" sid="9880601928187893" type="Touch">
                     <param id="0" name="Touch number">0</param>
                 </condition>
             </conditions>
+            <actions />
+            <sub-events>
+                <event-block sid="6565347934604266">
+                    <conditions>
+                        <condition id="4" name="Is touching object" sid="2984779619061912" type="Touch">
+                            <param id="0" name="Object">BackgroundTile</param>
+                        </condition>
+                        <condition id="7" name="Compare touch speed" sid="8096356866163439" type="Touch">
+                            <param id="0" name="Touch index">0</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Speed">0</param>
+                        </condition>
+                        <condition id="4" inverted="1" name="Is touching object" sid="5983752671452148" type="Touch">
+                            <param id="0" name="Object">jumpButton</param>
+                        </condition>
+                        <condition id="4" inverted="1" name="Is touching object" sid="4452069818619849" type="Touch">
+                            <param id="0" name="Object">runButton</param>
+                        </condition>
+                        <condition id="4" inverted="1" name="Is touching object" sid="858806286678171" type="Touch">
+                            <param id="0" name="Object">PlayButton</param>
+                        </condition>
+                        <condition id="4" inverted="1" name="Is touching object" sid="408402438800787" type="Touch">
+                            <param id="0" name="Object">UndoButton</param>
+                        </condition>
+                        <condition id="4" inverted="1" name="Is touching object" sid="8154965534932897" type="Touch">
+                            <param id="0" name="Object">SolidTile</param>
+                        </condition>
+                        <condition id="-8" name="Compare two values" sid="5205509417479675" type="System">
+                            <param id="0" name="First value">distance(TouchLastX,TouchLastY,Touch.X(&quot;UI&quot;),Touch.Y(&quot;UI&quot;) ) </param>
+                            <param id="1" name="Comparison">2</param>
+                            <param id="2" name="Second value">5</param>
+                        </condition>
+                        <condition id="-8" name="Compare two values" sid="3998553046767428" type="System">
+                            <param id="0" name="First value">play</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="0" name="Call function" sid="2299346272493035" type="Function">
+                            <param id="0" name="Name">&quot;placeMarker&quot;</param>
+                            <param id="1" name="Parameter {n}"></param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="5736638573940964">
+                    <conditions />
+                    <actions />
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block sid="3479185510858068">
+            <conditions />
+            <actions />
+        </event-block>
+        <event-block sid="6175548220700343">
+            <conditions>
+                <condition id="3" name="On touched object" sid="4607810283368039" type="Touch">
+                    <param id="0" name="Object">runButton</param>
+                </condition>
+            </conditions>
             <actions>
-                <action id="0" name="Call function" sid="2299346272493035" type="Function">
-                    <param id="0" name="Name">&quot;placeMarker&quot;</param>
-                    <param id="1" name="Parameter {n}"></param>
+                <action id="5" name="Set frame" sid="878096880058304" type="runButton">
+                    <param id="0" name="Frame number">1</param>
+                </action>
+                <action id="5" name="Set frame" sid="9483481161178176" type="jumpButton">
+                    <param id="0" name="Frame number">0</param>
+                </action>
+                <action id="-9" name="Set value" sid="640361755418034" type="System">
+                    <param id="0" name="Variable">currentAction</param>
+                    <param id="1" name="Value">&quot;&quot;</param>
                 </action>
             </actions>
         </event-block>
-        <event-block sid="3479185510858068">
+        <event-block sid="3032452355207492">
             <conditions>
-                <condition id="7" name="Compare touch speed" sid="9290195260581115" type="Touch">
-                    <param id="0" name="Touch index">0</param>
-                    <param id="1" name="Comparison">3</param>
-                    <param id="2" name="Speed">2</param>
+                <condition id="3" name="On touched object" sid="1581523943752692" type="Touch">
+                    <param id="0" name="Object">jumpButton</param>
                 </condition>
             </conditions>
-            <actions />
+            <actions>
+                <action id="5" name="Set frame" sid="7960847831172939" type="jumpButton">
+                    <param id="0" name="Frame number">1</param>
+                </action>
+                <action id="5" name="Set frame" sid="3643863408758573" type="runButton">
+                    <param id="0" name="Frame number">0</param>
+                </action>
+                <action id="-9" name="Set value" sid="4035061308947018" type="System">
+                    <param id="0" name="Variable">currentAction</param>
+                    <param id="1" name="Value">&quot;jump&quot;</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="1059072336095674">
+            <conditions>
+                <condition behavior="Timer" id="0" name="On timer" sid="4680868378197237" type="Player">
+                    <param id="0" name="Tag">&quot;&quot;</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="0" name="Alert" sid="7317170457471333" type="Browser">
+                    <param id="0" name="Message">&quot;You STUCK!&quot;</param>
+                </action>
+                <action id="-26" name="Restart layout" sid="3885935617370327" type="System" />
+            </actions>
+        </event-block>
+        <event-block sid="1728515655500697">
+            <conditions>
+                <condition id="0" name="On collision with another object" sid="6573280441655532" type="Player">
+                    <param id="0" name="Object">DeathTile</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-26" name="Restart layout" sid="7939857117256571" type="System" />
+            </actions>
+        </event-block>
+        <event-block sid="1556958829921694">
+            <conditions>
+                <condition id="9" name="Is overlapping at offset" sid="7089439347353751" type="Player">
+                    <param id="0" name="Object">FallTile</param>
+                    <param id="1" name="Offset X">0</param>
+                    <param id="2" name="Offset Y">10</param>
+                </condition>
+                <condition id="-8" name="Compare two values" sid="1410458308623128" type="System">
+                    <param id="0" name="First value">Player.Y</param>
+                    <param id="1" name="Comparison">3</param>
+                    <param id="2" name="Second value">FallTile.Y</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-16" name="Wait" sid="8385200330615928" type="System">
+                    <param id="0" name="Seconds">0.5</param>
+                </action>
+                <action behavior="Physics" id="21" name="Set immovable" sid="9568150088245632" type="FallTile">
+                    <param id="0" name="Setting">0</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="2001964900944484">
+            <conditions>
+                <condition id="9" name="Is overlapping at offset" sid="3365500470388627" type="Player">
+                    <param id="0" name="Object">CrumbleBlock</param>
+                    <param id="1" name="Offset X">0</param>
+                    <param id="2" name="Offset Y">10</param>
+                </condition>
+                <condition id="2" name="Is playing" sid="7749537992851052" type="CrumbleBlock">
+                    <param id="0" name="Animation">&quot;Default&quot;</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="4" name="Set animation" sid="563860161158637" type="CrumbleBlock">
+                    <param id="0" name="Animation">&quot;Crumble&quot;</param>
+                    <param id="1" name="From">1</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="5908005355719573">
+            <conditions>
+                <condition id="4" name="On finished" sid="2617032612590027" type="CrumbleBlock">
+                    <param id="0" name="Animation">&quot;Crumble&quot;</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-9" name="Destroy" sid="233706408366129" type="CrumbleBlock" />
+            </actions>
         </event-block>
     </events>
 </c2eventsheet>

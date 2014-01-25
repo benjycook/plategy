@@ -10,9 +10,14 @@ you probably do not want to add any .uistate.xml files to the repository.-->
         <display name="HTML5" />
     </configurations>
     <open-tabs>
-        <layout>Layout 1</layout>
-        <event-sheet active="1">main</event-sheet>
+        <layout>Level 1</layout>
+        <layout active="1">Opening</layout>
+        <layout>Level 2</layout>
+        <event-sheet>main</event-sheet>
         <event-sheet>pan</event-sheet>
+        <event-sheet>locomotion</event-sheet>
+        <event-sheet>opening</event-sheet>
+        <event-sheet>Level 1</event-sheet>
     </open-tabs>
     <properties>
         <property expanded="1" name="About" />

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>opening</name>
+    <events>
+        <event-block sid="6789030718682054">
+            <conditions>
+                <condition id="0" name="On any touch start" sid="994748924710298" type="Touch" />
+            </conditions>
+            <actions>
+                <action id="-2" name="Go to layout" sid="7389387111693814" type="System">
+                    <param id="0" name="Layout">Level 1</param>
+                </action>
+            </actions>
+        </event-block>
+    </events>
+</c2eventsheet>

@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>locomotion</name>
+    <events>
+        <event-block sid="5718005744848906">
+            <conditions>
+                <condition behavior="Platform" id="3" name="Is jumping" sid="4871116020455023" type="Player" />
+            </conditions>
+            <actions>
+                <action id="4" name="Set animation" sid="4188184756668739" type="Player">
+                    <param id="0" name="Animation">&quot;Jump&quot;</param>
+                    <param id="1" name="From">1</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="2909994337609827">
+            <conditions>
+                <condition id="-22" name="Else" sid="7268499500821702" type="System" />
+            </conditions>
+            <actions />
+            <sub-events>
+                <event-block sid="7785467170187492">
+                    <conditions>
+                        <condition behavior="Platform" id="4" name="Is falling" sid="4788010291676875" type="Player" />
+                    </conditions>
+                    <actions>
+                        <action id="4" name="Set animation" sid="6519188169957973" type="Player">
+                            <param id="0" name="Animation">&quot;Fall&quot;</param>
+                            <param id="1" name="From">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="4877176905868426">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="4407215039581595" type="System" />
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="9233637554680063">
+                            <conditions>
+                                <condition behavior="Physics" id="1" name="Compare velocity" sid="2195822092236029" type="Player">
+                                    <param id="0" name="Which">0</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Value">0</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="4" name="Set animation" sid="1810390028819736" type="Player">
+                                    <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                    <param id="1" name="From">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="5752226907871844">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="3182370372385911" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="4" name="Set animation" sid="2776840477202293" type="Player">
+                                    <param id="0" name="Animation">&quot;Walk&quot;</param>
+                                    <param id="1" name="From">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-block>
+    </events>
+</c2eventsheet>

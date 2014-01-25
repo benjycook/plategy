@@ -3,72 +3,86 @@
     <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
     <name>pan</name>
     <events>
-        <variable comment="ID of the touch using to pan" constant="0" name="TouchPanID" sid="4307575874630259" static="0" type="number">-1</variable>
-        <variable comment="Initial X position of touch (for pan)" constant="0" name="TouchLastX" sid="8247950022313521" static="0" type="number">0</variable>
-        <variable comment="Initial Y position of touch (for pan)" constant="0" name="TouchLastY" sid="4563840306723032" static="0" type="number">0</variable>
-        <comment>If the user touches, and we&apos;re not already panning with a different touch, store the touch ID and the position of the touch. Note we get the position of the touch from a separate layer which has a parallax of 0, otherwise panning the view would alter the reported touch position, resulting in confusing feedback loops.</comment>
-        <event-block sid="9695464963241578">
+        <variable comment="ID of the touch using to pan" constant="0" name="TouchPanID" sid="338062665038466" static="0" type="number">-1</variable>
+        <variable comment="Initial X position of touch (for pan)" constant="0" name="TouchLastX" sid="7922573783287643" static="0" type="number">0</variable>
+        <variable comment="Initial Y position of touch (for pan)" constant="0" name="TouchLastY" sid="6948754525846232" static="0" type="number">0</variable>
+        <event-block sid="6644939458668234">
             <conditions>
-                <condition id="0" name="On any touch start" sid="9191104846563662" type="Touch" />
-                <condition id="-14" name="Compare variable" sid="2164626215755954" type="System">
+                <condition id="10" name="On Nth touch start" sid="2372362540582319" type="Touch">
+                    <param id="0" name="Touch number">0</param>
+                </condition>
+                <condition id="-14" name="Compare variable" sid="6438760679681248" type="System">
                     <param id="0" name="Variable">TouchPanID</param>
                     <param id="1" name="Comparison">0</param>
                     <param id="2" name="Value">-1</param>
                 </condition>
             </conditions>
             <actions>
-                <action id="-9" name="Set value" sid="3579167274302501" type="System">
-                    <param id="0" name="Variable">TouchPanID</param>
-                    <param id="1" name="Value">Touch.TouchID</param>
-                </action>
-                <action id="-9" name="Set value" sid="4079024521537529" type="System">
+                <action id="-9" name="Set value" sid="50329450433337" type="System">
                     <param id="0" name="Variable">TouchLastX</param>
                     <param id="1" name="Value">Touch.X(&quot;UI&quot;)</param>
                 </action>
-                <action id="-9" name="Set value" sid="5823382554629646" type="System">
+                <action id="-9" name="Set value" sid="5667300432954841" type="System">
                     <param id="0" name="Variable">TouchLastY</param>
                     <param id="1" name="Value">Touch.Y(&quot;UI&quot;)</param>
+                </action>
+                <action id="-9" name="Set value" sid="2917942078611402" type="System">
+                    <param id="0" name="Variable">TouchPanID</param>
+                    <param id="1" name="Value">Touch.TouchID</param>
                 </action>
             </actions>
         </event-block>
         <comment>While we have a touch to pan with, offset the scroll position by the change in position of the touch. This makes the view scroll with the touch.</comment>
-        <event-block sid="5365707400980339">
+        <event-block sid="4953565248164034">
             <conditions>
-                <condition id="-14" name="Compare variable" sid="9932430961643623" type="System">
+                <condition id="-14" name="Compare variable" sid="9129986219648992" type="System">
                     <param id="0" name="Variable">TouchPanID</param>
                     <param id="1" name="Comparison">5</param>
                     <param id="2" name="Value">0</param>
                 </condition>
             </conditions>
             <actions>
-                <action id="-7" name="Scroll to position" sid="3166862516685749" type="System">
+                <action id="-7" name="Scroll to position" sid="3116804744796222" type="System">
                     <param id="0" name="X">scrollx - (Touch.X(&quot;UI&quot;) - TouchLastX) / LayerScale(&quot;Game&quot;)</param>
                     <param id="1" name="Y">scrolly - (Touch.Y(&quot;UI&quot;) - TouchLastY) / LayerScale(&quot;Game&quot;)</param>
                 </action>
-                <action id="-9" name="Set value" sid="4094903953510094" type="System">
+                <action id="-9" name="Set value" sid="4314014716954999" type="System">
                     <param id="0" name="Variable">TouchLastX</param>
                     <param id="1" name="Value">Touch.X(&quot;UI&quot;)</param>
                 </action>
-                <action id="-9" name="Set value" sid="5239704588193112" type="System">
+                <action id="-9" name="Set value" sid="8759595657670731" type="System">
                     <param id="0" name="Variable">TouchLastY</param>
                     <param id="1" name="Value">Touch.Y(&quot;UI&quot;)</param>
                 </action>
             </actions>
         </event-block>
         <comment>When the touch we are panning with ends, reset the stored touch ID so we stop panning.</comment>
-        <event-block sid="494157463361098">
+        <event-block sid="3313446056468386">
             <conditions>
-                <condition id="1" name="On any touch end" sid="8611059514455349" type="Touch" />
-                <condition id="-14" name="Compare variable" sid="4351141601933288" type="System">
+                <condition id="11" name="On Nth touch end" sid="7632054589527746" type="Touch">
+                    <param id="0" name="Touch number">0</param>
+                </condition>
+                <condition id="-14" name="Compare variable" sid="2428009741203961" type="System">
                     <param id="0" name="Variable">TouchPanID</param>
                     <param id="1" name="Comparison">0</param>
                     <param id="2" name="Value">Touch.TouchID</param>
                 </condition>
             </conditions>
             <actions>
-                <action id="-9" name="Set value" sid="8581046602080429" type="System">
+                <action id="-9" name="Set value" sid="5792667922728954" type="System">
                     <param id="0" name="Variable">TouchPanID</param>
                     <param id="1" name="Value">-1</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Display the touch ID panning with.</comment>
+        <event-block sid="6297157323699082">
+            <conditions>
+                <condition id="-1" name="Every tick" sid="3952136464837139" type="System" />
+            </conditions>
+            <actions>
+                <action id="0" name="Set text" sid="1493532204888552" type="debug">
+                    <param id="0" name="Text">&quot;Panning with touch ID: &quot; &amp; TouchPanID</param>
                 </action>
             </actions>
         </event-block>
