@@ -1088,1198 +1088,6 @@ if (typeof Object.getPrototypeOf !== "function")
 			return a.toLowerCase() === b.toLowerCase();
 	};
 }());
-var MatrixArray=typeof Float32Array!=="undefined"?Float32Array:Array,glMatrixArrayType=MatrixArray,vec3={},mat3={},mat4={},quat4={};vec3.create=function(a){var b=new MatrixArray(3);a&&(b[0]=a[0],b[1]=a[1],b[2]=a[2]);return b};vec3.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];return b};vec3.add=function(a,b,c){if(!c||a===c)return a[0]+=b[0],a[1]+=b[1],a[2]+=b[2],a;c[0]=a[0]+b[0];c[1]=a[1]+b[1];c[2]=a[2]+b[2];return c};
-vec3.subtract=function(a,b,c){if(!c||a===c)return a[0]-=b[0],a[1]-=b[1],a[2]-=b[2],a;c[0]=a[0]-b[0];c[1]=a[1]-b[1];c[2]=a[2]-b[2];return c};vec3.negate=function(a,b){b||(b=a);b[0]=-a[0];b[1]=-a[1];b[2]=-a[2];return b};vec3.scale=function(a,b,c){if(!c||a===c)return a[0]*=b,a[1]*=b,a[2]*=b,a;c[0]=a[0]*b;c[1]=a[1]*b;c[2]=a[2]*b;return c};
-vec3.normalize=function(a,b){b||(b=a);var c=a[0],d=a[1],e=a[2],g=Math.sqrt(c*c+d*d+e*e);if(g){if(g===1)return b[0]=c,b[1]=d,b[2]=e,b}else return b[0]=0,b[1]=0,b[2]=0,b;g=1/g;b[0]=c*g;b[1]=d*g;b[2]=e*g;return b};vec3.cross=function(a,b,c){c||(c=a);var d=a[0],e=a[1],a=a[2],g=b[0],f=b[1],b=b[2];c[0]=e*b-a*f;c[1]=a*g-d*b;c[2]=d*f-e*g;return c};vec3.length=function(a){var b=a[0],c=a[1],a=a[2];return Math.sqrt(b*b+c*c+a*a)};vec3.dot=function(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]};
-vec3.direction=function(a,b,c){c||(c=a);var d=a[0]-b[0],e=a[1]-b[1],a=a[2]-b[2],b=Math.sqrt(d*d+e*e+a*a);if(!b)return c[0]=0,c[1]=0,c[2]=0,c;b=1/b;c[0]=d*b;c[1]=e*b;c[2]=a*b;return c};vec3.lerp=function(a,b,c,d){d||(d=a);d[0]=a[0]+c*(b[0]-a[0]);d[1]=a[1]+c*(b[1]-a[1]);d[2]=a[2]+c*(b[2]-a[2]);return d};vec3.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+"]"};
-mat3.create=function(a){var b=new MatrixArray(9);a&&(b[0]=a[0],b[1]=a[1],b[2]=a[2],b[3]=a[3],b[4]=a[4],b[5]=a[5],b[6]=a[6],b[7]=a[7],b[8]=a[8]);return b};mat3.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];return b};mat3.identity=function(a){a[0]=1;a[1]=0;a[2]=0;a[3]=0;a[4]=1;a[5]=0;a[6]=0;a[7]=0;a[8]=1;return a};
-mat3.transpose=function(a,b){if(!b||a===b){var c=a[1],d=a[2],e=a[5];a[1]=a[3];a[2]=a[6];a[3]=c;a[5]=a[7];a[6]=d;a[7]=e;return a}b[0]=a[0];b[1]=a[3];b[2]=a[6];b[3]=a[1];b[4]=a[4];b[5]=a[7];b[6]=a[2];b[7]=a[5];b[8]=a[8];return b};mat3.toMat4=function(a,b){b||(b=mat4.create());b[15]=1;b[14]=0;b[13]=0;b[12]=0;b[11]=0;b[10]=a[8];b[9]=a[7];b[8]=a[6];b[7]=0;b[6]=a[5];b[5]=a[4];b[4]=a[3];b[3]=0;b[2]=a[2];b[1]=a[1];b[0]=a[0];return b};
-mat3.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+", "+a[4]+", "+a[5]+", "+a[6]+", "+a[7]+", "+a[8]+"]"};mat4.create=function(a){var b=new MatrixArray(16);a&&(b[0]=a[0],b[1]=a[1],b[2]=a[2],b[3]=a[3],b[4]=a[4],b[5]=a[5],b[6]=a[6],b[7]=a[7],b[8]=a[8],b[9]=a[9],b[10]=a[10],b[11]=a[11],b[12]=a[12],b[13]=a[13],b[14]=a[14],b[15]=a[15]);return b};
-mat4.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9];b[10]=a[10];b[11]=a[11];b[12]=a[12];b[13]=a[13];b[14]=a[14];b[15]=a[15];return b};mat4.identity=function(a){a[0]=1;a[1]=0;a[2]=0;a[3]=0;a[4]=0;a[5]=1;a[6]=0;a[7]=0;a[8]=0;a[9]=0;a[10]=1;a[11]=0;a[12]=0;a[13]=0;a[14]=0;a[15]=1;return a};
-mat4.transpose=function(a,b){if(!b||a===b){var c=a[1],d=a[2],e=a[3],g=a[6],f=a[7],h=a[11];a[1]=a[4];a[2]=a[8];a[3]=a[12];a[4]=c;a[6]=a[9];a[7]=a[13];a[8]=d;a[9]=g;a[11]=a[14];a[12]=e;a[13]=f;a[14]=h;return a}b[0]=a[0];b[1]=a[4];b[2]=a[8];b[3]=a[12];b[4]=a[1];b[5]=a[5];b[6]=a[9];b[7]=a[13];b[8]=a[2];b[9]=a[6];b[10]=a[10];b[11]=a[14];b[12]=a[3];b[13]=a[7];b[14]=a[11];b[15]=a[15];return b};
-mat4.determinant=function(a){var b=a[0],c=a[1],d=a[2],e=a[3],g=a[4],f=a[5],h=a[6],i=a[7],j=a[8],k=a[9],l=a[10],n=a[11],o=a[12],m=a[13],p=a[14],a=a[15];return o*k*h*e-j*m*h*e-o*f*l*e+g*m*l*e+j*f*p*e-g*k*p*e-o*k*d*i+j*m*d*i+o*c*l*i-b*m*l*i-j*c*p*i+b*k*p*i+o*f*d*n-g*m*d*n-o*c*h*n+b*m*h*n+g*c*p*n-b*f*p*n-j*f*d*a+g*k*d*a+j*c*h*a-b*k*h*a-g*c*l*a+b*f*l*a};
-mat4.inverse=function(a,b){b||(b=a);var c=a[0],d=a[1],e=a[2],g=a[3],f=a[4],h=a[5],i=a[6],j=a[7],k=a[8],l=a[9],n=a[10],o=a[11],m=a[12],p=a[13],r=a[14],s=a[15],A=c*h-d*f,B=c*i-e*f,t=c*j-g*f,u=d*i-e*h,v=d*j-g*h,w=e*j-g*i,x=k*p-l*m,y=k*r-n*m,z=k*s-o*m,C=l*r-n*p,D=l*s-o*p,E=n*s-o*r,q=1/(A*E-B*D+t*C+u*z-v*y+w*x);b[0]=(h*E-i*D+j*C)*q;b[1]=(-d*E+e*D-g*C)*q;b[2]=(p*w-r*v+s*u)*q;b[3]=(-l*w+n*v-o*u)*q;b[4]=(-f*E+i*z-j*y)*q;b[5]=(c*E-e*z+g*y)*q;b[6]=(-m*w+r*t-s*B)*q;b[7]=(k*w-n*t+o*B)*q;b[8]=(f*D-h*z+j*x)*q;
-b[9]=(-c*D+d*z-g*x)*q;b[10]=(m*v-p*t+s*A)*q;b[11]=(-k*v+l*t-o*A)*q;b[12]=(-f*C+h*y-i*x)*q;b[13]=(c*C-d*y+e*x)*q;b[14]=(-m*u+p*B-r*A)*q;b[15]=(k*u-l*B+n*A)*q;return b};mat4.toRotationMat=function(a,b){b||(b=mat4.create());b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9];b[10]=a[10];b[11]=a[11];b[12]=0;b[13]=0;b[14]=0;b[15]=1;return b};
-mat4.toMat3=function(a,b){b||(b=mat3.create());b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[4];b[4]=a[5];b[5]=a[6];b[6]=a[8];b[7]=a[9];b[8]=a[10];return b};mat4.toInverseMat3=function(a,b){var c=a[0],d=a[1],e=a[2],g=a[4],f=a[5],h=a[6],i=a[8],j=a[9],k=a[10],l=k*f-h*j,n=-k*g+h*i,o=j*g-f*i,m=c*l+d*n+e*o;if(!m)return null;m=1/m;b||(b=mat3.create());b[0]=l*m;b[1]=(-k*d+e*j)*m;b[2]=(h*d-e*f)*m;b[3]=n*m;b[4]=(k*c-e*i)*m;b[5]=(-h*c+e*g)*m;b[6]=o*m;b[7]=(-j*c+d*i)*m;b[8]=(f*c-d*g)*m;return b};
-mat4.multiply=function(a,b,c){c||(c=a);var d=a[0],e=a[1],g=a[2],f=a[3],h=a[4],i=a[5],j=a[6],k=a[7],l=a[8],n=a[9],o=a[10],m=a[11],p=a[12],r=a[13],s=a[14],a=a[15],A=b[0],B=b[1],t=b[2],u=b[3],v=b[4],w=b[5],x=b[6],y=b[7],z=b[8],C=b[9],D=b[10],E=b[11],q=b[12],F=b[13],G=b[14],b=b[15];c[0]=A*d+B*h+t*l+u*p;c[1]=A*e+B*i+t*n+u*r;c[2]=A*g+B*j+t*o+u*s;c[3]=A*f+B*k+t*m+u*a;c[4]=v*d+w*h+x*l+y*p;c[5]=v*e+w*i+x*n+y*r;c[6]=v*g+w*j+x*o+y*s;c[7]=v*f+w*k+x*m+y*a;c[8]=z*d+C*h+D*l+E*p;c[9]=z*e+C*i+D*n+E*r;c[10]=z*g+C*
-j+D*o+E*s;c[11]=z*f+C*k+D*m+E*a;c[12]=q*d+F*h+G*l+b*p;c[13]=q*e+F*i+G*n+b*r;c[14]=q*g+F*j+G*o+b*s;c[15]=q*f+F*k+G*m+b*a;return c};mat4.multiplyVec3=function(a,b,c){c||(c=b);var d=b[0],e=b[1],b=b[2];c[0]=a[0]*d+a[4]*e+a[8]*b+a[12];c[1]=a[1]*d+a[5]*e+a[9]*b+a[13];c[2]=a[2]*d+a[6]*e+a[10]*b+a[14];return c};
-mat4.multiplyVec4=function(a,b,c){c||(c=b);var d=b[0],e=b[1],g=b[2],b=b[3];c[0]=a[0]*d+a[4]*e+a[8]*g+a[12]*b;c[1]=a[1]*d+a[5]*e+a[9]*g+a[13]*b;c[2]=a[2]*d+a[6]*e+a[10]*g+a[14]*b;c[3]=a[3]*d+a[7]*e+a[11]*g+a[15]*b;return c};
-mat4.translate=function(a,b,c){var d=b[0],e=b[1],b=b[2],g,f,h,i,j,k,l,n,o,m,p,r;if(!c||a===c)return a[12]=a[0]*d+a[4]*e+a[8]*b+a[12],a[13]=a[1]*d+a[5]*e+a[9]*b+a[13],a[14]=a[2]*d+a[6]*e+a[10]*b+a[14],a[15]=a[3]*d+a[7]*e+a[11]*b+a[15],a;g=a[0];f=a[1];h=a[2];i=a[3];j=a[4];k=a[5];l=a[6];n=a[7];o=a[8];m=a[9];p=a[10];r=a[11];c[0]=g;c[1]=f;c[2]=h;c[3]=i;c[4]=j;c[5]=k;c[6]=l;c[7]=n;c[8]=o;c[9]=m;c[10]=p;c[11]=r;c[12]=g*d+j*e+o*b+a[12];c[13]=f*d+k*e+m*b+a[13];c[14]=h*d+l*e+p*b+a[14];c[15]=i*d+n*e+r*b+a[15];
-return c};mat4.scale=function(a,b,c){var d=b[0],e=b[1],b=b[2];if(!c||a===c)return a[0]*=d,a[1]*=d,a[2]*=d,a[3]*=d,a[4]*=e,a[5]*=e,a[6]*=e,a[7]*=e,a[8]*=b,a[9]*=b,a[10]*=b,a[11]*=b,a;c[0]=a[0]*d;c[1]=a[1]*d;c[2]=a[2]*d;c[3]=a[3]*d;c[4]=a[4]*e;c[5]=a[5]*e;c[6]=a[6]*e;c[7]=a[7]*e;c[8]=a[8]*b;c[9]=a[9]*b;c[10]=a[10]*b;c[11]=a[11]*b;c[12]=a[12];c[13]=a[13];c[14]=a[14];c[15]=a[15];return c};
-mat4.rotate=function(a,b,c,d){var e=c[0],g=c[1],c=c[2],f=Math.sqrt(e*e+g*g+c*c),h,i,j,k,l,n,o,m,p,r,s,A,B,t,u,v,w,x,y,z;if(!f)return null;f!==1&&(f=1/f,e*=f,g*=f,c*=f);h=Math.sin(b);i=Math.cos(b);j=1-i;b=a[0];f=a[1];k=a[2];l=a[3];n=a[4];o=a[5];m=a[6];p=a[7];r=a[8];s=a[9];A=a[10];B=a[11];t=e*e*j+i;u=g*e*j+c*h;v=c*e*j-g*h;w=e*g*j-c*h;x=g*g*j+i;y=c*g*j+e*h;z=e*c*j+g*h;e=g*c*j-e*h;g=c*c*j+i;d?a!==d&&(d[12]=a[12],d[13]=a[13],d[14]=a[14],d[15]=a[15]):d=a;d[0]=b*t+n*u+r*v;d[1]=f*t+o*u+s*v;d[2]=k*t+m*u+A*
-v;d[3]=l*t+p*u+B*v;d[4]=b*w+n*x+r*y;d[5]=f*w+o*x+s*y;d[6]=k*w+m*x+A*y;d[7]=l*w+p*x+B*y;d[8]=b*z+n*e+r*g;d[9]=f*z+o*e+s*g;d[10]=k*z+m*e+A*g;d[11]=l*z+p*e+B*g;return d};mat4.rotateX=function(a,b,c){var d=Math.sin(b),b=Math.cos(b),e=a[4],g=a[5],f=a[6],h=a[7],i=a[8],j=a[9],k=a[10],l=a[11];c?a!==c&&(c[0]=a[0],c[1]=a[1],c[2]=a[2],c[3]=a[3],c[12]=a[12],c[13]=a[13],c[14]=a[14],c[15]=a[15]):c=a;c[4]=e*b+i*d;c[5]=g*b+j*d;c[6]=f*b+k*d;c[7]=h*b+l*d;c[8]=e*-d+i*b;c[9]=g*-d+j*b;c[10]=f*-d+k*b;c[11]=h*-d+l*b;return c};
-mat4.rotateY=function(a,b,c){var d=Math.sin(b),b=Math.cos(b),e=a[0],g=a[1],f=a[2],h=a[3],i=a[8],j=a[9],k=a[10],l=a[11];c?a!==c&&(c[4]=a[4],c[5]=a[5],c[6]=a[6],c[7]=a[7],c[12]=a[12],c[13]=a[13],c[14]=a[14],c[15]=a[15]):c=a;c[0]=e*b+i*-d;c[1]=g*b+j*-d;c[2]=f*b+k*-d;c[3]=h*b+l*-d;c[8]=e*d+i*b;c[9]=g*d+j*b;c[10]=f*d+k*b;c[11]=h*d+l*b;return c};
-mat4.rotateZ=function(a,b,c){var d=Math.sin(b),b=Math.cos(b),e=a[0],g=a[1],f=a[2],h=a[3],i=a[4],j=a[5],k=a[6],l=a[7];c?a!==c&&(c[8]=a[8],c[9]=a[9],c[10]=a[10],c[11]=a[11],c[12]=a[12],c[13]=a[13],c[14]=a[14],c[15]=a[15]):c=a;c[0]=e*b+i*d;c[1]=g*b+j*d;c[2]=f*b+k*d;c[3]=h*b+l*d;c[4]=e*-d+i*b;c[5]=g*-d+j*b;c[6]=f*-d+k*b;c[7]=h*-d+l*b;return c};
-mat4.frustum=function(a,b,c,d,e,g,f){f||(f=mat4.create());var h=b-a,i=d-c,j=g-e;f[0]=e*2/h;f[1]=0;f[2]=0;f[3]=0;f[4]=0;f[5]=e*2/i;f[6]=0;f[7]=0;f[8]=(b+a)/h;f[9]=(d+c)/i;f[10]=-(g+e)/j;f[11]=-1;f[12]=0;f[13]=0;f[14]=-(g*e*2)/j;f[15]=0;return f};mat4.perspective=function(a,b,c,d,e){a=c*Math.tan(a*Math.PI/360);b*=a;return mat4.frustum(-b,b,-a,a,c,d,e)};
-mat4.ortho=function(a,b,c,d,e,g,f){f||(f=mat4.create());var h=b-a,i=d-c,j=g-e;f[0]=2/h;f[1]=0;f[2]=0;f[3]=0;f[4]=0;f[5]=2/i;f[6]=0;f[7]=0;f[8]=0;f[9]=0;f[10]=-2/j;f[11]=0;f[12]=-(a+b)/h;f[13]=-(d+c)/i;f[14]=-(g+e)/j;f[15]=1;return f};
-mat4.lookAt=function(a,b,c,d){d||(d=mat4.create());var e,g,f,h,i,j,k,l,n=a[0],o=a[1],a=a[2];g=c[0];f=c[1];e=c[2];c=b[1];j=b[2];if(n===b[0]&&o===c&&a===j)return mat4.identity(d);c=n-b[0];j=o-b[1];k=a-b[2];l=1/Math.sqrt(c*c+j*j+k*k);c*=l;j*=l;k*=l;b=f*k-e*j;e=e*c-g*k;g=g*j-f*c;(l=Math.sqrt(b*b+e*e+g*g))?(l=1/l,b*=l,e*=l,g*=l):g=e=b=0;f=j*g-k*e;h=k*b-c*g;i=c*e-j*b;(l=Math.sqrt(f*f+h*h+i*i))?(l=1/l,f*=l,h*=l,i*=l):i=h=f=0;d[0]=b;d[1]=f;d[2]=c;d[3]=0;d[4]=e;d[5]=h;d[6]=j;d[7]=0;d[8]=g;d[9]=i;d[10]=k;d[11]=
-0;d[12]=-(b*n+e*o+g*a);d[13]=-(f*n+h*o+i*a);d[14]=-(c*n+j*o+k*a);d[15]=1;return d};mat4.fromRotationTranslation=function(a,b,c){c||(c=mat4.create());var d=a[0],e=a[1],g=a[2],f=a[3],h=d+d,i=e+e,j=g+g,a=d*h,k=d*i;d*=j;var l=e*i;e*=j;g*=j;h*=f;i*=f;f*=j;c[0]=1-(l+g);c[1]=k+f;c[2]=d-i;c[3]=0;c[4]=k-f;c[5]=1-(a+g);c[6]=e+h;c[7]=0;c[8]=d+i;c[9]=e-h;c[10]=1-(a+l);c[11]=0;c[12]=b[0];c[13]=b[1];c[14]=b[2];c[15]=1;return c};
-mat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+", "+a[4]+", "+a[5]+", "+a[6]+", "+a[7]+", "+a[8]+", "+a[9]+", "+a[10]+", "+a[11]+", "+a[12]+", "+a[13]+", "+a[14]+", "+a[15]+"]"};quat4.create=function(a){var b=new MatrixArray(4);a&&(b[0]=a[0],b[1]=a[1],b[2]=a[2],b[3]=a[3]);return b};quat4.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];return b};
-quat4.calculateW=function(a,b){var c=a[0],d=a[1],e=a[2];if(!b||a===b)return a[3]=-Math.sqrt(Math.abs(1-c*c-d*d-e*e)),a;b[0]=c;b[1]=d;b[2]=e;b[3]=-Math.sqrt(Math.abs(1-c*c-d*d-e*e));return b};quat4.inverse=function(a,b){if(!b||a===b)return a[0]*=-1,a[1]*=-1,a[2]*=-1,a;b[0]=-a[0];b[1]=-a[1];b[2]=-a[2];b[3]=a[3];return b};quat4.length=function(a){var b=a[0],c=a[1],d=a[2],a=a[3];return Math.sqrt(b*b+c*c+d*d+a*a)};
-quat4.normalize=function(a,b){b||(b=a);var c=a[0],d=a[1],e=a[2],g=a[3],f=Math.sqrt(c*c+d*d+e*e+g*g);if(f===0)return b[0]=0,b[1]=0,b[2]=0,b[3]=0,b;f=1/f;b[0]=c*f;b[1]=d*f;b[2]=e*f;b[3]=g*f;return b};quat4.multiply=function(a,b,c){c||(c=a);var d=a[0],e=a[1],g=a[2],a=a[3],f=b[0],h=b[1],i=b[2],b=b[3];c[0]=d*b+a*f+e*i-g*h;c[1]=e*b+a*h+g*f-d*i;c[2]=g*b+a*i+d*h-e*f;c[3]=a*b-d*f-e*h-g*i;return c};
-quat4.multiplyVec3=function(a,b,c){c||(c=b);var d=b[0],e=b[1],g=b[2],b=a[0],f=a[1],h=a[2],a=a[3],i=a*d+f*g-h*e,j=a*e+h*d-b*g,k=a*g+b*e-f*d,d=-b*d-f*e-h*g;c[0]=i*a+d*-b+j*-h-k*-f;c[1]=j*a+d*-f+k*-b-i*-h;c[2]=k*a+d*-h+i*-f-j*-b;return c};quat4.toMat3=function(a,b){b||(b=mat3.create());var c=a[0],d=a[1],e=a[2],g=a[3],f=c+c,h=d+d,i=e+e,j=c*f,k=c*h;c*=i;var l=d*h;d*=i;e*=i;f*=g;h*=g;g*=i;b[0]=1-(l+e);b[1]=k+g;b[2]=c-h;b[3]=k-g;b[4]=1-(j+e);b[5]=d+f;b[6]=c+h;b[7]=d-f;b[8]=1-(j+l);return b};
-quat4.toMat4=function(a,b){b||(b=mat4.create());var c=a[0],d=a[1],e=a[2],g=a[3],f=c+c,h=d+d,i=e+e,j=c*f,k=c*h;c*=i;var l=d*h;d*=i;e*=i;f*=g;h*=g;g*=i;b[0]=1-(l+e);b[1]=k+g;b[2]=c-h;b[3]=0;b[4]=k-g;b[5]=1-(j+e);b[6]=d+f;b[7]=0;b[8]=c+h;b[9]=d-f;b[10]=1-(j+l);b[11]=0;b[12]=0;b[13]=0;b[14]=0;b[15]=1;return b};
-quat4.slerp=function(a,b,c,d){d||(d=a);var e=a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3],g,f;if(Math.abs(e)>=1)return d!==a&&(d[0]=a[0],d[1]=a[1],d[2]=a[2],d[3]=a[3]),d;g=Math.acos(e);f=Math.sqrt(1-e*e);if(Math.abs(f)<0.001)return d[0]=a[0]*0.5+b[0]*0.5,d[1]=a[1]*0.5+b[1]*0.5,d[2]=a[2]*0.5+b[2]*0.5,d[3]=a[3]*0.5+b[3]*0.5,d;e=Math.sin((1-c)*g)/f;c=Math.sin(c*g)/f;d[0]=a[0]*e+b[0]*c;d[1]=a[1]*e+b[1]*c;d[2]=a[2]*e+b[2]*c;d[3]=a[3]*e+b[3]*c;return d};
-quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
-(function()
-{
-	var MAX_VERTICES = 8000;						// equates to 2500 objects being drawn
-	var MAX_INDICES = (MAX_VERTICES / 2) * 3;		// 6 indices for every 4 vertices
-	var MAX_POINTS = 8000;
-	var MULTI_BUFFERS = 4;							// cycle 4 buffers to try and avoid blocking
-	var BATCH_NULL = 0;
-	var BATCH_QUAD = 1;
-	var BATCH_SETTEXTURE = 2;
-	var BATCH_SETOPACITY = 3;
-	var BATCH_SETBLEND = 4;
-	var BATCH_UPDATEMODELVIEW = 5;
-	var BATCH_RENDERTOTEXTURE = 6;
-	var BATCH_CLEAR = 7;
-	var BATCH_POINTS = 8;
-	var BATCH_SETPROGRAM = 9;
-	var BATCH_SETPROGRAMPARAMETERS = 10;
-	var BATCH_SETTEXTURE1 = 11;
-	function GLWrap_(gl, isMobile)
-	{
-		this.isIE = /msie/i.test(navigator.userAgent) || /trident/i.test(navigator.userAgent);
-		this.width = 0;		// not yet known, wait for call to setSize()
-		this.height = 0;
-		this.cam = vec3.create([0, 0, 100]);			// camera position
-		this.look = vec3.create([0, 0, 0]);				// lookat position
-		this.up = vec3.create([0, 1, 0]);				// up vector
-		this.worldScale = vec3.create([1, 1, 1]);		// world scaling factor
-		this.matP = mat4.create();						// perspective matrix
-		this.matMV = mat4.create();						// model view matrix
-		this.lastMV = mat4.create();
-		this.currentMV = mat4.create();
-		this.gl = gl;
-		this.initState();
-	};
-	GLWrap_.prototype.initState = function ()
-	{
-		var gl = this.gl;
-		var i, len;
-		this.lastOpacity = 1;
-		this.lastTexture0 = null;			// last bound to TEXTURE0
-		this.lastTexture1 = null;			// last bound to TEXTURE1
-		this.currentOpacity = 1;
-		gl.clearColor(0, 0, 0, 0);
-		gl.clear(gl.COLOR_BUFFER_BIT);
-		gl.enable(gl.BLEND);
-        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-		gl.disable(gl.CULL_FACE);
-		gl.disable(gl.DEPTH_TEST);
-		this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-		this.lastSrcBlend = gl.ONE;
-		this.lastDestBlend = gl.ONE_MINUS_SRC_ALPHA;
-		this.pointBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.pointBuffer);
-		this.vertexBuffers = new Array(MULTI_BUFFERS);
-		this.texcoordBuffers = new Array(MULTI_BUFFERS);
-		for (i = 0; i < MULTI_BUFFERS; i++)
-		{
-			this.vertexBuffers[i] = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffers[i]);
-			this.texcoordBuffers[i] = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.texcoordBuffers[i]);
-		}
-		this.curBuffer = 0;
-		this.indexBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-		this.vertexData = new Float32Array(MAX_VERTICES * 2);
-		this.texcoordData = new Float32Array(MAX_VERTICES * 2);
-		this.pointData = new Float32Array(MAX_POINTS * 4);
-		var indexData = new Uint16Array(MAX_INDICES);
-		i = 0, len = MAX_INDICES;
-		var fv = 0;
-		while (i < len)
-		{
-			indexData[i++] = fv;		// top left
-			indexData[i++] = fv + 1;	// top right
-			indexData[i++] = fv + 2;	// bottom right (first tri)
-			indexData[i++] = fv;		// top left
-			indexData[i++] = fv + 2;	// bottom right
-			indexData[i++] = fv + 3;	// bottom left
-			fv += 4;
-		}
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
-		this.vertexPtr = 0;
-		this.pointPtr = 0;
-		var fsSource, vsSource;
-		this.shaderPrograms = [];
-		fsSource = [
-			"varying mediump vec2 vTex;",
-			"uniform lowp float opacity;",
-			"uniform lowp sampler2D samplerFront;",
-			"void main(void) {",
-			"	gl_FragColor = texture2D(samplerFront, vTex);",
-			"	gl_FragColor *= opacity;",
-			"}"
-		].join("\n");
-		vsSource = [
-			"attribute highp vec2 aPos;",
-			"attribute mediump vec2 aTex;",
-			"varying mediump vec2 vTex;",
-			"uniform highp mat4 matP;",
-			"uniform highp mat4 matMV;",
-			"void main(void) {",
-			"	gl_Position = matP * matMV * vec4(aPos.x, aPos.y, 0.0, 1.0);",
-			"	vTex = aTex;",
-			"}"
-		].join("\n");
-		var shaderProg = this.createShaderProgram({src: fsSource}, vsSource, "<default>");
-;
-		this.shaderPrograms.push(shaderProg);		// Default shader is always shader 0
-		fsSource = [
-			"uniform mediump sampler2D samplerFront;",
-			"varying lowp float opacity;",
-			"void main(void) {",
-			"	gl_FragColor = texture2D(samplerFront, gl_PointCoord);",
-			"	gl_FragColor *= opacity;",
-			"}"
-		].join("\n");
-		var pointVsSource = [
-			"attribute vec4 aPos;",
-			"varying float opacity;",
-			"uniform mat4 matP;",
-			"uniform mat4 matMV;",
-			"void main(void) {",
-			"	gl_Position = matP * matMV * vec4(aPos.x, aPos.y, 0.0, 1.0);",
-			"	gl_PointSize = aPos.z;",
-			"	opacity = aPos.w;",
-			"}"
-		].join("\n");
-		shaderProg = this.createShaderProgram({src: fsSource}, pointVsSource, "<point>");
-;
-		this.shaderPrograms.push(shaderProg);		// Point shader is always shader 1
-		for (var shader_name in cr.shaders)
-		{
-			if (cr.shaders.hasOwnProperty(shader_name))
-				this.shaderPrograms.push(this.createShaderProgram(cr.shaders[shader_name], vsSource, shader_name));
-		}
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, null);
-		this.batch = [];
-		this.batchPtr = 0;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-		this.lastProgram = -1;				// start -1 so first switchProgram can do work
-		this.currentProgram = -1;			// current program during batch execution
-		this.currentShader = null;
-		this.fbo = gl.createFramebuffer();
-		this.renderToTex = null;
-		this.tmpVec3 = vec3.create([0, 0, 0]);
-;
-;
-		var pointsizes = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE);
-		this.minPointSize = pointsizes[0];
-		this.maxPointSize = pointsizes[1];
-;
-		this.switchProgram(0);
-		cr.seal(this);
-	};
-	function GLShaderProgram(gl, shaderProgram, name)
-	{
-		this.gl = gl;
-		this.shaderProgram = shaderProgram;
-		this.name = name;
-		this.locAPos = gl.getAttribLocation(shaderProgram, "aPos");
-		this.locATex = gl.getAttribLocation(shaderProgram, "aTex");
-		this.locMatP = gl.getUniformLocation(shaderProgram, "matP");
-		this.locMatMV = gl.getUniformLocation(shaderProgram, "matMV");
-		this.locOpacity = gl.getUniformLocation(shaderProgram, "opacity");
-		this.locSamplerFront = gl.getUniformLocation(shaderProgram, "samplerFront");
-		this.locSamplerBack = gl.getUniformLocation(shaderProgram, "samplerBack");
-		this.locDestStart = gl.getUniformLocation(shaderProgram, "destStart");
-		this.locDestEnd = gl.getUniformLocation(shaderProgram, "destEnd");
-		this.locSeconds = gl.getUniformLocation(shaderProgram, "seconds");
-		this.locPixelWidth = gl.getUniformLocation(shaderProgram, "pixelWidth");
-		this.locPixelHeight = gl.getUniformLocation(shaderProgram, "pixelHeight");
-		this.locLayerScale = gl.getUniformLocation(shaderProgram, "layerScale");
-		if (this.locOpacity)
-			gl.uniform1f(this.locOpacity, 1);
-		if (this.locSamplerFront)
-			gl.uniform1i(this.locSamplerFront, 0);
-		if (this.locSamplerBack)
-			gl.uniform1i(this.locSamplerBack, 1);
-		if (this.locDestStart)
-			gl.uniform2f(this.locDestStart, 0.0, 0.0);
-		if (this.locDestEnd)
-			gl.uniform2f(this.locDestEnd, 1.0, 1.0);
-		this.hasCurrentMatMV = false;		// matMV needs updating
-	};
-	GLWrap_.prototype.createShaderProgram = function(shaderEntry, vsSource, name)
-	{
-		var gl = this.gl;
-		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		gl.shaderSource(fragmentShader, shaderEntry.src);
-		gl.compileShader(fragmentShader);
-		if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS))
-		{
-;
-			gl.deleteShader(fragmentShader);
-			return null;
-		}
-		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-		gl.shaderSource(vertexShader, vsSource);
-		gl.compileShader(vertexShader);
-		if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
-		{
-;
-			gl.deleteShader(fragmentShader);
-			gl.deleteShader(vertexShader);
-			return null;
-		}
-		var shaderProgram = gl.createProgram();
-		gl.attachShader(shaderProgram, fragmentShader);
-		gl.attachShader(shaderProgram, vertexShader);
-		gl.linkProgram(shaderProgram);
-		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
-		{
-;
-			gl.deleteShader(fragmentShader);
-			gl.deleteShader(vertexShader);
-			gl.deleteProgram(shaderProgram);
-			return null;
-		}
-		gl.useProgram(shaderProgram);
-;
-		gl.deleteShader(fragmentShader);
-		gl.deleteShader(vertexShader);
-		var ret = new GLShaderProgram(gl, shaderProgram, name);
-		ret.extendBoxHorizontal = shaderEntry.extendBoxHorizontal || 0;
-		ret.extendBoxVertical = shaderEntry.extendBoxVertical || 0;
-		ret.crossSampling = !!shaderEntry.crossSampling;
-		ret.animated = !!shaderEntry.animated;
-		ret.parameters = shaderEntry.parameters || [];
-		var i, len;
-		for (i = 0, len = ret.parameters.length; i < len; i++)
-		{
-			ret.parameters[i][1] = gl.getUniformLocation(shaderProgram, ret.parameters[i][0]);
-			gl.uniform1f(ret.parameters[i][1], 0);
-		}
-		cr.seal(ret);
-		return ret;
-	};
-	GLWrap_.prototype.getShaderIndex = function(name_)
-	{
-		var i, len;
-		for (i = 0, len = this.shaderPrograms.length; i < len; i++)
-		{
-			if (this.shaderPrograms[i].name === name_)
-				return i;
-		}
-		return -1;
-	};
-	GLWrap_.prototype.project = function (x, y, out)
-	{
-		var viewport = [0, 0, this.width, this.height];
-		var mv = this.matMV;
-		var proj = this.matP;
-		var fTempo = [0, 0, 0, 0, 0, 0, 0, 0];
-		fTempo[0] = mv[0]*x+mv[4]*y+mv[12];
-		fTempo[1] = mv[1]*x+mv[5]*y+mv[13];
-		fTempo[2] = mv[2]*x+mv[6]*y+mv[14];
-		fTempo[3] = mv[3]*x+mv[7]*y+mv[15];
-		fTempo[4] = proj[0]*fTempo[0]+proj[4]*fTempo[1]+proj[8]*fTempo[2]+proj[12]*fTempo[3];
-		fTempo[5] = proj[1]*fTempo[0]+proj[5]*fTempo[1]+proj[9]*fTempo[2]+proj[13]*fTempo[3];
-		fTempo[6] = proj[2]*fTempo[0]+proj[6]*fTempo[1]+proj[10]*fTempo[2]+proj[14]*fTempo[3];
-		fTempo[7] = -fTempo[2];
-		if(fTempo[7]===0.0)	//The w value
-			return;
-		fTempo[7]=1.0/fTempo[7];
-		fTempo[4]*=fTempo[7];
-		fTempo[5]*=fTempo[7];
-		fTempo[6]*=fTempo[7];
-		out[0]=(fTempo[4]*0.5+0.5)*viewport[2]+viewport[0];
-		out[1]=(fTempo[5]*0.5+0.5)*viewport[3]+viewport[1];
-	};
-	GLWrap_.prototype.setSize = function(w, h, force)
-	{
-		if (this.width === w && this.height === h && !force)
-			return;
-		this.endBatch();
-		this.width = w;
-		this.height = h;
-		this.gl.viewport(0, 0, w, h);
-		mat4.perspective(45, w / h, 1, 1000, this.matP);
-		mat4.lookAt(this.cam, this.look, this.up, this.matMV);
-		var tl = [0, 0];
-		var br = [0, 0];
-		this.project(0, 0, tl);
-		this.project(1, 1, br);
-		this.worldScale[0] = 1 / (br[0] - tl[0]);
-		this.worldScale[1] = -1 / (br[1] - tl[1]);
-		var i, len, s;
-		for (i = 0, len = this.shaderPrograms.length; i < len; i++)
-		{
-			s = this.shaderPrograms[i];
-			s.hasCurrentMatMV = false;
-			if (s.locMatP)
-			{
-				this.gl.useProgram(s.shaderProgram);
-				this.gl.uniformMatrix4fv(s.locMatP, false, this.matP);
-			}
-		}
-		this.gl.useProgram(this.shaderPrograms[this.lastProgram].shaderProgram);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-		this.gl.activeTexture(this.gl.TEXTURE1);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.lastTexture0 = null;
-		this.lastTexture1 = null;
-	};
-	GLWrap_.prototype.resetModelView = function ()
-	{
-		mat4.lookAt(this.cam, this.look, this.up, this.matMV);
-		mat4.scale(this.matMV, this.worldScale);
-	};
-	GLWrap_.prototype.translate = function (x, y)
-	{
-		if (x === 0 && y === 0)
-			return;
-		this.tmpVec3[0] = x;// * this.worldScale[0];
-		this.tmpVec3[1] = y;// * this.worldScale[1];
-		this.tmpVec3[2] = 0;
-		mat4.translate(this.matMV, this.tmpVec3);
-	};
-	GLWrap_.prototype.scale = function (x, y)
-	{
-		if (x === 1 && y === 1)
-			return;
-		this.tmpVec3[0] = x;
-		this.tmpVec3[1] = y;
-		this.tmpVec3[2] = 1;
-		mat4.scale(this.matMV, this.tmpVec3);
-	};
-	GLWrap_.prototype.rotateZ = function (a)
-	{
-		if (a === 0)
-			return;
-		mat4.rotateZ(this.matMV, a);
-	};
-	GLWrap_.prototype.updateModelView = function()
-	{
-		var anydiff = false;
-		for (var i = 0; i < 16; i++)
-		{
-			if (this.lastMV[i] !== this.matMV[i])
-			{
-				anydiff = true;
-				break;
-			}
-		}
-		if (!anydiff)
-			return;
-		var b = this.pushBatch();
-		b.type = BATCH_UPDATEMODELVIEW;
-		if (b.mat4param)
-			mat4.set(this.matMV, b.mat4param);
-		else
-			b.mat4param = mat4.create(this.matMV);
-		mat4.set(this.matMV, this.lastMV);
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-	};
-	/*
-	var debugBatch = false;
-	jQuery(document).mousedown(
-		function(info) {
-			if (info.which === 2)
-				debugBatch = true;
-		}
-	);
-	*/
-	function GLBatchJob(type_, glwrap_)
-	{
-		this.type = type_;
-		this.glwrap = glwrap_;
-		this.gl = glwrap_.gl;
-		this.opacityParam = 0;		// for setOpacity()
-		this.startIndex = 0;		// for quad()
-		this.indexCount = 0;		// "
-		this.texParam = null;		// for setTexture()
-		this.mat4param = null;		// for updateModelView()
-		this.shaderParams = [];		// for user parameters
-		cr.seal(this);
-	};
-	GLBatchJob.prototype.doSetTexture = function ()
-	{
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texParam);
-	};
-	GLBatchJob.prototype.doSetTexture1 = function ()
-	{
-		var gl = this.gl;
-		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, this.texParam);
-		gl.activeTexture(gl.TEXTURE0);
-	};
-	GLBatchJob.prototype.doSetOpacity = function ()
-	{
-		var o = this.opacityParam;
-		var glwrap = this.glwrap;
-		glwrap.currentOpacity = o;
-		var curProg = glwrap.currentShader;
-		if (curProg.locOpacity)
-			this.gl.uniform1f(curProg.locOpacity, o);
-	};
-	GLBatchJob.prototype.doQuad = function ()
-	{
-		this.gl.drawElements(this.gl.TRIANGLES, this.indexCount, this.gl.UNSIGNED_SHORT, this.startIndex * 2);
-	};
-	GLBatchJob.prototype.doSetBlend = function ()
-	{
-		this.gl.blendFunc(this.startIndex, this.indexCount);
-	};
-	GLBatchJob.prototype.doUpdateModelView = function ()
-	{
-		var i, len, s, shaderPrograms = this.glwrap.shaderPrograms, currentProgram = this.glwrap.currentProgram;
-		for (i = 0, len = shaderPrograms.length; i < len; i++)
-		{
-			s = shaderPrograms[i];
-			if (i === currentProgram && s.locMatMV)
-			{
-				this.gl.uniformMatrix4fv(s.locMatMV, false, this.mat4param);
-				s.hasCurrentMatMV = true;
-			}
-			else
-				s.hasCurrentMatMV = false;
-		}
-		mat4.set(this.mat4param, this.glwrap.currentMV);
-	};
-	GLBatchJob.prototype.doRenderToTexture = function ()
-	{
-		var gl = this.gl;
-		var glwrap = this.glwrap;
-		if (this.texParam)
-		{
-			if (glwrap.lastTexture1 === this.texParam)
-			{
-				gl.activeTexture(gl.TEXTURE1);
-				gl.bindTexture(gl.TEXTURE_2D, null);
-				glwrap.lastTexture1 = null;
-				gl.activeTexture(gl.TEXTURE0);
-			}
-			gl.bindFramebuffer(gl.FRAMEBUFFER, glwrap.fbo);
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texParam, 0);
-		}
-		else
-		{
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0);
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		}
-	};
-	GLBatchJob.prototype.doClear = function ()
-	{
-		var gl = this.gl;
-		if (this.startIndex === 0)		// clear whole surface
-		{
-			gl.clearColor(this.mat4param[0], this.mat4param[1], this.mat4param[2], this.mat4param[3]);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-		}
-		else							// clear rectangle
-		{
-			gl.enable(gl.SCISSOR_TEST);
-			gl.scissor(this.mat4param[0], this.mat4param[1], this.mat4param[2], this.mat4param[3]);
-			gl.clearColor(0, 0, 0, 0);
-			gl.clear(this.gl.COLOR_BUFFER_BIT);
-			gl.disable(gl.SCISSOR_TEST);
-		}
-	};
-	GLBatchJob.prototype.doPoints = function ()
-	{
-		var gl = this.gl;
-		var glwrap = this.glwrap;
-		var s = glwrap.shaderPrograms[1];
-		gl.useProgram(s.shaderProgram);
-		if (!s.hasCurrentMatMV && s.locMatMV)
-		{
-			gl.uniformMatrix4fv(s.locMatMV, false, glwrap.currentMV);
-			s.hasCurrentMatMV = true;
-		}
-		gl.enableVertexAttribArray(s.locAPos);
-		gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.pointBuffer);
-		gl.vertexAttribPointer(s.locAPos, 4, gl.FLOAT, false, 0, 0);
-		gl.drawArrays(gl.POINTS, this.startIndex / 4, this.indexCount);
-		s = glwrap.currentShader;
-		gl.useProgram(s.shaderProgram);
-		if (s.locAPos >= 0)
-		{
-			gl.enableVertexAttribArray(s.locAPos);
-			gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.vertexBuffers[glwrap.curBuffer]);
-			gl.vertexAttribPointer(s.locAPos, 2, gl.FLOAT, false, 0, 0);
-		}
-		if (s.locATex >= 0)
-		{
-			gl.enableVertexAttribArray(s.locATex);
-			gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.texcoordBuffers[glwrap.curBuffer]);
-			gl.vertexAttribPointer(s.locATex, 2, gl.FLOAT, false, 0, 0);
-		}
-	};
-	GLBatchJob.prototype.doSetProgram = function ()
-	{
-		var gl = this.gl;
-		var glwrap = this.glwrap;
-		var s = glwrap.shaderPrograms[this.startIndex];		// recycled param to save memory
-		glwrap.currentProgram = this.startIndex;			// current batch program
-		glwrap.currentShader = s;
-		gl.useProgram(s.shaderProgram);						// switch to
-		if (!s.hasCurrentMatMV && s.locMatMV)
-		{
-			gl.uniformMatrix4fv(s.locMatMV, false, glwrap.currentMV);
-			s.hasCurrentMatMV = true;
-		}
-		if (s.locOpacity)
-			gl.uniform1f(s.locOpacity, glwrap.currentOpacity);
-		if (s.locAPos >= 0)
-		{
-			gl.enableVertexAttribArray(s.locAPos);
-			gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.vertexBuffers[glwrap.curBuffer]);
-			gl.vertexAttribPointer(s.locAPos, 2, gl.FLOAT, false, 0, 0);
-		}
-		if (s.locATex >= 0)
-		{
-			gl.enableVertexAttribArray(s.locATex);
-			gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.texcoordBuffers[glwrap.curBuffer]);
-			gl.vertexAttribPointer(s.locATex, 2, gl.FLOAT, false, 0, 0);
-		}
-	}
-	GLBatchJob.prototype.doSetProgramParameters = function ()
-	{
-		var i, len, s = this.glwrap.currentShader;
-		var gl = this.gl;
-		if (s.locSamplerBack && this.glwrap.lastTexture1 !== this.texParam)
-		{
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, this.texParam);
-			this.glwrap.lastTexture1 = this.texParam;
-			gl.activeTexture(gl.TEXTURE0);
-		}
-		if (s.locPixelWidth)
-			gl.uniform1f(s.locPixelWidth, this.mat4param[0]);
-		if (s.locPixelHeight)
-			gl.uniform1f(s.locPixelHeight, this.mat4param[1]);
-		if (s.locDestStart)
-			gl.uniform2f(s.locDestStart, this.mat4param[2], this.mat4param[3]);
-		if (s.locDestEnd)
-			gl.uniform2f(s.locDestEnd, this.mat4param[4], this.mat4param[5]);
-		if (s.locLayerScale)
-			gl.uniform1f(s.locLayerScale, this.mat4param[6]);
-		if (s.locSeconds)
-			gl.uniform1f(s.locSeconds, cr.performance_now() / 1000.0);
-		if (s.parameters.length)
-		{
-			for (i = 0, len = s.parameters.length; i < len; i++)
-			{
-				gl.uniform1f(s.parameters[i][1], this.shaderParams[i]);
-			}
-		}
-	};
-	GLWrap_.prototype.pushBatch = function ()
-	{
-		if (this.batchPtr === this.batch.length)
-			this.batch.push(new GLBatchJob(BATCH_NULL, this));
-		return this.batch[this.batchPtr++];
-	};
-	GLWrap_.prototype.endBatch = function ()
-	{
-		if (this.batchPtr === 0)
-			return;
-		if (this.gl.isContextLost())
-			return;
-		var gl = this.gl;
-		if (this.pointPtr > 0)
-		{
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.pointBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, this.pointData.subarray(0, this.pointPtr), gl.STREAM_DRAW);
-			if (s && s.locAPos >= 0 && s.name === "<point>")
-				gl.vertexAttribPointer(s.locAPos, 4, gl.FLOAT, false, 0, 0);
-		}
-		if (this.vertexPtr > 0)
-		{
-			var s = this.currentShader;
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffers[this.curBuffer]);
-			gl.bufferData(gl.ARRAY_BUFFER, this.vertexData.subarray(0, this.vertexPtr), gl.STREAM_DRAW);
-			if (s && s.locAPos >= 0 && s.name !== "<point>")
-				gl.vertexAttribPointer(s.locAPos, 2, gl.FLOAT, false, 0, 0);
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.texcoordBuffers[this.curBuffer]);
-			gl.bufferData(gl.ARRAY_BUFFER, this.texcoordData.subarray(0, this.vertexPtr), gl.STREAM_DRAW);
-			if (s && s.locATex >= 0 && s.name !== "<point>")
-				gl.vertexAttribPointer(s.locATex, 2, gl.FLOAT, false, 0, 0);
-		}
-		var i, len, b;
-		for (i = 0, len = this.batchPtr; i < len; i++)
-		{
-			b = this.batch[i];
-			switch (b.type) {
-			case BATCH_QUAD:
-				b.doQuad();
-				break;
-			case BATCH_SETTEXTURE:
-				b.doSetTexture();
-				break;
-			case BATCH_SETOPACITY:
-				b.doSetOpacity();
-				break;
-			case BATCH_SETBLEND:
-				b.doSetBlend();
-				break;
-			case BATCH_UPDATEMODELVIEW:
-				b.doUpdateModelView();
-				break;
-			case BATCH_RENDERTOTEXTURE:
-				b.doRenderToTexture();
-				break;
-			case BATCH_CLEAR:
-				b.doClear();
-				break;
-			case BATCH_POINTS:
-				b.doPoints();
-				break;
-			case BATCH_SETPROGRAM:
-				b.doSetProgram();
-				break;
-			case BATCH_SETPROGRAMPARAMETERS:
-				b.doSetProgramParameters();
-				break;
-			case BATCH_SETTEXTURE1:
-				b.doSetTexture1();
-				break;
-			}
-		}
-		this.batchPtr = 0;
-		this.vertexPtr = 0;
-		this.pointPtr = 0;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-		this.curBuffer++;
-		if (this.curBuffer >= MULTI_BUFFERS)
-			this.curBuffer = 0;
-	};
-	GLWrap_.prototype.setOpacity = function (op)
-	{
-		if (op === this.lastOpacity)
-			return;
-		var b = this.pushBatch();
-		b.type = BATCH_SETOPACITY;
-		b.opacityParam = op;
-		this.lastOpacity = op;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-	};
-	GLWrap_.prototype.setTexture = function (tex)
-	{
-		if (tex === this.lastTexture0)
-			return;
-;
-		var b = this.pushBatch();
-		b.type = BATCH_SETTEXTURE;
-		b.texParam = tex;
-		this.lastTexture0 = tex;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-	};
-	GLWrap_.prototype.setBlend = function (s, d)
-	{
-		if (s === this.lastSrcBlend && d === this.lastDestBlend)
-			return;
-		var b = this.pushBatch();
-		b.type = BATCH_SETBLEND;
-		b.startIndex = s;		// recycle params to save memory
-		b.indexCount = d;
-		this.lastSrcBlend = s;
-		this.lastDestBlend = d;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-	};
-	GLWrap_.prototype.setAlphaBlend = function ()
-	{
-		this.setBlend(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
-	};
-	var LAST_VERTEX = MAX_VERTICES * 2 - 8;
-	GLWrap_.prototype.quad = function(tlx, tly, trx, try_, brx, bry, blx, bly)
-	{
-		if (this.vertexPtr >= LAST_VERTEX)
-			this.endBatch();
-		var v = this.vertexPtr;			// vertex cursor
-		var vd = this.vertexData;		// vertex data array
-		var td = this.texcoordData;		// texture coord data array
-		if (this.hasQuadBatchTop)
-		{
-			this.batch[this.batchPtr - 1].indexCount += 6;
-		}
-		else
-		{
-			var b = this.pushBatch();
-			b.type = BATCH_QUAD;
-			b.startIndex = (v / 4) * 3;
-			b.indexCount = 6;
-			this.hasQuadBatchTop = true;
-			this.hasPointBatchTop = false;
-		}
-		vd[v] = tlx;
-		td[v++] = 0;
-		vd[v] = tly;
-		td[v++] = 0;
-		vd[v] = trx;
-		td[v++] = 1;
-		vd[v] = try_;
-		td[v++] = 0;
-		vd[v] = brx;
-		td[v++] = 1;
-		vd[v] = bry;
-		td[v++] = 1;
-		vd[v] = blx;
-		td[v++] = 0;
-		vd[v] = bly;
-		td[v++] = 1;
-		this.vertexPtr = v;
-	};
-	GLWrap_.prototype.quadTex = function(tlx, tly, trx, try_, brx, bry, blx, bly, rcTex)
-	{
-		if (this.vertexPtr >= LAST_VERTEX)
-			this.endBatch();
-		var v = this.vertexPtr;			// vertex cursor
-		var vd = this.vertexData;		// vertex data array
-		var td = this.texcoordData;		// texture coord data array
-		if (this.hasQuadBatchTop)
-		{
-			this.batch[this.batchPtr - 1].indexCount += 6;
-		}
-		else
-		{
-			var b = this.pushBatch();
-			b.type = BATCH_QUAD;
-			b.startIndex = (v / 4) * 3;
-			b.indexCount = 6;
-			this.hasQuadBatchTop = true;
-			this.hasPointBatchTop = false;
-		}
-		var rc_left = rcTex.left;
-		var rc_top = rcTex.top;
-		var rc_right = rcTex.right;
-		var rc_bottom = rcTex.bottom;
-		vd[v] = tlx;
-		td[v++] = rc_left;
-		vd[v] = tly;
-		td[v++] = rc_top;
-		vd[v] = trx;
-		td[v++] = rc_right;
-		vd[v] = try_;
-		td[v++] = rc_top;
-		vd[v] = brx;
-		td[v++] = rc_right;
-		vd[v] = bry;
-		td[v++] = rc_bottom;
-		vd[v] = blx;
-		td[v++] = rc_left;
-		vd[v] = bly;
-		td[v++] = rc_bottom;
-		this.vertexPtr = v;
-	};
-	GLWrap_.prototype.quadTexUV = function(tlx, tly, trx, try_, brx, bry, blx, bly, tlu, tlv, tru, trv, bru, brv, blu, blv)
-	{
-		if (this.vertexPtr >= LAST_VERTEX)
-			this.endBatch();
-		var v = this.vertexPtr;			// vertex cursor
-		var vd = this.vertexData;		// vertex data array
-		var td = this.texcoordData;		// texture coord data array
-		if (this.hasQuadBatchTop)
-		{
-			this.batch[this.batchPtr - 1].indexCount += 6;
-		}
-		else
-		{
-			var b = this.pushBatch();
-			b.type = BATCH_QUAD;
-			b.startIndex = (v / 4) * 3;
-			b.indexCount = 6;
-			this.hasQuadBatchTop = true;
-			this.hasPointBatchTop = false;
-		}
-		vd[v] = tlx;
-		td[v++] = tlu;
-		vd[v] = tly;
-		td[v++] = tlv;
-		vd[v] = trx;
-		td[v++] = tru;
-		vd[v] = try_;
-		td[v++] = trv;
-		vd[v] = brx;
-		td[v++] = bru;
-		vd[v] = bry;
-		td[v++] = brv;
-		vd[v] = blx;
-		td[v++] = blu;
-		vd[v] = bly;
-		td[v++] = blv;
-		this.vertexPtr = v;
-	};
-	var LAST_POINT = MAX_POINTS - 4;
-	GLWrap_.prototype.point = function(x_, y_, size_, opacity_)
-	{
-		if (this.pointPtr >= LAST_POINT)
-			this.endBatch();
-		var p = this.pointPtr;			// point cursor
-		var pd = this.pointData;		// point data array
-		if (this.hasPointBatchTop)
-		{
-			this.batch[this.batchPtr - 1].indexCount++;
-		}
-		else
-		{
-			var b = this.pushBatch();
-			b.type = BATCH_POINTS;
-			b.startIndex = p;
-			b.indexCount = 1;
-			this.hasPointBatchTop = true;
-			this.hasQuadBatchTop = false;
-		}
-		pd[p++] = x_;
-		pd[p++] = y_;
-		pd[p++] = size_;
-		pd[p++] = opacity_;
-		this.pointPtr = p;
-	};
-	GLWrap_.prototype.switchProgram = function (progIndex)
-	{
-		if (this.lastProgram === progIndex)
-			return;			// no change
-		var shaderProg = this.shaderPrograms[progIndex];
-		if (!shaderProg)
-		{
-			if (this.lastProgram === 0)
-				return;								// already on default shader
-			progIndex = 0;
-			shaderProg = this.shaderPrograms[0];
-		}
-		var b = this.pushBatch();
-		b.type = BATCH_SETPROGRAM;
-		b.startIndex = progIndex;
-		this.lastProgram = progIndex;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-	};
-	GLWrap_.prototype.programUsesDest = function (progIndex)
-	{
-		var s = this.shaderPrograms[progIndex];
-		return !!(s.locDestStart || s.locDestEnd);
-	};
-	GLWrap_.prototype.programUsesCrossSampling = function (progIndex)
-	{
-		var s = this.shaderPrograms[progIndex];
-		return !!(s.locDestStart || s.locDestEnd || s.crossSampling);
-	};
-	GLWrap_.prototype.programExtendsBox = function (progIndex)
-	{
-		var s = this.shaderPrograms[progIndex];
-		return s.extendBoxHorizontal !== 0 || s.extendBoxVertical !== 0;
-	};
-	GLWrap_.prototype.getProgramBoxExtendHorizontal = function (progIndex)
-	{
-		return this.shaderPrograms[progIndex].extendBoxHorizontal;
-	};
-	GLWrap_.prototype.getProgramBoxExtendVertical = function (progIndex)
-	{
-		return this.shaderPrograms[progIndex].extendBoxVertical;
-	};
-	GLWrap_.prototype.getProgramParameterType = function (progIndex, paramIndex)
-	{
-		return this.shaderPrograms[progIndex].parameters[paramIndex][2];
-	};
-	GLWrap_.prototype.programIsAnimated = function (progIndex)
-	{
-		return this.shaderPrograms[progIndex].animated;
-	};
-	GLWrap_.prototype.setProgramParameters = function (backTex, pixelWidth, pixelHeight, destStartX, destStartY, destEndX, destEndY, layerScale, params)
-	{
-		var i, len, s = this.shaderPrograms[this.lastProgram];
-		if (s.locPixelWidth || s.locPixelHeight || s.locSeconds || s.locSamplerBack ||
-			s.locDestStart || s.locDestEnd || s.locLayerScale || params.length)
-		{
-			var b = this.pushBatch();
-			b.type = BATCH_SETPROGRAMPARAMETERS;
-			if (b.mat4param)
-				mat4.set(this.matMV, b.mat4param);
-			else
-				b.mat4param = mat4.create();
-			b.mat4param[0] = pixelWidth;
-			b.mat4param[1] = pixelHeight;
-			b.mat4param[2] = destStartX;
-			b.mat4param[3] = destStartY;
-			b.mat4param[4] = destEndX;
-			b.mat4param[5] = destEndY;
-			b.mat4param[6] = layerScale;
-			if (s.locSamplerBack)
-			{
-;
-				b.texParam = backTex;
-			}
-			else
-				b.texParam = null;
-			if (params.length)
-			{
-				b.shaderParams.length = params.length;
-				for (i = 0, len = params.length; i < len; i++)
-					b.shaderParams[i] = params[i];
-			}
-			this.hasQuadBatchTop = false;
-			this.hasPointBatchTop = false;
-		}
-	};
-	GLWrap_.prototype.clear = function (r, g, b_, a)
-	{
-		var b = this.pushBatch();
-		b.type = BATCH_CLEAR;
-		b.startIndex = 0;					// clear all mode
-		if (!b.mat4param)
-			b.mat4param = mat4.create();
-		b.mat4param[0] = r;
-		b.mat4param[1] = g;
-		b.mat4param[2] = b_;
-		b.mat4param[3] = a;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-	};
-	GLWrap_.prototype.clearRect = function (x, y, w, h)
-	{
-		var b = this.pushBatch();
-		b.type = BATCH_CLEAR;
-		b.startIndex = 1;					// clear rect mode
-		if (!b.mat4param)
-			b.mat4param = mat4.create();
-		b.mat4param[0] = x;
-		b.mat4param[1] = y;
-		b.mat4param[2] = w;
-		b.mat4param[3] = h;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-	};
-	GLWrap_.prototype.present = function ()
-	{
-		this.endBatch();
-		this.gl.flush();
-		/*
-		if (debugBatch)
-		{
-;
-			debugBatch = false;
-		}
-		*/
-	};
-	function nextHighestPowerOfTwo(x) {
-		--x;
-		for (var i = 1; i < 32; i <<= 1) {
-			x = x | x >> i;
-		}
-		return x + 1;
-	}
-	var all_textures = [];
-	var textures_by_src = {};
-	var BF_RGBA8 = 0;
-	var BF_RGB8 = 1;
-	var BF_RGBA4 = 2;
-	var BF_RGB5_A1 = 3;
-	var BF_RGB565 = 4;
-	GLWrap_.prototype.loadTexture = function (img, tiling, linearsampling, pixelformat, tiletype)
-	{
-		tiling = !!tiling;
-		linearsampling = !!linearsampling;
-		var tex_key = img.src + "," + tiling + "," + linearsampling + (tiling ? ("," + tiletype) : "");
-		var webGL_texture = null;
-		if (typeof img.src !== "undefined" && textures_by_src.hasOwnProperty(tex_key))
-		{
-			webGL_texture = textures_by_src[tex_key];
-			webGL_texture.c2refcount++;
-			return webGL_texture;
-		}
-		this.endBatch();
-;
-		var gl = this.gl;
-		var isPOT = (cr.isPOT(img.width) && cr.isPOT(img.height));
-		webGL_texture = gl.createTexture();
-		gl.bindTexture(gl.TEXTURE_2D, webGL_texture);
-		gl.pixelStorei(gl["UNPACK_PREMULTIPLY_ALPHA_WEBGL"], true);
-		var internalformat = gl.RGBA;
-		var format = gl.RGBA;
-		var type = gl.UNSIGNED_BYTE;
-		if (pixelformat && !this.isIE)
-		{
-			switch (pixelformat) {
-			case BF_RGB8:
-				internalformat = gl.RGB;
-				format = gl.RGB;
-				break;
-			case BF_RGBA4:
-				type = gl.UNSIGNED_SHORT_4_4_4_4;
-				break;
-			case BF_RGB5_A1:
-				type = gl.UNSIGNED_SHORT_5_5_5_1;
-				break;
-			case BF_RGB565:
-				internalformat = gl.RGB;
-				format = gl.RGB;
-				type = gl.UNSIGNED_SHORT_5_6_5;
-				break;
-			}
-		}
-		if (!isPOT && tiling)
-		{
-			var canvas = document.createElement("canvas");
-			canvas.width = cr.nextHighestPowerOfTwo(img.width);
-			canvas.height = cr.nextHighestPowerOfTwo(img.height);
-			var ctx = canvas.getContext("2d");
-			ctx.drawImage(img,
-						  0, 0, img.width, img.height,
-						  0, 0, canvas.width, canvas.height);
-			gl.texImage2D(gl.TEXTURE_2D, 0, internalformat, format, type, canvas);
-		}
-		else
-			gl.texImage2D(gl.TEXTURE_2D, 0, internalformat, format, type, img);
-		if (tiling)
-		{
-			if (tiletype === "repeat-x")
-			{
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-			}
-			else if (tiletype === "repeat-y")
-			{
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-			}
-			else
-			{
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-			}
-		}
-		else
-		{
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		}
-		if (linearsampling)
-		{
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-			if (isPOT)
-			{
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-				gl.generateMipmap(gl.TEXTURE_2D);
-			}
-			else
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		}
-		else
-		{
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		}
-		gl.bindTexture(gl.TEXTURE_2D, null);
-		this.lastTexture0 = null;
-		webGL_texture.c2width = img.width;
-		webGL_texture.c2height = img.height;
-		webGL_texture.c2refcount = 1;
-		webGL_texture.c2texkey = tex_key;
-		all_textures.push(webGL_texture);
-		textures_by_src[tex_key] = webGL_texture;
-		return webGL_texture;
-	};
-	GLWrap_.prototype.createEmptyTexture = function (w, h, linearsampling, _16bit, tiling)
-	{
-		this.endBatch();
-		var gl = this.gl;
-		if (this.isIE)
-			_16bit = false;
-		var webGL_texture = gl.createTexture();
-		gl.bindTexture(gl.TEXTURE_2D, webGL_texture);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, _16bit ? gl.UNSIGNED_SHORT_4_4_4_4 : gl.UNSIGNED_BYTE, null);
-		if (tiling)
-		{
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-		}
-		else
-		{
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		}
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, linearsampling ? gl.LINEAR : gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, linearsampling ? gl.LINEAR : gl.NEAREST);
-		gl.bindTexture(gl.TEXTURE_2D, null);
-		this.lastTexture0 = null;
-		webGL_texture.c2width = w;
-		webGL_texture.c2height = h;
-		all_textures.push(webGL_texture);
-		return webGL_texture;
-	};
-	GLWrap_.prototype.videoToTexture = function (video_, texture_, _16bit)
-	{
-		this.endBatch();
-		var gl = this.gl;
-		if (this.isIE)
-			_16bit = false;
-		gl.bindTexture(gl.TEXTURE_2D, texture_);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, _16bit ? gl.UNSIGNED_SHORT_4_4_4_4 : gl.UNSIGNED_BYTE, video_);
-		gl.bindTexture(gl.TEXTURE_2D, null);
-		this.lastTexture0 = null;
-	};
-	GLWrap_.prototype.deleteTexture = function (tex)
-	{
-		if (!tex)
-			return;
-		if (typeof tex.c2refcount !== "undefined" && tex.c2refcount > 1)
-		{
-			tex.c2refcount--;
-			return;
-		}
-		this.endBatch();
-		if (tex === this.lastTexture0)
-		{
-			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-			this.lastTexture0 = null;
-		}
-		if (tex === this.lastTexture1)
-		{
-			this.gl.activeTexture(this.gl.TEXTURE1);
-			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-			this.gl.activeTexture(this.gl.TEXTURE0);
-			this.lastTexture1 = null;
-		}
-		cr.arrayFindRemove(all_textures, tex);
-		if (typeof tex.c2texkey !== "undefined")
-			delete textures_by_src[tex.c2texkey];
-		this.gl.deleteTexture(tex);
-	};
-	GLWrap_.prototype.estimateVRAM = function ()
-	{
-		var total = this.width * this.height * 4 * 2;
-		var i, len, t;
-		for (i = 0, len = all_textures.length; i < len; i++)
-		{
-			t = all_textures[i];
-			total += (t.c2width * t.c2height * 4);
-		}
-		return total;
-	};
-	GLWrap_.prototype.textureCount = function ()
-	{
-		return all_textures.length;
-	};
-	GLWrap_.prototype.setRenderingToTexture = function (tex)
-	{
-		if (tex === this.renderToTex)
-			return;
-;
-		var b = this.pushBatch();
-		b.type = BATCH_RENDERTOTEXTURE;
-		b.texParam = tex;
-		this.renderToTex = tex;
-		this.hasQuadBatchTop = false;
-		this.hasPointBatchTop = false;
-	};
-	cr.GLWrap = GLWrap_;
-}());
 ;
 (function()
 {
@@ -11651,6 +10459,2780 @@ cr.do_cmp = function (x, cmp, y)
     }
 };
 cr.shaders = {};
+;
+;
+cr.plugins_.Audio = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var pluginProto = cr.plugins_.Audio.prototype;
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+	var typeProto = pluginProto.Type.prototype;
+	typeProto.onCreate = function()
+	{
+	};
+	var audRuntime = null;
+	var audInst = null;
+	var audTag = "";
+	var appPath = "";			// for PhoneGap only
+	var API_HTML5 = 0;
+	var API_WEBAUDIO = 1;
+	var API_PHONEGAP = 2;
+	var API_APPMOBI = 3;
+	var api = API_HTML5;
+	var context = null;
+	var audioBuffers = [];		// cache of buffers
+	var audioInstances = [];	// cache of instances
+	var lastAudio = null;
+	var useOgg = false;			// determined at create time
+	var timescale_mode = 0;
+	var silent = false;
+	var masterVolume = 1;
+	var listenerX = 0;
+	var listenerY = 0;
+	var panningModel = 1;		// HRTF
+	var distanceModel = 1;		// Inverse
+	var refDistance = 10;
+	var maxDistance = 10000;
+	var rolloffFactor = 1;
+	var micSource = null;
+	var micTag = "";
+	var isMusicWorkaround = false;
+	var musicPlayNextTouch = [];
+	function dbToLinear(x)
+	{
+		var v = dbToLinear_nocap(x);
+		if (v < 0)
+			v = 0;
+		if (v > 1)
+			v = 1;
+		return v;
+	};
+	function linearToDb(x)
+	{
+		if (x < 0)
+			x = 0;
+		if (x > 1)
+			x = 1;
+		return linearToDb_nocap(x);
+	};
+	function dbToLinear_nocap(x)
+	{
+		return Math.pow(10, x / 20);
+	};
+	function linearToDb_nocap(x)
+	{
+		return (Math.log(x) / Math.log(10)) * 20;
+	};
+	var effects = {};
+	function getDestinationForTag(tag)
+	{
+		tag = tag.toLowerCase();
+		if (effects.hasOwnProperty(tag))
+		{
+			if (effects[tag].length)
+				return effects[tag][0].getInputNode();
+		}
+		return context["destination"];
+	};
+	function createGain()
+	{
+		if (context["createGain"])
+			return context["createGain"]();
+		else
+			return context["createGainNode"]();
+	};
+	function createDelay(d)
+	{
+		if (context["createDelay"])
+			return context["createDelay"](d);
+		else
+			return context["createDelayNode"](d);
+	};
+	function startSource(s)
+	{
+		if (s["start"])
+			s["start"](0);
+		else
+			s["noteOn"](0);
+	};
+	function startSourceAt(s, x, d)
+	{
+		if (s["start"])
+			s["start"](0, x);
+		else
+			s["noteGrainOn"](0, x, d - x);
+	};
+	function stopSource(s)
+	{
+		try {
+			if (s["stop"])
+				s["stop"](0);
+			else
+				s["noteOff"](0);
+		}
+		catch (e) {}
+	};
+	function setAudioParam(ap, value, ramp, time)
+	{
+		if (!ap)
+			return;		// iOS is missing some parameters
+		ap["cancelScheduledValues"](0);
+		if (time === 0)
+		{
+			ap["value"] = value;
+			return;
+		}
+		var curTime = context["currentTime"];
+		time += curTime;
+		switch (ramp) {
+		case 0:		// step
+			ap["setValueAtTime"](value, time);
+			break;
+		case 1:		// linear
+			ap["setValueAtTime"](ap["value"], curTime);		// to set what to ramp from
+			ap["linearRampToValueAtTime"](value, time);
+			break;
+		case 2:		// exponential
+			ap["setValueAtTime"](ap["value"], curTime);		// to set what to ramp from
+			ap["exponentialRampToValueAtTime"](value, time);
+			break;
+		}
+	};
+	var filterTypes = ["lowpass", "highpass", "bandpass", "lowshelf", "highshelf", "peaking", "notch", "allpass"];
+	function FilterEffect(type, freq, detune, q, gain, mix)
+	{
+		this.type = "filter";
+		this.params = [type, freq, detune, q, gain, mix];
+		this.inputNode = createGain();
+		this.wetNode = createGain();
+		this.wetNode["gain"]["value"] = mix;
+		this.dryNode = createGain();
+		this.dryNode["gain"]["value"] = 1 - mix;
+		this.filterNode = context["createBiquadFilter"]();
+		if (typeof this.filterNode["type"] === "number")
+			this.filterNode["type"] = type;
+		else
+			this.filterNode["type"] = filterTypes[type];
+		this.filterNode["frequency"]["value"] = freq;
+		if (this.filterNode["detune"])		// iOS 6 doesn't have detune yet
+			this.filterNode["detune"]["value"] = detune;
+		this.filterNode["Q"]["value"] = q;
+		this.filterNode["gain"]["value"] = gain;
+		this.inputNode["connect"](this.filterNode);
+		this.inputNode["connect"](this.dryNode);
+		this.filterNode["connect"](this.wetNode);
+	};
+	FilterEffect.prototype.connectTo = function (node)
+	{
+		this.wetNode["disconnect"]();
+		this.wetNode["connect"](node);
+		this.dryNode["disconnect"]();
+		this.dryNode["connect"](node);
+	};
+	FilterEffect.prototype.remove = function ()
+	{
+		this.inputNode["disconnect"]();
+		this.filterNode["disconnect"]();
+		this.wetNode["disconnect"]();
+		this.dryNode["disconnect"]();
+	};
+	FilterEffect.prototype.getInputNode = function ()
+	{
+		return this.inputNode;
+	};
+	FilterEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 0:		// mix
+			value = value / 100;
+			if (value < 0) value = 0;
+			if (value > 1) value = 1;
+			this.params[5] = value;
+			setAudioParam(this.wetNode["gain"], value, ramp, time);
+			setAudioParam(this.dryNode["gain"], 1 - value, ramp, time);
+			break;
+		case 1:		// filter frequency
+			this.params[1] = value;
+			setAudioParam(this.filterNode["frequency"], value, ramp, time);
+			break;
+		case 2:		// filter detune
+			this.params[2] = value;
+			setAudioParam(this.filterNode["detune"], value, ramp, time);
+			break;
+		case 3:		// filter Q
+			this.params[3] = value;
+			setAudioParam(this.filterNode["Q"], value, ramp, time);
+			break;
+		case 4:		// filter/delay gain (note value is in dB here)
+			this.params[4] = value;
+			setAudioParam(this.filterNode["gain"], value, ramp, time);
+			break;
+		}
+	};
+	function DelayEffect(delayTime, delayGain, mix)
+	{
+		this.type = "delay";
+		this.params = [delayTime, delayGain, mix];
+		this.inputNode = createGain();
+		this.wetNode = createGain();
+		this.wetNode["gain"]["value"] = mix;
+		this.dryNode = createGain();
+		this.dryNode["gain"]["value"] = 1 - mix;
+		this.mainNode = createGain();
+		this.delayNode = createDelay(delayTime);
+		this.delayNode["delayTime"]["value"] = delayTime;
+		this.delayGainNode = createGain();
+		this.delayGainNode["gain"]["value"] = delayGain;
+		this.inputNode["connect"](this.mainNode);
+		this.inputNode["connect"](this.dryNode);
+		this.mainNode["connect"](this.wetNode);
+		this.mainNode["connect"](this.delayNode);
+		this.delayNode["connect"](this.delayGainNode);
+		this.delayGainNode["connect"](this.mainNode);
+	};
+	DelayEffect.prototype.connectTo = function (node)
+	{
+		this.wetNode["disconnect"]();
+		this.wetNode["connect"](node);
+		this.dryNode["disconnect"]();
+		this.dryNode["connect"](node);
+	};
+	DelayEffect.prototype.remove = function ()
+	{
+		this.inputNode["disconnect"]();
+		this.mainNode["disconnect"]();
+		this.delayNode["disconnect"]();
+		this.delayGainNode["disconnect"]();
+		this.wetNode["disconnect"]();
+		this.dryNode["disconnect"]();
+	};
+	DelayEffect.prototype.getInputNode = function ()
+	{
+		return this.inputNode;
+	};
+	DelayEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 0:		// mix
+			value = value / 100;
+			if (value < 0) value = 0;
+			if (value > 1) value = 1;
+			this.params[2] = value;
+			setAudioParam(this.wetNode["gain"], value, ramp, time);
+			setAudioParam(this.dryNode["gain"], 1 - value, ramp, time);
+			break;
+		case 4:		// filter/delay gain (note value is passed in dB but needs to be linear here)
+			this.params[1] = dbToLinear(value);
+			setAudioParam(this.delayGainNode["gain"], dbToLinear(value), ramp, time);
+			break;
+		case 5:		// delay time
+			this.params[0] = value;
+			setAudioParam(this.delayNode["delayTime"], value, ramp, time);
+			break;
+		}
+	};
+	function ConvolveEffect(buffer, normalize, mix, src)
+	{
+		this.type = "convolve";
+		this.params = [normalize, mix, src];
+		this.inputNode = createGain();
+		this.wetNode = createGain();
+		this.wetNode["gain"]["value"] = mix;
+		this.dryNode = createGain();
+		this.dryNode["gain"]["value"] = 1 - mix;
+		this.convolveNode = context["createConvolver"]();
+		if (buffer)
+		{
+			this.convolveNode["normalize"] = normalize;
+			this.convolveNode["buffer"] = buffer;
+		}
+		this.inputNode["connect"](this.convolveNode);
+		this.inputNode["connect"](this.dryNode);
+		this.convolveNode["connect"](this.wetNode);
+	};
+	ConvolveEffect.prototype.connectTo = function (node)
+	{
+		this.wetNode["disconnect"]();
+		this.wetNode["connect"](node);
+		this.dryNode["disconnect"]();
+		this.dryNode["connect"](node);
+	};
+	ConvolveEffect.prototype.remove = function ()
+	{
+		this.inputNode["disconnect"]();
+		this.convolveNode["disconnect"]();
+		this.wetNode["disconnect"]();
+		this.dryNode["disconnect"]();
+	};
+	ConvolveEffect.prototype.getInputNode = function ()
+	{
+		return this.inputNode;
+	};
+	ConvolveEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 0:		// mix
+			value = value / 100;
+			if (value < 0) value = 0;
+			if (value > 1) value = 1;
+			this.params[1] = value;
+			setAudioParam(this.wetNode["gain"], value, ramp, time);
+			setAudioParam(this.dryNode["gain"], 1 - value, ramp, time);
+			break;
+		}
+	};
+	function FlangerEffect(delay, modulation, freq, feedback, mix)
+	{
+		this.type = "flanger";
+		this.params = [delay, modulation, freq, feedback, mix];
+		this.inputNode = createGain();
+		this.dryNode = createGain();
+		this.dryNode["gain"]["value"] = 1 - (mix / 2);
+		this.wetNode = createGain();
+		this.wetNode["gain"]["value"] = mix / 2;
+		this.feedbackNode = createGain();
+		this.feedbackNode["gain"]["value"] = feedback;
+		this.delayNode = createDelay(delay + modulation);
+		this.delayNode["delayTime"]["value"] = delay;
+		this.oscNode = context["createOscillator"]();
+		this.oscNode["frequency"]["value"] = freq;
+		this.oscGainNode = createGain();
+		this.oscGainNode["gain"]["value"] = modulation;
+		this.inputNode["connect"](this.delayNode);
+		this.inputNode["connect"](this.dryNode);
+		this.delayNode["connect"](this.wetNode);
+		this.delayNode["connect"](this.feedbackNode);
+		this.feedbackNode["connect"](this.delayNode);
+		this.oscNode["connect"](this.oscGainNode);
+		this.oscGainNode["connect"](this.delayNode["delayTime"]);
+		startSource(this.oscNode);
+	};
+	FlangerEffect.prototype.connectTo = function (node)
+	{
+		this.dryNode["disconnect"]();
+		this.dryNode["connect"](node);
+		this.wetNode["disconnect"]();
+		this.wetNode["connect"](node);
+	};
+	FlangerEffect.prototype.remove = function ()
+	{
+		this.inputNode["disconnect"]();
+		this.delayNode["disconnect"]();
+		this.oscNode["disconnect"]();
+		this.oscGainNode["disconnect"]();
+		this.dryNode["disconnect"]();
+		this.wetNode["disconnect"]();
+		this.feedbackNode["disconnect"]();
+	};
+	FlangerEffect.prototype.getInputNode = function ()
+	{
+		return this.inputNode;
+	};
+	FlangerEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 0:		// mix
+			value = value / 100;
+			if (value < 0) value = 0;
+			if (value > 1) value = 1;
+			this.params[4] = value;
+			setAudioParam(this.wetNode["gain"], value / 2, ramp, time);
+			setAudioParam(this.dryNode["gain"], 1 - (value / 2), ramp, time);
+			break;
+		case 6:		// modulation
+			this.params[1] = value / 1000;
+			setAudioParam(this.oscGainNode["gain"], value / 1000, ramp, time);
+			break;
+		case 7:		// modulation frequency
+			this.params[2] = value;
+			setAudioParam(this.oscNode["frequency"], value, ramp, time);
+			break;
+		case 8:		// feedback
+			this.params[3] = value / 100;
+			setAudioParam(this.feedbackNode["gain"], value / 100, ramp, time);
+			break;
+		}
+	};
+	function PhaserEffect(freq, detune, q, modulation, modfreq, mix)
+	{
+		this.type = "phaser";
+		this.params = [freq, detune, q, modulation, modfreq, mix];
+		this.inputNode = createGain();
+		this.dryNode = createGain();
+		this.dryNode["gain"]["value"] = 1 - (mix / 2);
+		this.wetNode = createGain();
+		this.wetNode["gain"]["value"] = mix / 2;
+		this.filterNode = context["createBiquadFilter"]();
+		if (typeof this.filterNode["type"] === "number")
+			this.filterNode["type"] = 7;	// all-pass
+		else
+			this.filterNode["type"] = "allpass";
+		this.filterNode["frequency"]["value"] = freq;
+		if (this.filterNode["detune"])		// iOS 6 doesn't have detune yet
+			this.filterNode["detune"]["value"] = detune;
+		this.filterNode["Q"]["value"] = q;
+		this.oscNode = context["createOscillator"]();
+		this.oscNode["frequency"]["value"] = modfreq;
+		this.oscGainNode = createGain();
+		this.oscGainNode["gain"]["value"] = modulation;
+		this.inputNode["connect"](this.filterNode);
+		this.inputNode["connect"](this.dryNode);
+		this.filterNode["connect"](this.wetNode);
+		this.oscNode["connect"](this.oscGainNode);
+		this.oscGainNode["connect"](this.filterNode["frequency"]);
+		startSource(this.oscNode);
+	};
+	PhaserEffect.prototype.connectTo = function (node)
+	{
+		this.dryNode["disconnect"]();
+		this.dryNode["connect"](node);
+		this.wetNode["disconnect"]();
+		this.wetNode["connect"](node);
+	};
+	PhaserEffect.prototype.remove = function ()
+	{
+		this.inputNode["disconnect"]();
+		this.filterNode["disconnect"]();
+		this.oscNode["disconnect"]();
+		this.oscGainNode["disconnect"]();
+		this.dryNode["disconnect"]();
+		this.wetNode["disconnect"]();
+	};
+	PhaserEffect.prototype.getInputNode = function ()
+	{
+		return this.inputNode;
+	};
+	PhaserEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 0:		// mix
+			value = value / 100;
+			if (value < 0) value = 0;
+			if (value > 1) value = 1;
+			this.params[5] = value;
+			setAudioParam(this.wetNode["gain"], value / 2, ramp, time);
+			setAudioParam(this.dryNode["gain"], 1 - (value / 2), ramp, time);
+			break;
+		case 1:		// filter frequency
+			this.params[0] = value;
+			setAudioParam(this.filterNode["frequency"], value, ramp, time);
+			break;
+		case 2:		// filter detune
+			this.params[1] = value;
+			setAudioParam(this.filterNode["detune"], value, ramp, time);
+			break;
+		case 3:		// filter Q
+			this.params[2] = value;
+			setAudioParam(this.filterNode["Q"], value, ramp, time);
+			break;
+		case 6:		// modulation
+			this.params[3] = value;
+			setAudioParam(this.oscGainNode["gain"], value, ramp, time);
+			break;
+		case 7:		// modulation frequency
+			this.params[4] = value;
+			setAudioParam(this.oscNode["frequency"], value, ramp, time);
+			break;
+		}
+	};
+	function GainEffect(g)
+	{
+		this.type = "gain";
+		this.params = [g];
+		this.node = createGain();
+		this.node["gain"]["value"] = g;
+	};
+	GainEffect.prototype.connectTo = function (node_)
+	{
+		this.node["disconnect"]();
+		this.node["connect"](node_);
+	};
+	GainEffect.prototype.remove = function ()
+	{
+		this.node["disconnect"]();
+	};
+	GainEffect.prototype.getInputNode = function ()
+	{
+		return this.node;
+	};
+	GainEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 4:		// gain
+			this.params[0] = dbToLinear(value);
+			setAudioParam(this.node["gain"], dbToLinear(value), ramp, time);
+			break;
+		}
+	};
+	function TremoloEffect(freq, mix)
+	{
+		this.type = "tremolo";
+		this.params = [freq, mix];
+		this.node = createGain();
+		this.node["gain"]["value"] = 1 - (mix / 2);
+		this.oscNode = context["createOscillator"]();
+		this.oscNode["frequency"]["value"] = freq;
+		this.oscGainNode = createGain();
+		this.oscGainNode["gain"]["value"] = mix / 2;
+		this.oscNode["connect"](this.oscGainNode);
+		this.oscGainNode["connect"](this.node["gain"]);
+		startSource(this.oscNode);
+	};
+	TremoloEffect.prototype.connectTo = function (node_)
+	{
+		this.node["disconnect"]();
+		this.node["connect"](node_);
+	};
+	TremoloEffect.prototype.remove = function ()
+	{
+		this.oscNode["disconnect"]();
+		this.oscGainNode["disconnect"]();
+		this.node["disconnect"]();
+	};
+	TremoloEffect.prototype.getInputNode = function ()
+	{
+		return this.node;
+	};
+	TremoloEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 0:		// mix
+			value = value / 100;
+			if (value < 0) value = 0;
+			if (value > 1) value = 1;
+			this.params[1] = value;
+			setAudioParam(this.node["gain"]["value"], 1 - (value / 2), ramp, time);
+			setAudioParam(this.oscGainNode["gain"]["value"], value / 2, ramp, time);
+			break;
+		case 7:		// modulation frequency
+			this.params[0] = value;
+			setAudioParam(this.oscNode["frequency"], value, ramp, time);
+			break;
+		}
+	};
+	function RingModulatorEffect(freq, mix)
+	{
+		this.type = "ringmod";
+		this.params = [freq, mix];
+		this.inputNode = createGain();
+		this.wetNode = createGain();
+		this.wetNode["gain"]["value"] = mix;
+		this.dryNode = createGain();
+		this.dryNode["gain"]["value"] = 1 - mix;
+		this.ringNode = createGain();
+		this.ringNode["gain"]["value"] = 0;
+		this.oscNode = context["createOscillator"]();
+		this.oscNode["frequency"]["value"] = freq;
+		this.oscNode["connect"](this.ringNode["gain"]);
+		startSource(this.oscNode);
+		this.inputNode["connect"](this.ringNode);
+		this.inputNode["connect"](this.dryNode);
+		this.ringNode["connect"](this.wetNode);
+	};
+	RingModulatorEffect.prototype.connectTo = function (node_)
+	{
+		this.wetNode["disconnect"]();
+		this.wetNode["connect"](node_);
+		this.dryNode["disconnect"]();
+		this.dryNode["connect"](node_);
+	};
+	RingModulatorEffect.prototype.remove = function ()
+	{
+		this.oscNode["disconnect"]();
+		this.ringNode["disconnect"]();
+		this.inputNode["disconnect"]();
+		this.wetNode["disconnect"]();
+		this.dryNode["disconnect"]();
+	};
+	RingModulatorEffect.prototype.getInputNode = function ()
+	{
+		return this.inputNode;
+	};
+	RingModulatorEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 0:		// mix
+			value = value / 100;
+			if (value < 0) value = 0;
+			if (value > 1) value = 1;
+			this.params[1] = value;
+			setAudioParam(this.wetNode["gain"], value, ramp, time);
+			setAudioParam(this.dryNode["gain"], 1 - value, ramp, time);
+			break;
+		case 7:		// modulation frequency
+			this.params[0] = value;
+			setAudioParam(this.oscNode["frequency"], value, ramp, time);
+			break;
+		}
+	};
+	function DistortionEffect(threshold, headroom, drive, makeupgain, mix)
+	{
+		this.type = "distortion";
+		this.params = [threshold, headroom, drive, makeupgain, mix];
+		this.inputNode = createGain();
+		this.preGain = createGain();
+		this.postGain = createGain();
+		this.setDrive(drive, dbToLinear_nocap(makeupgain));
+		this.wetNode = createGain();
+		this.wetNode["gain"]["value"] = mix;
+		this.dryNode = createGain();
+		this.dryNode["gain"]["value"] = 1 - mix;
+		this.waveShaper = context["createWaveShaper"]();
+		this.curve = new Float32Array(65536);
+		this.generateColortouchCurve(threshold, headroom);
+		this.waveShaper.curve = this.curve;
+		this.inputNode["connect"](this.preGain);
+		this.inputNode["connect"](this.dryNode);
+		this.preGain["connect"](this.waveShaper);
+		this.waveShaper["connect"](this.postGain);
+		this.postGain["connect"](this.wetNode);
+	};
+	DistortionEffect.prototype.setDrive = function (drive, makeupgain)
+	{
+		if (drive < 0.01)
+			drive = 0.01;
+		this.preGain["gain"]["value"] = drive;
+		this.postGain["gain"]["value"] = Math.pow(1 / drive, 0.6) * makeupgain;
+	};
+	function e4(x, k)
+	{
+		return 1.0 - Math.exp(-k * x);
+	}
+	DistortionEffect.prototype.shape = function (x, linearThreshold, linearHeadroom)
+	{
+		var maximum = 1.05 * linearHeadroom * linearThreshold;
+		var kk = (maximum - linearThreshold);
+		var sign = x < 0 ? -1 : +1;
+		var absx = x < 0 ? -x : x;
+		var shapedInput = absx < linearThreshold ? absx : linearThreshold + kk * e4(absx - linearThreshold, 1.0 / kk);
+		shapedInput *= sign;
+		return shapedInput;
+	};
+	DistortionEffect.prototype.generateColortouchCurve = function (threshold, headroom)
+	{
+		var linearThreshold = dbToLinear_nocap(threshold);
+		var linearHeadroom = dbToLinear_nocap(headroom);
+		var n = 65536;
+		var n2 = n / 2;
+		var x = 0;
+		for (var i = 0; i < n2; ++i) {
+			x = i / n2;
+			x = this.shape(x, linearThreshold, linearHeadroom);
+			this.curve[n2 + i] = x;
+			this.curve[n2 - i - 1] = -x;
+		}
+	};
+	DistortionEffect.prototype.connectTo = function (node)
+	{
+		this.wetNode["disconnect"]();
+		this.wetNode["connect"](node);
+		this.dryNode["disconnect"]();
+		this.dryNode["connect"](node);
+	};
+	DistortionEffect.prototype.remove = function ()
+	{
+		this.inputNode["disconnect"]();
+		this.preGain["disconnect"]();
+		this.waveShaper["disconnect"]();
+		this.postGain["disconnect"]();
+		this.wetNode["disconnect"]();
+		this.dryNode["disconnect"]();
+	};
+	DistortionEffect.prototype.getInputNode = function ()
+	{
+		return this.inputNode;
+	};
+	DistortionEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+		switch (param) {
+		case 0:		// mix
+			value = value / 100;
+			if (value < 0) value = 0;
+			if (value > 1) value = 1;
+			this.params[4] = value;
+			setAudioParam(this.wetNode["gain"], value, ramp, time);
+			setAudioParam(this.dryNode["gain"], 1 - value, ramp, time);
+			break;
+		}
+	};
+	function CompressorEffect(threshold, knee, ratio, attack, release)
+	{
+		this.type = "compressor";
+		this.params = [threshold, knee, ratio, attack, release];
+		this.node = context["createDynamicsCompressor"]();
+		this.node["threshold"]["value"] = threshold;
+		this.node["knee"]["value"] = knee;
+		this.node["ratio"]["value"] = ratio;
+		this.node["attack"]["value"] = attack;
+		this.node["release"]["value"] = release;
+	};
+	CompressorEffect.prototype.connectTo = function (node_)
+	{
+		this.node["disconnect"]();
+		this.node["connect"](node_);
+	};
+	CompressorEffect.prototype.remove = function ()
+	{
+		this.node["disconnect"]();
+	};
+	CompressorEffect.prototype.getInputNode = function ()
+	{
+		return this.node;
+	};
+	CompressorEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+	};
+	function AnalyserEffect(fftSize, smoothing)
+	{
+		this.type = "analyser";
+		this.params = [fftSize, smoothing];
+		this.node = context["createAnalyser"]();
+		this.node["fftSize"] = fftSize;
+		this.node["smoothingTimeConstant"] = smoothing;
+		this.freqBins = new Float32Array(this.node["frequencyBinCount"]);
+		this.signal = new Uint8Array(fftSize);
+		this.peak = 0;
+		this.rms = 0;
+	};
+	AnalyserEffect.prototype.tick = function ()
+	{
+		this.node["getFloatFrequencyData"](this.freqBins);
+		this.node["getByteTimeDomainData"](this.signal);
+		var fftSize = this.node["fftSize"];
+		var i = 0;
+		this.peak = 0;
+		var rmsSquaredSum = 0;
+		var s = 0;
+		for ( ; i < fftSize; i++)
+		{
+			s = (this.signal[i] - 128) / 128;
+			if (s < 0)
+				s = -s;
+			if (this.peak < s)
+				this.peak = s;
+			rmsSquaredSum += s * s;
+		}
+		this.peak = linearToDb(this.peak);
+		this.rms = linearToDb(Math.sqrt(rmsSquaredSum / fftSize));
+	};
+	AnalyserEffect.prototype.connectTo = function (node_)
+	{
+		this.node["disconnect"]();
+		this.node["connect"](node_);
+	};
+	AnalyserEffect.prototype.remove = function ()
+	{
+		this.node["disconnect"]();
+	};
+	AnalyserEffect.prototype.getInputNode = function ()
+	{
+		return this.node;
+	};
+	AnalyserEffect.prototype.setParam = function(param, value, ramp, time)
+	{
+	};
+	var OT_POS_SAMPLES = 4;
+	function ObjectTracker()
+	{
+		this.obj = null;
+		this.loadUid = 0;
+		this.speeds = [];
+		this.lastX = 0;
+		this.lastY = 0;
+		this.moveAngle = 0;
+	};
+	ObjectTracker.prototype.setObject = function (obj_)
+	{
+		this.obj = obj_;
+		if (this.obj)
+		{
+			this.lastX = this.obj.x;
+			this.lastY = this.obj.y;
+		}
+		this.speeds.length = 0;
+	};
+	ObjectTracker.prototype.hasObject = function ()
+	{
+		return !!this.obj;
+	};
+	ObjectTracker.prototype.tick = function (dt)
+	{
+		if (!this.obj || dt === 0)
+			return;
+		this.moveAngle = cr.angleTo(this.lastX, this.lastY, this.obj.x, this.obj.y);
+		var s = cr.distanceTo(this.lastX, this.lastY, this.obj.x, this.obj.y) / dt;
+		if (this.speeds.length < OT_POS_SAMPLES)
+			this.speeds.push(s);
+		else
+		{
+			this.speeds.shift();
+			this.speeds.push(s);
+		}
+		this.lastX = this.obj.x;
+		this.lastY = this.obj.y;
+	};
+	ObjectTracker.prototype.getSpeed = function ()
+	{
+		if (!this.speeds.length)
+			return 0;
+		var i, len, sum = 0;
+		for (i = 0, len = this.speeds.length; i < len; i++)
+		{
+			sum += this.speeds[i];
+		}
+		return sum / this.speeds.length;
+	};
+	ObjectTracker.prototype.getVelocityX = function ()
+	{
+		return Math.cos(this.moveAngle) * this.getSpeed();
+	};
+	ObjectTracker.prototype.getVelocityY = function ()
+	{
+		return Math.sin(this.moveAngle) * this.getSpeed();
+	};
+	var iOShadtouch = false;	// has had touch input on iOS to work around web audio API muting
+	function C2AudioBuffer(src_, is_music)
+	{
+		this.src = src_;
+		this.myapi = api;
+		this.is_music = is_music;
+		this.added_end_listener = false;
+		var self = this;
+		this.outNode = null;
+		this.mediaSourceNode = null;
+		this.panWhenReady = [];		// for web audio API positioned sounds
+		this.seekWhenReady = 0;
+		this.pauseWhenReady = false;
+		if (api === API_WEBAUDIO && is_music)
+		{
+			this.myapi = API_HTML5;
+			this.outNode = createGain();
+		}
+		this.bufferObject = null;			// actual audio object
+		this.audioData = null;				// web audio api: ajax request result (compressed audio that needs decoding)
+		var request;
+		switch (this.myapi) {
+		case API_HTML5:
+			this.bufferObject = new Audio();
+			if (api === API_WEBAUDIO && context["createMediaElementSource"] && !audRuntime.isFirefox)
+			{
+				this.bufferObject.addEventListener("canplay", function ()
+				{
+					if (!self.mediaSourceNode)		// protect against this event firing twice
+					{
+						self.mediaSourceNode = context["createMediaElementSource"](self.bufferObject);
+						self.mediaSourceNode["connect"](self.outNode);
+					}
+				});
+			}
+			this.bufferObject.autoplay = false;	// this is only a source buffer, not an instance
+			this.bufferObject.preload = "auto";
+			this.bufferObject.src = src_;
+			break;
+		case API_WEBAUDIO:
+			request = new XMLHttpRequest();
+			request.open("GET", src_, true);
+			request.responseType = "arraybuffer";
+			request.onload = function () {
+				self.audioData = request.response;
+				self.decodeAudioBuffer();
+			};
+			request.send();
+			break;
+		case API_PHONEGAP:
+			this.bufferObject = true;
+			break;
+		case API_APPMOBI:
+			this.bufferObject = true;
+			break;
+		}
+	};
+	C2AudioBuffer.prototype.decodeAudioBuffer = function ()
+	{
+		if (this.bufferObject || !this.audioData)
+			return;		// audio already decoded or AJAX request not yet complete
+		var self = this;
+		if (context["decodeAudioData"])
+		{
+			context["decodeAudioData"](this.audioData, function (buffer) {
+					self.bufferObject = buffer;
+					var p, i, len, a;
+					if (!cr.is_undefined(self.playTagWhenReady) && !silent)
+					{
+						if (self.panWhenReady.length)
+						{
+							for (i = 0, len = self.panWhenReady.length; i < len; i++)
+							{
+								p = self.panWhenReady[i];
+								a = new C2AudioInstance(self, p.thistag);
+								a.setPannerEnabled(true);
+								if (typeof p.objUid !== "undefined")
+								{
+									p.obj = audRuntime.getObjectByUID(p.objUid);
+									if (!p.obj)
+										continue;
+								}
+								if (p.obj)
+								{
+									var px = cr.rotatePtAround(p.obj.x, p.obj.y, -p.obj.layer.getAngle(), listenerX, listenerY, true);
+									var py = cr.rotatePtAround(p.obj.x, p.obj.y, -p.obj.layer.getAngle(), listenerX, listenerY, false);
+									a.setPan(px, py, cr.to_degrees(p.obj.angle - p.obj.layer.getAngle()), p.ia, p.oa, p.og);
+									a.setObject(p.obj);
+								}
+								else
+								{
+									a.setPan(p.x, p.y, p.a, p.ia, p.oa, p.og);
+								}
+								a.play(self.loopWhenReady, self.volumeWhenReady, self.seekWhenReady);
+								if (self.pauseWhenReady)
+									a.pause();
+								audioInstances.push(a);
+							}
+							self.panWhenReady.length = 0;
+						}
+						else
+						{
+							a = new C2AudioInstance(self, self.playTagWhenReady);
+							a.play(self.loopWhenReady, self.volumeWhenReady, self.seekWhenReady);
+							if (self.pauseWhenReady)
+								a.pause();
+							audioInstances.push(a);
+						}
+					}
+					else if (!cr.is_undefined(self.convolveWhenReady))
+					{
+						var convolveNode = self.convolveWhenReady.convolveNode;
+						convolveNode["normalize"] = self.normalizeWhenReady;
+						convolveNode["buffer"] = buffer;
+					}
+			});
+		}
+		else
+		{
+			this.bufferObject = context["createBuffer"](this.audioData, false);
+			if (!cr.is_undefined(this.playTagWhenReady) && !silent)
+			{
+				var a = new C2AudioInstance(this, this.playTagWhenReady);
+				a.play(this.loopWhenReady, this.volumeWhenReady, this.seekWhenReady);
+				if (this.pauseWhenReady)
+					a.pause();
+				audioInstances.push(a);
+			}
+			else if (!cr.is_undefined(this.convolveWhenReady))
+			{
+				var convolveNode = this.convolveWhenReady.convolveNode;
+				convolveNode["normalize"] = this.normalizeWhenReady;
+				convolveNode["buffer"] = this.bufferObject;
+			}
+		}
+	};
+	C2AudioBuffer.prototype.isLoaded = function ()
+	{
+		switch (this.myapi) {
+		case API_HTML5:
+			return this.bufferObject["readyState"] === 4;	// HAVE_ENOUGH_DATA
+		case API_WEBAUDIO:
+			return !!this.audioData;			// null until AJAX request completes
+		case API_PHONEGAP:
+			return true;
+		case API_APPMOBI:
+			return true;
+		}
+		return false;
+	};
+	function C2AudioInstance(buffer_, tag_)
+	{
+		var self = this;
+		this.tag = tag_;
+		this.fresh = true;
+		this.stopped = true;
+		this.src = buffer_.src;
+		this.buffer = buffer_;
+		this.myapi = api;
+		this.is_music = buffer_.is_music;
+		this.playbackRate = 1;
+		this.pgended = true;			// for PhoneGap only: ended flag
+		this.resume_me = false;			// make sure resumes when leaving suspend
+		this.is_paused = false;
+		this.resume_position = 0;		// for web audio api to resume from correct playback position
+		this.looping = false;
+		this.is_muted = false;
+		this.is_silent = false;
+		this.volume = 1;
+		this.mutevol = 1;
+		this.startTime = audRuntime.kahanTime.sum;
+		this.gainNode = null;
+		this.pannerNode = null;
+		this.pannerEnabled = false;
+		this.objectTracker = null;
+		this.panX = 0;
+		this.panY = 0;
+		this.panAngle = 0;
+		this.panConeInner = 0;
+		this.panConeOuter = 0;
+		this.panConeOuterGain = 0;
+		this.instanceObject = null;
+		var add_end_listener = false;
+		switch (this.myapi) {
+		case API_HTML5:
+			if (this.is_music)
+			{
+				this.instanceObject = buffer_.bufferObject;
+				add_end_listener = !buffer_.added_end_listener;
+				buffer_.added_end_listener = true;
+			}
+			else
+			{
+				this.instanceObject = new Audio();
+				this.instanceObject.autoplay = false;
+				this.instanceObject.src = buffer_.bufferObject.src;
+				add_end_listener = true;
+			}
+			if (add_end_listener)
+			{
+				this.instanceObject.addEventListener('ended', function () {
+						audTag = self.tag;
+						self.stopped = true;
+						audRuntime.trigger(cr.plugins_.Audio.prototype.cnds.OnEnded, audInst);
+				});
+			}
+			break;
+		case API_WEBAUDIO:
+			this.gainNode = createGain();
+			this.gainNode["connect"](getDestinationForTag(tag_));
+			if (this.buffer.myapi === API_WEBAUDIO)
+			{
+				if (buffer_.bufferObject)
+				{
+					this.instanceObject = context["createBufferSource"]();
+					this.instanceObject["buffer"] = buffer_.bufferObject;
+					this.instanceObject["connect"](this.gainNode);
+				}
+			}
+			else
+			{
+				this.instanceObject = this.buffer.bufferObject;		// reference the audio element
+				this.buffer.outNode["connect"](this.gainNode);
+			}
+			break;
+		case API_PHONEGAP:
+			this.instanceObject = new window["Media"](appPath + this.src, null, null, function (status) {
+					if (status === window["Media"]["MEDIA_STOPPED"])
+					{
+						self.pgended = true;
+						self.stopped = true;
+						audTag = self.tag;
+						audRuntime.trigger(cr.plugins_.Audio.prototype.cnds.OnEnded, audInst);
+					}
+			});
+			break;
+		case API_APPMOBI:
+			this.instanceObject = true;
+			break;
+		}
+	};
+	C2AudioInstance.prototype.hasEnded = function ()
+	{
+		switch (this.myapi) {
+		case API_HTML5:
+			return this.instanceObject.ended;
+		case API_WEBAUDIO:
+			if (this.buffer.myapi === API_WEBAUDIO)
+			{
+				if (!this.fresh && !this.stopped && this.instanceObject["loop"])
+					return false;
+				if (this.is_paused)
+					return false;
+				return (audRuntime.kahanTime.sum - this.startTime) > this.buffer.bufferObject["duration"];
+			}
+			else
+				return this.instanceObject.ended;
+		case API_PHONEGAP:
+			return this.pgended;
+		case API_APPMOBI:
+			true;	// recycling an AppMobi sound does not matter because it will just do another throwaway playSound
+		}
+		return true;
+	};
+	C2AudioInstance.prototype.canBeRecycled = function ()
+	{
+		if (this.fresh || this.stopped)
+			return true;		// not yet used or is not playing
+		return this.hasEnded();
+	};
+	C2AudioInstance.prototype.setPannerEnabled = function (enable_)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		if (!this.pannerEnabled && enable_)
+		{
+			if (!this.pannerNode)
+			{
+				this.pannerNode = context["createPanner"]();
+				if (typeof this.pannerNode["panningModel"] === "number")
+					this.pannerNode["panningModel"] = panningModel;
+				else
+					this.pannerNode["panningModel"] = ["equalpower", "HRTF", "soundfield"][panningModel];
+				if (typeof this.pannerNode["distanceModel"] === "number")
+					this.pannerNode["distanceModel"] = distanceModel;
+				else
+					this.pannerNode["distanceModel"] = ["linear", "inverse", "exponential"][distanceModel];
+				this.pannerNode["refDistance"] = refDistance;
+				this.pannerNode["maxDistance"] = maxDistance;
+				this.pannerNode["rolloffFactor"] = rolloffFactor;
+			}
+			this.gainNode["disconnect"]();
+			this.gainNode["connect"](this.pannerNode);
+			this.pannerNode["connect"](getDestinationForTag(this.tag));
+			this.pannerEnabled = true;
+		}
+		else if (this.pannerEnabled && !enable_)
+		{
+			this.pannerNode["disconnect"]();
+			this.gainNode["disconnect"]();
+			this.gainNode["connect"](getDestinationForTag(this.tag));
+			this.pannerEnabled = false;
+		}
+	};
+	C2AudioInstance.prototype.setPan = function (x, y, angle, innerangle, outerangle, outergain)
+	{
+		if (!this.pannerEnabled || api !== API_WEBAUDIO)
+			return;
+		this.pannerNode["setPosition"](x, y, 0);
+		this.pannerNode["setOrientation"](Math.cos(cr.to_radians(angle)), Math.sin(cr.to_radians(angle)), 0);
+		this.pannerNode["coneInnerAngle"] = innerangle;
+		this.pannerNode["coneOuterAngle"] = outerangle;
+		this.pannerNode["coneOuterGain"] = outergain;
+		this.panX = x;
+		this.panY = y;
+		this.panAngle = angle;
+		this.panConeInner = innerangle;
+		this.panConeOuter = outerangle;
+		this.panConeOuterGain = outergain;
+	};
+	C2AudioInstance.prototype.setObject = function (o)
+	{
+		if (!this.pannerEnabled || api !== API_WEBAUDIO)
+			return;
+		if (!this.objectTracker)
+			this.objectTracker = new ObjectTracker();
+		this.objectTracker.setObject(o);
+	};
+	C2AudioInstance.prototype.tick = function (dt)
+	{
+		if (!this.pannerEnabled || api !== API_WEBAUDIO || !this.objectTracker || !this.objectTracker.hasObject() || !this.isPlaying())
+		{
+			return;
+		}
+		this.objectTracker.tick(dt);
+		var inst = this.objectTracker.obj;
+		var px = cr.rotatePtAround(inst.x, inst.y, -inst.layer.getAngle(), listenerX, listenerY, true);
+		var py = cr.rotatePtAround(inst.x, inst.y, -inst.layer.getAngle(), listenerX, listenerY, false);
+		this.pannerNode["setPosition"](px, py, 0);
+		var a = 0;
+		if (typeof this.objectTracker.obj.angle !== "undefined")
+		{
+			a = inst.angle - inst.layer.getAngle();
+			this.pannerNode["setOrientation"](Math.cos(a), Math.sin(a), 0);
+		}
+		this.pannerNode["setVelocity"](this.objectTracker.getVelocityX(), this.objectTracker.getVelocityY(), 0);
+	};
+	C2AudioInstance.prototype.play = function (looping, vol, fromPosition)
+	{
+		var instobj = this.instanceObject;
+		this.looping = looping;
+		this.volume = vol;
+		var seekPos = fromPosition || 0;
+		switch (this.myapi) {
+		case API_HTML5:
+			if (instobj.playbackRate !== 1.0)
+				instobj.playbackRate = 1.0;
+			if (instobj.volume !== vol * masterVolume)
+				instobj.volume = vol * masterVolume;
+			if (instobj.loop !== looping)
+				instobj.loop = looping;
+			if (instobj.muted)
+				instobj.muted = false;
+			if (instobj.currentTime !== seekPos)
+			{
+				try {
+					instobj.currentTime = seekPos;
+				}
+				catch (err)
+				{
+;
+				}
+			}
+			if (this.is_music && isMusicWorkaround)
+				musicPlayNextTouch.push(this);
+			else
+				this.instanceObject.play();
+			break;
+		case API_WEBAUDIO:
+			this.muted = false;
+			this.mutevol = 1;
+			if (this.buffer.myapi === API_WEBAUDIO)
+			{
+				if (!this.fresh)
+				{
+					this.instanceObject = context["createBufferSource"]();
+					this.instanceObject["buffer"] = this.buffer.bufferObject;
+					this.instanceObject["connect"](this.gainNode);
+				}
+				this.instanceObject.loop = looping;
+				this.gainNode["gain"]["value"] = vol * masterVolume;
+				if (seekPos === 0)
+					startSource(this.instanceObject);
+				else
+					startSourceAt(this.instanceObject, seekPos, this.getDuration());
+			}
+			else
+			{
+				if (instobj.playbackRate !== 1.0)
+					instobj.playbackRate = 1.0;
+				if (instobj.loop !== looping)
+					instobj.loop = looping;
+				this.gainNode["gain"]["value"] = vol * masterVolume;
+				if (instobj.currentTime !== seekPos)
+				{
+					try {
+						instobj.currentTime = seekPos;
+					}
+					catch (err)
+					{
+;
+					}
+				}
+				if (this.is_music && isMusicWorkaround)
+					musicPlayNextTouch.push(this);
+				else
+					instobj.play();
+			}
+			break;
+		case API_PHONEGAP:
+			if ((!this.fresh && this.stopped) || seekPos !== 0)
+				instobj["seekTo"](seekPos);
+			instobj["play"]();
+			this.pgended = false;
+			break;
+		case API_APPMOBI:
+			if (audRuntime.isDirectCanvas)
+				AppMobi["context"]["playSound"](this.src);
+			else
+				AppMobi["player"]["playSound"](this.src);
+			break;
+		}
+		this.playbackRate = 1;
+		this.startTime = audRuntime.kahanTime.sum - seekPos;
+		this.fresh = false;
+		this.stopped = false;
+		this.is_paused = false;
+	};
+	C2AudioInstance.prototype.stop = function ()
+	{
+		switch (this.myapi) {
+		case API_HTML5:
+			if (!this.instanceObject.paused)
+				this.instanceObject.pause();
+			break;
+		case API_WEBAUDIO:
+			if (this.buffer.myapi === API_WEBAUDIO)
+				stopSource(this.instanceObject);
+			else
+			{
+				if (!this.instanceObject.paused)
+					this.instanceObject.pause();
+			}
+			break;
+		case API_PHONEGAP:
+			this.instanceObject["stop"]();
+			break;
+		case API_APPMOBI:
+			break;
+		}
+		this.stopped = true;
+		this.is_paused = false;
+	};
+	C2AudioInstance.prototype.pause = function ()
+	{
+		if (this.fresh || this.stopped || this.hasEnded() || this.is_paused)
+			return;
+		switch (this.myapi) {
+		case API_HTML5:
+			if (!this.instanceObject.paused)
+				this.instanceObject.pause();
+			break;
+		case API_WEBAUDIO:
+			if (this.buffer.myapi === API_WEBAUDIO)
+			{
+				this.resume_position = this.getPlaybackTime();
+				if (this.looping)
+					this.resume_position = this.resume_position % this.getDuration();
+				stopSource(this.instanceObject);
+			}
+			else
+			{
+				if (!this.instanceObject.paused)
+					this.instanceObject.pause();
+			}
+			break;
+		case API_PHONEGAP:
+			this.instanceObject["pause"]();
+			break;
+		case API_APPMOBI:
+			break;
+		}
+		this.is_paused = true;
+	};
+	C2AudioInstance.prototype.resume = function ()
+	{
+		if (this.fresh || this.stopped || this.hasEnded() || !this.is_paused)
+			return;
+		switch (this.myapi) {
+		case API_HTML5:
+			this.instanceObject.play();
+			break;
+		case API_WEBAUDIO:
+			if (this.buffer.myapi === API_WEBAUDIO)
+			{
+				this.instanceObject = context["createBufferSource"]();
+				this.instanceObject["buffer"] = this.buffer.bufferObject;
+				this.instanceObject["connect"](this.gainNode);
+				this.instanceObject.loop = this.looping;
+				this.gainNode["gain"]["value"] = masterVolume * this.volume * this.mutevol;
+				this.startTime = audRuntime.kahanTime.sum - this.resume_position;
+				startSourceAt(this.instanceObject, this.resume_position, this.getDuration());
+			}
+			else
+			{
+				this.instanceObject.play();
+			}
+			break;
+		case API_PHONEGAP:
+			this.instanceObject["play"]();
+			break;
+		case API_APPMOBI:
+			break;
+		}
+		this.is_paused = false;
+	};
+	C2AudioInstance.prototype.seek = function (pos)
+	{
+		if (this.fresh || this.stopped || this.hasEnded())
+			return;
+		switch (this.myapi) {
+		case API_HTML5:
+			try {
+				this.instanceObject.currentTime = pos;
+			}
+			catch (e) {}
+			break;
+		case API_WEBAUDIO:
+			if (this.buffer.myapi === API_WEBAUDIO)
+			{
+				if (this.is_paused)
+					this.resume_position = pos;
+				else
+				{
+					this.pause();
+					this.resume_position = pos;
+					this.resume();
+				}
+			}
+			else
+			{
+				try {
+					this.instanceObject.currentTime = pos;
+				}
+				catch (e) {}
+			}
+			break;
+		case API_PHONEGAP:
+			break;
+		case API_APPMOBI:
+			break;
+		}
+	};
+	C2AudioInstance.prototype.reconnect = function (toNode)
+	{
+		if (this.myapi !== API_WEBAUDIO)
+			return;
+		if (this.pannerEnabled)
+		{
+			this.pannerNode["disconnect"]();
+			this.pannerNode["connect"](toNode);
+		}
+		else
+		{
+			this.gainNode["disconnect"]();
+			this.gainNode["connect"](toNode);
+		}
+	};
+	C2AudioInstance.prototype.getDuration = function ()
+	{
+		switch (this.myapi) {
+		case API_HTML5:
+			if (typeof this.instanceObject.duration !== "undefined")
+				return this.instanceObject.duration;
+			else
+				return 0;
+		case API_WEBAUDIO:
+			return this.buffer.bufferObject["duration"];
+		case API_PHONEGAP:
+			return this.instanceObject["getDuration"]();
+		case API_APPMOBI:
+			return 0;
+		}
+		return 0;
+	};
+	C2AudioInstance.prototype.getPlaybackTime = function ()
+	{
+		var duration = this.getDuration();
+		var ret = 0;
+		switch (this.myapi) {
+		case API_HTML5:
+			if (typeof this.instanceObject.currentTime !== "undefined")
+				ret = this.instanceObject.currentTime;
+			break;
+		case API_WEBAUDIO:
+			if (this.buffer.myapi === API_WEBAUDIO)
+			{
+				if (this.is_paused)
+					return this.resume_position;
+				else
+					ret = audRuntime.kahanTime.sum - this.startTime;
+			}
+			else if (typeof this.instanceObject.currentTime !== "undefined")
+				ret = this.instanceObject.currentTime;
+			break;
+		case API_PHONEGAP:
+			break;
+		case API_APPMOBI:
+			break;
+		}
+		if (!this.looping && ret > duration)
+			ret = duration;
+		return ret;
+	};
+	C2AudioInstance.prototype.isPlaying = function ()
+	{
+		return !this.is_paused && !this.fresh && !this.stopped && !this.hasEnded();
+	};
+	C2AudioInstance.prototype.setVolume = function (v)
+	{
+		this.volume = v;
+		this.updateVolume();
+	};
+	C2AudioInstance.prototype.updateVolume = function ()
+	{
+		var volToSet = this.volume * masterVolume;
+		switch (this.myapi) {
+		case API_HTML5:
+			if (this.instanceObject.volume && this.instanceObject.volume !== volToSet)
+				this.instanceObject.volume = volToSet;
+			break;
+		case API_WEBAUDIO:
+			this.gainNode["gain"]["value"] = volToSet * this.mutevol;
+			break;
+		case API_PHONEGAP:
+			break;
+		case API_APPMOBI:
+			break;
+		}
+	};
+	C2AudioInstance.prototype.getVolume = function ()
+	{
+		return this.volume;
+	};
+	C2AudioInstance.prototype.doSetMuted = function (m)
+	{
+		switch (this.myapi) {
+		case API_HTML5:
+			if (this.instanceObject.muted !== !!m)
+				this.instanceObject.muted = !!m;
+			break;
+		case API_WEBAUDIO:
+			this.mutevol = (m ? 0 : 1);
+			this.gainNode["gain"]["value"] = masterVolume * this.volume * this.mutevol;
+			break;
+		case API_PHONEGAP:
+			break;
+		case API_APPMOBI:
+			break;
+		}
+	};
+	C2AudioInstance.prototype.setMuted = function (m)
+	{
+		this.is_muted = !!m;
+		this.doSetMuted(this.is_muted || this.is_silent);
+	};
+	C2AudioInstance.prototype.setSilent = function (m)
+	{
+		this.is_silent = !!m;
+		this.doSetMuted(this.is_muted || this.is_silent);
+	};
+	C2AudioInstance.prototype.setLooping = function (l)
+	{
+		this.looping = l;
+		switch (this.myapi) {
+		case API_HTML5:
+			if (this.instanceObject.loop !== !!l)
+				this.instanceObject.loop = !!l;
+			break;
+		case API_WEBAUDIO:
+			if (this.instanceObject.loop !== !!l)
+				this.instanceObject.loop = !!l;
+			break;
+		case API_PHONEGAP:
+			break;
+		case API_APPMOBI:
+			break;
+		}
+	};
+	C2AudioInstance.prototype.setPlaybackRate = function (r)
+	{
+		this.playbackRate = r;
+		this.updatePlaybackRate();
+	};
+	C2AudioInstance.prototype.updatePlaybackRate = function ()
+	{
+		var r = this.playbackRate;
+		if ((timescale_mode === 1 && !this.is_music) || timescale_mode === 2)
+			r *= audRuntime.timescale;
+		switch (this.myapi) {
+		case API_HTML5:
+			if (this.instanceObject.playbackRate !== r)
+				this.instanceObject.playbackRate = r;
+			break;
+		case API_WEBAUDIO:
+			if (this.buffer.myapi === API_WEBAUDIO)
+			{
+				if (this.instanceObject["playbackRate"]["value"] !== r)
+					this.instanceObject["playbackRate"]["value"] = r;
+			}
+			else
+			{
+				if (this.instanceObject.playbackRate !== r)
+					this.instanceObject.playbackRate = r;
+			}
+			break;
+		case API_PHONEGAP:
+			break;
+		case API_APPMOBI:
+			break;
+		}
+	};
+	C2AudioInstance.prototype.setSuspended = function (s)
+	{
+		switch (this.myapi) {
+		case API_HTML5:
+			if (s)
+			{
+				if (this.isPlaying())
+				{
+					this.instanceObject["pause"]();
+					this.resume_me = true;
+				}
+				else
+					this.resume_me = false;
+			}
+			else
+			{
+				if (this.resume_me)
+					this.instanceObject["play"]();
+			}
+			break;
+		case API_WEBAUDIO:
+			if (s)
+			{
+				if (this.isPlaying())
+				{
+					if (this.buffer.myapi === API_WEBAUDIO)
+					{
+						this.resume_position = this.getPlaybackTime();
+						if (this.looping)
+							this.resume_position = this.resume_position % this.getDuration();
+						stopSource(this.instanceObject);
+					}
+					else
+						this.instanceObject["pause"]();
+					this.resume_me = true;
+				}
+				else
+					this.resume_me = false;
+			}
+			else
+			{
+				if (this.resume_me)
+				{
+					if (this.buffer.myapi === API_WEBAUDIO)
+					{
+						this.instanceObject = context["createBufferSource"]();
+						this.instanceObject["buffer"] = this.buffer.bufferObject;
+						this.instanceObject["connect"](this.gainNode);
+						this.instanceObject.loop = this.looping;
+						this.gainNode["gain"]["value"] = masterVolume * this.volume * this.mutevol;
+						this.startTime = audRuntime.kahanTime.sum - this.resume_position;
+						startSourceAt(this.instanceObject, this.resume_position, this.getDuration());
+					}
+					else
+					{
+						this.instanceObject["play"]();
+					}
+				}
+			}
+			break;
+		case API_PHONEGAP:
+			if (s)
+			{
+				if (this.isPlaying())
+				{
+					this.instanceObject["pause"]();
+					this.resume_me = true;
+				}
+				else
+					this.resume_me = false;
+			}
+			else
+			{
+				if (this.resume_me)
+					this.instanceObject["play"]();
+			}
+			break;
+		case API_APPMOBI:
+			break;
+		}
+	};
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+		audRuntime = this.runtime;
+		audInst = this;
+		this.listenerTracker = null;
+		this.listenerZ = -600;
+		if ((this.runtime.isiOS || (this.runtime.isAndroid && (this.runtime.isChrome || this.runtime.isAndroidStockBrowser))) && !this.runtime.isCrosswalk)
+		{
+			isMusicWorkaround = true;
+		}
+		context = null;
+		if (typeof AudioContext !== "undefined")
+		{
+			api = API_WEBAUDIO;
+			context = new AudioContext();
+		}
+		else if (typeof webkitAudioContext !== "undefined")
+		{
+			api = API_WEBAUDIO;
+			context = new webkitAudioContext();
+		}
+		if ((this.runtime.isiOS && api === API_WEBAUDIO) || isMusicWorkaround)
+		{
+			document.addEventListener("touchstart", function ()
+			{
+				var i, len, m;
+				if (isMusicWorkaround)
+				{
+					if (!silent)
+					{
+						for (i = 0, len = musicPlayNextTouch.length; i < len; ++i)
+						{
+							m = musicPlayNextTouch[i];
+							if (!m.stopped && !m.is_paused)
+								m.instanceObject.play();
+						}
+					}
+					musicPlayNextTouch.length = 0;
+				}
+				if (iOShadtouch || !context)
+					return;
+				var buffer = context["createBuffer"](1, 1, 22050);
+				var source = context["createBufferSource"]();
+				source["buffer"] = buffer;
+				source["connect"](context["destination"]);
+				startSource(source);
+				iOShadtouch = true;
+			}, true);
+		}
+		if (api !== API_WEBAUDIO)
+		{
+			if (this.runtime.isPhoneGap)
+				api = API_PHONEGAP;
+			else if (this.runtime.isAppMobi)
+				api = API_APPMOBI;
+		}
+		if (api === API_PHONEGAP)
+		{
+			appPath = location.href;
+			var i = appPath.lastIndexOf("/");
+			if (i > -1)
+				appPath = appPath.substr(0, i + 1);
+			appPath = appPath.replace("file://", "");
+		}
+		if (this.runtime.isSafari && this.runtime.isWindows && typeof Audio === "undefined")
+		{
+			alert("It looks like you're using Safari for Windows without Quicktime.  Audio cannot be played until Quicktime is installed.");
+			this.runtime.DestroyInstance(this);
+		}
+		else
+		{
+			if (this.runtime.isDirectCanvas)
+				useOgg = this.runtime.isAndroid;		// AAC on iOS, OGG on Android
+			else
+			{
+				try {
+					useOgg = !!(new Audio().canPlayType('audio/ogg; codecs="vorbis"'));
+				}
+				catch (e)
+				{
+					useOgg = false;
+				}
+			}
+			switch (api) {
+			case API_HTML5:
+;
+				break;
+			case API_WEBAUDIO:
+;
+				break;
+			case API_PHONEGAP:
+;
+				break;
+			case API_APPMOBI:
+;
+				break;
+			default:
+;
+			}
+			this.runtime.tickMe(this);
+		}
+	};
+	var instanceProto = pluginProto.Instance.prototype;
+	instanceProto.onCreate = function ()
+	{
+		timescale_mode = this.properties[0];	// 0 = off, 1 = sounds only, 2 = all
+		this.saveload = this.properties[1];		// 0 = all, 1 = sounds only, 2 = music only, 3 = none
+		panningModel = this.properties[2];		// 0 = equalpower, 1 = hrtf, 3 = soundfield
+		distanceModel = this.properties[3];		// 0 = linear, 1 = inverse, 2 = exponential
+		this.listenerZ = -this.properties[4];
+		refDistance = this.properties[5];
+		maxDistance = this.properties[6];
+		rolloffFactor = this.properties[7];
+		this.listenerTracker = new ObjectTracker();
+		if (api === API_WEBAUDIO)
+		{
+			context["listener"]["speedOfSound"] = this.properties[8];
+			context["listener"]["dopplerFactor"] = this.properties[9];
+			context["listener"]["setPosition"](this.runtime.width / 2, this.runtime.height / 2, this.listenerZ);
+			context["listener"]["setOrientation"](0, 0, 1, 0, -1, 0);
+			window["c2OnAudioMicStream"] = function (localMediaStream, tag)
+			{
+				if (micSource)
+					micSource["disconnect"]();
+				micTag = tag.toLowerCase();
+				micSource = context["createMediaStreamSource"](localMediaStream);
+				micSource["connect"](getDestinationForTag(micTag));
+			};
+		}
+		this.runtime.addSuspendCallback(function(s)
+		{
+			audInst.onSuspend(s);
+		});
+		var self = this;
+		this.runtime.addDestroyCallback(function (inst)
+		{
+			self.onInstanceDestroyed(inst);
+		});
+	};
+	instanceProto.onInstanceDestroyed = function (inst)
+	{
+		var i, len, a;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+		{
+			a = audioInstances[i];
+			if (a.objectTracker)
+			{
+				if (a.objectTracker.obj === inst)
+				{
+					a.objectTracker.obj = null;
+					if (a.pannerEnabled && a.isPlaying() && a.looping)
+						a.stop();
+				}
+			}
+		}
+		if (this.listenerTracker.obj === inst)
+			this.listenerTracker.obj = null;
+	};
+	instanceProto.saveToJSON = function ()
+	{
+		var o = {
+			"silent": silent,
+			"masterVolume": masterVolume,
+			"listenerZ": this.listenerZ,
+			"listenerUid": this.listenerTracker.hasObject() ? this.listenerTracker.obj.uid : -1,
+			"playing": [],
+			"effects": {}
+		};
+		var playingarr = o["playing"];
+		var i, len, a, d, p, panobj, playbackTime;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+		{
+			a = audioInstances[i];
+			if (!a.isPlaying())
+				continue;				// no need to save stopped sounds
+			if (this.saveload === 3)	// not saving/loading any sounds/music
+				continue;
+			if (a.is_music && this.saveload === 1)	// not saving/loading music
+				continue;
+			if (!a.is_music && this.saveload === 2)	// not saving/loading sound
+				continue;
+			playbackTime = a.getPlaybackTime();
+			if (a.looping)
+				playbackTime = playbackTime % a.getDuration();
+			d = {
+				"tag": a.tag,
+				"buffersrc": a.buffer.src,
+				"is_music": a.is_music,
+				"playbackTime": playbackTime,
+				"volume": a.volume,
+				"looping": a.looping,
+				"muted": a.is_muted,
+				"playbackRate": a.playbackRate,
+				"paused": a.is_paused,
+				"resume_position": a.resume_position
+			};
+			if (a.pannerEnabled)
+			{
+				d["pan"] = {};
+				panobj = d["pan"];
+				if (a.objectTracker && a.objectTracker.hasObject())
+				{
+					panobj["objUid"] = a.objectTracker.obj.uid;
+				}
+				else
+				{
+					panobj["x"] = a.panX;
+					panobj["y"] = a.panY;
+					panobj["a"] = a.panAngle;
+				}
+				panobj["ia"] = a.panConeInner;
+				panobj["oa"] = a.panConeOuter;
+				panobj["og"] = a.panConeOuterGain;
+			}
+			playingarr.push(d);
+		}
+		var fxobj = o["effects"];
+		var fxarr;
+		for (p in effects)
+		{
+			if (effects.hasOwnProperty(p))
+			{
+				fxarr = [];
+				for (i = 0, len = effects[p].length; i < len; i++)
+				{
+					fxarr.push({ "type": effects[p][i].type, "params": effects[p][i].params });
+				}
+				fxobj[p] = fxarr;
+			}
+		}
+		return o;
+	};
+	var objectTrackerUidsToLoad = [];
+	instanceProto.loadFromJSON = function (o)
+	{
+		var setSilent = o["silent"];
+		masterVolume = o["masterVolume"];
+		this.listenerZ = o["listenerZ"];
+		this.listenerTracker.setObject(null);
+		var listenerUid = o["listenerUid"];
+		if (listenerUid !== -1)
+		{
+			this.listenerTracker.loadUid = listenerUid;
+			objectTrackerUidsToLoad.push(this.listenerTracker);
+		}
+		var playingarr = o["playing"];
+		var i, len, d, src, is_music, tag, playbackTime, looping, vol, b, a, p, pan, panObjUid;
+		if (this.saveload !== 3)
+		{
+			for (i = 0, len = audioInstances.length; i < len; i++)
+			{
+				a = audioInstances[i];
+				if (a.is_music && this.saveload === 1)
+					continue;		// only saving/loading sound: leave music playing
+				if (!a.is_music && this.saveload === 2)
+					continue;		// only saving/loading music: leave sound playing
+				a.stop();
+			}
+		}
+		var fxarr, fxtype, fxparams, fx;
+		for (p in effects)
+		{
+			if (effects.hasOwnProperty(p))
+			{
+				for (i = 0, len = effects[p].length; i < len; i++)
+					effects[p][i].remove();
+			}
+		}
+		cr.wipe(effects);
+		for (p in o["effects"])
+		{
+			if (o["effects"].hasOwnProperty(p))
+			{
+				fxarr = o["effects"][p];
+				for (i = 0, len = fxarr.length; i < len; i++)
+				{
+					fxtype = fxarr[i]["type"];
+					fxparams = fxarr[i]["params"];
+					switch (fxtype) {
+					case "filter":
+						addEffectForTag(p, new FilterEffect(fxparams[0], fxparams[1], fxparams[2], fxparams[3], fxparams[4], fxparams[5]));
+						break;
+					case "delay":
+						addEffectForTag(p, new DelayEffect(fxparams[0], fxparams[1], fxparams[2]));
+						break;
+					case "convolve":
+						src = fxparams[2];
+						b = this.getAudioBuffer(src, false);
+						if (b.bufferObject)
+						{
+							fx = new ConvolveEffect(b.bufferObject, fxparams[0], fxparams[1], src);
+						}
+						else
+						{
+							fx = new ConvolveEffect(null, fxparams[0], fxparams[1], src);
+							b.normalizeWhenReady = fxparams[0];
+							b.convolveWhenReady = fx;
+						}
+						addEffectForTag(p, fx);
+						break;
+					case "flanger":
+						addEffectForTag(p, new FlangerEffect(fxparams[0], fxparams[1], fxparams[2], fxparams[3], fxparams[4]));
+						break;
+					case "phaser":
+						addEffectForTag(p, new PhaserEffect(fxparams[0], fxparams[1], fxparams[2], fxparams[3], fxparams[4], fxparams[5]));
+						break;
+					case "gain":
+						addEffectForTag(p, new GainEffect(fxparams[0]));
+						break;
+					case "tremolo":
+						addEffectForTag(p, new TremoloEffect(fxparams[0], fxparams[1]));
+						break;
+					case "ringmod":
+						addEffectForTag(p, new RingModulatorEffect(fxparams[0], fxparams[1]));
+						break;
+					case "distortion":
+						addEffectForTag(p, new DistortionEffect(fxparams[0], fxparams[1], fxparams[2], fxparams[3], fxparams[4]));
+						break;
+					case "compressor":
+						addEffectForTag(p, new CompressorEffect(fxparams[0], fxparams[1], fxparams[2], fxparams[3], fxparams[4]));
+						break;
+					case "analyser":
+						addEffectForTag(p, new AnalyserEffect(fxparams[0], fxparams[1]));
+						break;
+					}
+				}
+			}
+		}
+		for (i = 0, len = playingarr.length; i < len; i++)
+		{
+			if (this.saveload === 3)	// not saving/loading any sounds/music
+				continue;
+			d = playingarr[i];
+			src = d["buffersrc"];
+			is_music = d["is_music"];
+			tag = d["tag"];
+			playbackTime = d["playbackTime"];
+			looping = d["looping"];
+			vol = d["volume"];
+			pan = d["pan"];
+			panObjUid = (pan && pan.hasOwnProperty("objUid")) ? pan["objUid"] : -1;
+			if (is_music && this.saveload === 1)	// not saving/loading music
+				continue;
+			if (!is_music && this.saveload === 2)	// not saving/loading sound
+				continue;
+			a = this.getAudioInstance(src, tag, is_music, looping, vol);
+			if (!a)
+			{
+				b = this.getAudioBuffer(src, is_music);
+				b.seekWhenReady = playbackTime;
+				b.pauseWhenReady = d["paused"];
+				if (pan)
+				{
+					if (panObjUid !== -1)
+					{
+						b.panWhenReady.push({ objUid: panObjUid, ia: pan["ia"], oa: pan["oa"], og: pan["og"], thistag: tag });
+					}
+					else
+					{
+						b.panWhenReady.push({ x: pan["x"], y: pan["y"], a: pan["a"], ia: pan["ia"], oa: pan["oa"], og: pan["og"], thistag: tag });
+					}
+				}
+				continue;
+			}
+			a.resume_position = d["resume_position"];
+			a.setPannerEnabled(!!pan);
+			a.play(looping, vol, playbackTime);
+			a.updatePlaybackRate();
+			a.updateVolume();
+			a.doSetMuted(a.is_muted || a.is_silent);
+			if (d["paused"])
+				a.pause();
+			if (d["muted"])
+				a.setMuted(true);
+			a.doSetMuted(a.is_muted || a.is_silent);
+			if (pan)
+			{
+				if (panObjUid !== -1)
+				{
+					a.objectTracker = a.objectTracker || new ObjectTracker();
+					a.objectTracker.loadUid = panObjUid;
+					objectTrackerUidsToLoad.push(a.objectTracker);
+				}
+				else
+				{
+					a.setPan(pan["x"], pan["y"], pan["a"], pan["ia"], pan["oa"], pan["og"]);
+				}
+			}
+		}
+		if (setSilent && !silent)			// setting silent
+		{
+			for (i = 0, len = audioInstances.length; i < len; i++)
+				audioInstances[i].setSilent(true);
+			silent = true;
+		}
+		else if (!setSilent && silent)		// setting not silent
+		{
+			for (i = 0, len = audioInstances.length; i < len; i++)
+				audioInstances[i].setSilent(false);
+			silent = false;
+		}
+	};
+	instanceProto.afterLoad = function ()
+	{
+		var i, len, ot, inst;
+		for (i = 0, len = objectTrackerUidsToLoad.length; i < len; i++)
+		{
+			ot = objectTrackerUidsToLoad[i];
+			inst = this.runtime.getObjectByUID(ot.loadUid);
+			ot.setObject(inst);
+			ot.loadUid = -1;
+			if (inst)
+			{
+				listenerX = inst.x;
+				listenerY = inst.y;
+			}
+		}
+		objectTrackerUidsToLoad.length = 0;
+	};
+	instanceProto.onSuspend = function (s)
+	{
+		var i, len;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+			audioInstances[i].setSuspended(s);
+	};
+	instanceProto.tick = function ()
+	{
+		var dt = this.runtime.dt;
+		var i, len, a;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+		{
+			a = audioInstances[i];
+			a.tick(dt);
+			if (a.myapi !== API_HTML5 && a.myapi !== API_APPMOBI)
+			{
+				if (!a.fresh && !a.stopped && a.hasEnded())
+				{
+					a.stopped = true;
+					audTag = a.tag;
+					audRuntime.trigger(cr.plugins_.Audio.prototype.cnds.OnEnded, audInst);
+				}
+			}
+			if (timescale_mode !== 0)
+				a.updatePlaybackRate();
+		}
+		var p, arr, f;
+		for (p in effects)
+		{
+			if (effects.hasOwnProperty(p))
+			{
+				arr = effects[p];
+				for (i = 0, len = arr.length; i < len; i++)
+				{
+					f = arr[i];
+					if (f.tick)
+						f.tick();
+				}
+			}
+		}
+		if (api === API_WEBAUDIO && this.listenerTracker.hasObject())
+		{
+			this.listenerTracker.tick(dt);
+			listenerX = this.listenerTracker.obj.x;
+			listenerY = this.listenerTracker.obj.y;
+			context["listener"]["setPosition"](this.listenerTracker.obj.x, this.listenerTracker.obj.y, this.listenerZ);
+			context["listener"]["setVelocity"](this.listenerTracker.getVelocityX(), this.listenerTracker.getVelocityY(), 0);
+		}
+	};
+	instanceProto.getAudioBuffer = function (src_, is_music)
+	{
+		var i, len, a, ret = null, j, k, lenj, ai;
+		for (i = 0, len = audioBuffers.length; i < len; i++)
+		{
+			a = audioBuffers[i];
+			if (a.src === src_)
+			{
+				ret = a;
+				break;
+			}
+		}
+		if (!ret)
+		{
+			ret = new C2AudioBuffer(src_, is_music);
+			audioBuffers.push(ret);
+		}
+		return ret;
+	};
+	instanceProto.getAudioInstance = function (src_, tag, is_music, looping, vol)
+	{
+		var i, len, a;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+		{
+			a = audioInstances[i];
+			if (a.src === src_ && (a.canBeRecycled() || is_music))
+			{
+				a.tag = tag;
+				return a;
+			}
+		}
+		var b = this.getAudioBuffer(src_, is_music);
+		if (!b.bufferObject)
+		{
+			if (tag !== "<preload>")
+			{
+				b.playTagWhenReady = tag;
+				b.loopWhenReady = looping;
+				b.volumeWhenReady = vol;
+			}
+			return null;
+		}
+		a = new C2AudioInstance(b, tag);
+		audioInstances.push(a);
+		return a;
+	};
+	var taggedAudio = [];
+	function getAudioByTag(tag)
+	{
+		taggedAudio.length = 0;
+		if (!tag.length)
+		{
+			if (!lastAudio || lastAudio.hasEnded())
+				return;
+			else
+			{
+				taggedAudio.length = 1;
+				taggedAudio[0] = lastAudio;
+				return;
+			}
+		}
+		var i, len, a;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+		{
+			a = audioInstances[i];
+			if (cr.equals_nocase(tag, a.tag))
+				taggedAudio.push(a);
+		}
+	};
+	function reconnectEffects(tag)
+	{
+		var i, len, arr, n, toNode = context["destination"];
+		if (effects.hasOwnProperty(tag))
+		{
+			arr = effects[tag];
+			if (arr.length)
+			{
+				toNode = arr[0].getInputNode();
+				for (i = 0, len = arr.length; i < len; i++)
+				{
+					n = arr[i];
+					if (i + 1 === len)
+						n.connectTo(context["destination"]);
+					else
+						n.connectTo(arr[i + 1].getInputNode());
+				}
+			}
+		}
+		getAudioByTag(tag);
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+			taggedAudio[i].reconnect(toNode);
+		if (micSource && micTag === tag)
+		{
+			micSource["disconnect"]();
+			micSource["connect"](toNode);
+		}
+	};
+	function addEffectForTag(tag, fx)
+	{
+		if (!effects.hasOwnProperty(tag))
+			effects[tag] = [fx];
+		else
+			effects[tag].push(fx);
+		reconnectEffects(tag);
+	};
+	function Cnds() {};
+	Cnds.prototype.OnEnded = function (t)
+	{
+		return cr.equals_nocase(audTag, t);
+	};
+	Cnds.prototype.PreloadsComplete = function ()
+	{
+		var i, len;
+		for (i = 0, len = audioBuffers.length; i < len; i++)
+		{
+			if (!audioBuffers[i].isLoaded())
+				return false;
+		}
+		return true;
+	};
+	Cnds.prototype.AdvancedAudioSupported = function ()
+	{
+		return api === API_WEBAUDIO;
+	};
+	Cnds.prototype.IsSilent = function ()
+	{
+		return silent;
+	};
+	Cnds.prototype.IsAnyPlaying = function ()
+	{
+		var i, len;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+		{
+			if (audioInstances[i].isPlaying())
+				return true;
+		}
+		return false;
+	};
+	Cnds.prototype.IsTagPlaying = function (tag)
+	{
+		getAudioByTag(tag);
+		var i, len;
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+		{
+			if (taggedAudio[i].isPlaying())
+				return true;
+		}
+		return false;
+	};
+	pluginProto.cnds = new Cnds();
+	function Acts() {};
+	Acts.prototype.Play = function (file, looping, vol, tag)
+	{
+		if (silent)
+			return;
+		var v = dbToLinear(vol);
+		var is_music = file[1];
+		var src = this.runtime.files_subfolder + file[0] + (useOgg ? ".ogg" : ".m4a");
+		lastAudio = this.getAudioInstance(src, tag, is_music, looping!==0, v);
+		if (!lastAudio)
+			return;
+		lastAudio.setPannerEnabled(false);
+		lastAudio.play(looping!==0, v);
+	};
+	Acts.prototype.PlayAtPosition = function (file, looping, vol, x_, y_, angle_, innerangle_, outerangle_, outergain_, tag)
+	{
+		if (silent)
+			return;
+		var v = dbToLinear(vol);
+		var is_music = file[1];
+		var src = this.runtime.files_subfolder + file[0] + (useOgg ? ".ogg" : ".m4a");
+		lastAudio = this.getAudioInstance(src, tag, is_music, looping!==0, v);
+		if (!lastAudio)
+		{
+			var b = this.getAudioBuffer(src, is_music);
+			b.panWhenReady.push({ x: x_, y: y_, a: angle_, ia: innerangle_, oa: outerangle_, og: dbToLinear(outergain_), thistag: tag });
+			return;
+		}
+		lastAudio.setPannerEnabled(true);
+		lastAudio.setPan(x_, y_, angle_, innerangle_, outerangle_, dbToLinear(outergain_));
+		lastAudio.play(looping!==0, v);
+	};
+	Acts.prototype.PlayAtObject = function (file, looping, vol, obj, innerangle, outerangle, outergain, tag)
+	{
+		if (silent || !obj)
+			return;
+		var inst = obj.getFirstPicked();
+		if (!inst)
+			return;
+		var v = dbToLinear(vol);
+		var is_music = file[1];
+		var src = this.runtime.files_subfolder + file[0] + (useOgg ? ".ogg" : ".m4a");
+		lastAudio = this.getAudioInstance(src, tag, is_music, looping!==0, v);
+		if (!lastAudio)
+		{
+			var b = this.getAudioBuffer(src, is_music);
+			b.panWhenReady.push({ obj: inst, ia: innerangle, oa: outerangle, og: dbToLinear(outergain), thistag: tag });
+			return;
+		}
+		lastAudio.setPannerEnabled(true);
+		var px = cr.rotatePtAround(inst.x, inst.y, -inst.layer.getAngle(), listenerX, listenerY, true);
+		var py = cr.rotatePtAround(inst.x, inst.y, -inst.layer.getAngle(), listenerX, listenerY, false);
+		lastAudio.setPan(px, py, cr.to_degrees(inst.angle - inst.layer.getAngle()), innerangle, outerangle, dbToLinear(outergain));
+		lastAudio.setObject(inst);
+		lastAudio.play(looping!==0, v);
+	};
+	Acts.prototype.PlayByName = function (folder, filename, looping, vol, tag)
+	{
+		if (silent)
+			return;
+		var v = dbToLinear(vol);
+		var is_music = (folder === 1);
+		var src = this.runtime.files_subfolder + filename.toLowerCase() + (useOgg ? ".ogg" : ".m4a");
+		lastAudio = this.getAudioInstance(src, tag, is_music, looping!==0, v);
+		if (!lastAudio)
+			return;
+		lastAudio.setPannerEnabled(false);
+		lastAudio.play(looping!==0, v);
+	};
+	Acts.prototype.PlayAtPositionByName = function (folder, filename, looping, vol, x_, y_, angle_, innerangle_, outerangle_, outergain_, tag)
+	{
+		if (silent)
+			return;
+		var v = dbToLinear(vol);
+		var is_music = (folder === 1);
+		var src = this.runtime.files_subfolder + filename.toLowerCase() + (useOgg ? ".ogg" : ".m4a");
+		lastAudio = this.getAudioInstance(src, tag, is_music, looping!==0, v);
+		if (!lastAudio)
+		{
+			var b = this.getAudioBuffer(src, is_music);
+			b.panWhenReady.push({ x: x_, y: y_, a: angle_, ia: innerangle_, oa: outerangle_, og: dbToLinear(outergain_), thistag: tag });
+			return;
+		}
+		lastAudio.setPannerEnabled(true);
+		lastAudio.setPan(x_, y_, angle_, innerangle_, outerangle_, dbToLinear(outergain_));
+		lastAudio.play(looping!==0, v);
+	};
+	Acts.prototype.PlayAtObjectByName = function (folder, filename, looping, vol, obj, innerangle, outerangle, outergain, tag)
+	{
+		if (silent || !obj)
+			return;
+		var inst = obj.getFirstPicked();
+		if (!inst)
+			return;
+		var v = dbToLinear(vol);
+		var is_music = (folder === 1);
+		var src = this.runtime.files_subfolder + filename.toLowerCase() + (useOgg ? ".ogg" : ".m4a");
+		lastAudio = this.getAudioInstance(src, tag, is_music, looping!==0, v);
+		if (!lastAudio)
+		{
+			var b = this.getAudioBuffer(src, is_music);
+			b.panWhenReady.push({ obj: inst, ia: innerangle, oa: outerangle, og: dbToLinear(outergain), thistag: tag });
+			return;
+		}
+		lastAudio.setPannerEnabled(true);
+		var px = cr.rotatePtAround(inst.x, inst.y, -inst.layer.getAngle(), listenerX, listenerY, true);
+		var py = cr.rotatePtAround(inst.x, inst.y, -inst.layer.getAngle(), listenerX, listenerY, false);
+		lastAudio.setPan(px, py, cr.to_degrees(inst.angle - inst.layer.getAngle()), innerangle, outerangle, dbToLinear(outergain));
+		lastAudio.setObject(inst);
+		lastAudio.play(looping!==0, v);
+	};
+	Acts.prototype.SetLooping = function (tag, looping)
+	{
+		getAudioByTag(tag);
+		var i, len;
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+			taggedAudio[i].setLooping(looping === 0);
+	};
+	Acts.prototype.SetMuted = function (tag, muted)
+	{
+		getAudioByTag(tag);
+		var i, len;
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+			taggedAudio[i].setMuted(muted === 0);
+	};
+	Acts.prototype.SetVolume = function (tag, vol)
+	{
+		getAudioByTag(tag);
+		var v = dbToLinear(vol);
+		var i, len;
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+			taggedAudio[i].setVolume(v);
+	};
+	Acts.prototype.Preload = function (file)
+	{
+		if (silent)
+			return;
+		var is_music = file[1];
+		var src = this.runtime.files_subfolder + file[0] + (useOgg ? ".ogg" : ".m4a");
+		if (api === API_APPMOBI)
+		{
+			if (this.runtime.isDirectCanvas)
+				AppMobi["context"]["loadSound"](src);
+			else
+				AppMobi["player"]["loadSound"](src);
+			return;
+		}
+		else if (api === API_PHONEGAP)
+		{
+			return;
+		}
+		this.getAudioInstance(src, "<preload>", is_music, false);
+	};
+	Acts.prototype.PreloadByName = function (folder, filename)
+	{
+		if (silent)
+			return;
+		var is_music = (folder === 1);
+		var src = this.runtime.files_subfolder + filename.toLowerCase() + (useOgg ? ".ogg" : ".m4a");
+		if (api === API_APPMOBI)
+		{
+			if (this.runtime.isDirectCanvas)
+				AppMobi["context"]["loadSound"](src);
+			else
+				AppMobi["player"]["loadSound"](src);
+			return;
+		}
+		else if (api === API_PHONEGAP)
+		{
+			return;
+		}
+		this.getAudioInstance(src, "<preload>", is_music, false);
+	};
+	Acts.prototype.SetPlaybackRate = function (tag, rate)
+	{
+		getAudioByTag(tag);
+		if (rate < 0.0)
+			rate = 0;
+		var i, len;
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+			taggedAudio[i].setPlaybackRate(rate);
+	};
+	Acts.prototype.Stop = function (tag)
+	{
+		getAudioByTag(tag);
+		var i, len;
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+			taggedAudio[i].stop();
+	};
+	Acts.prototype.StopAll = function ()
+	{
+		var i, len;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+			audioInstances[i].stop();
+	};
+	Acts.prototype.SetPaused = function (tag, state)
+	{
+		getAudioByTag(tag);
+		var i, len;
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+		{
+			if (state === 0)
+				taggedAudio[i].pause();
+			else
+				taggedAudio[i].resume();
+		}
+	};
+	Acts.prototype.Seek = function (tag, pos)
+	{
+		getAudioByTag(tag);
+		var i, len;
+		for (i = 0, len = taggedAudio.length; i < len; i++)
+		{
+			taggedAudio[i].seek(pos);
+		}
+	};
+	Acts.prototype.SetSilent = function (s)
+	{
+		var i, len;
+		if (s === 2)					// toggling
+			s = (silent ? 1 : 0);		// choose opposite state
+		if (s === 0 && !silent)			// setting silent
+		{
+			for (i = 0, len = audioInstances.length; i < len; i++)
+				audioInstances[i].setSilent(true);
+			silent = true;
+		}
+		else if (s === 1 && silent)		// setting not silent
+		{
+			for (i = 0, len = audioInstances.length; i < len; i++)
+				audioInstances[i].setSilent(false);
+			silent = false;
+		}
+	};
+	Acts.prototype.SetMasterVolume = function (vol)
+	{
+		masterVolume = dbToLinear(vol);
+		var i, len;
+		for (i = 0, len = audioInstances.length; i < len; i++)
+			audioInstances[i].updateVolume();
+	};
+	Acts.prototype.AddFilterEffect = function (tag, type, freq, detune, q, gain, mix)
+	{
+		if (api !== API_WEBAUDIO || type < 0 || type >= filterTypes.length)
+			return;
+		tag = tag.toLowerCase();
+		mix = mix / 100;
+		if (mix < 0) mix = 0;
+		if (mix > 1) mix = 1;
+		addEffectForTag(tag, new FilterEffect(type, freq, detune, q, gain, mix));
+	};
+	Acts.prototype.AddDelayEffect = function (tag, delay, gain, mix)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		mix = mix / 100;
+		if (mix < 0) mix = 0;
+		if (mix > 1) mix = 1;
+		addEffectForTag(tag, new DelayEffect(delay, dbToLinear(gain), mix));
+	};
+	Acts.prototype.AddFlangerEffect = function (tag, delay, modulation, freq, feedback, mix)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		mix = mix / 100;
+		if (mix < 0) mix = 0;
+		if (mix > 1) mix = 1;
+		addEffectForTag(tag, new FlangerEffect(delay / 1000, modulation / 1000, freq, feedback / 100, mix));
+	};
+	Acts.prototype.AddPhaserEffect = function (tag, freq, detune, q, mod, modfreq, mix)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		mix = mix / 100;
+		if (mix < 0) mix = 0;
+		if (mix > 1) mix = 1;
+		addEffectForTag(tag, new PhaserEffect(freq, detune, q, mod, modfreq, mix));
+	};
+	Acts.prototype.AddConvolutionEffect = function (tag, file, norm, mix)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		var doNormalize = (norm === 0);
+		var src = this.runtime.files_subfolder + file[0] + (useOgg ? ".ogg" : ".m4a");
+		var b = this.getAudioBuffer(src, false);
+		tag = tag.toLowerCase();
+		mix = mix / 100;
+		if (mix < 0) mix = 0;
+		if (mix > 1) mix = 1;
+		var fx;
+		if (b.bufferObject)
+		{
+			fx = new ConvolveEffect(b.bufferObject, doNormalize, mix, src);
+		}
+		else
+		{
+			fx = new ConvolveEffect(null, doNormalize, mix, src);
+			b.normalizeWhenReady = doNormalize;
+			b.convolveWhenReady = fx;
+		}
+		addEffectForTag(tag, fx);
+	};
+	Acts.prototype.AddGainEffect = function (tag, g)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		addEffectForTag(tag, new GainEffect(dbToLinear(g)));
+	};
+	Acts.prototype.AddMuteEffect = function (tag)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		addEffectForTag(tag, new GainEffect(0));	// re-use gain effect with 0 gain
+	};
+	Acts.prototype.AddTremoloEffect = function (tag, freq, mix)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		mix = mix / 100;
+		if (mix < 0) mix = 0;
+		if (mix > 1) mix = 1;
+		addEffectForTag(tag, new TremoloEffect(freq, mix));
+	};
+	Acts.prototype.AddRingModEffect = function (tag, freq, mix)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		mix = mix / 100;
+		if (mix < 0) mix = 0;
+		if (mix > 1) mix = 1;
+		addEffectForTag(tag, new RingModulatorEffect(freq, mix));
+	};
+	Acts.prototype.AddDistortionEffect = function (tag, threshold, headroom, drive, makeupgain, mix)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		mix = mix / 100;
+		if (mix < 0) mix = 0;
+		if (mix > 1) mix = 1;
+		addEffectForTag(tag, new DistortionEffect(threshold, headroom, drive, makeupgain, mix));
+	};
+	Acts.prototype.AddCompressorEffect = function (tag, threshold, knee, ratio, attack, release)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		addEffectForTag(tag, new CompressorEffect(threshold, knee, ratio, attack / 1000, release / 1000));
+	};
+	Acts.prototype.AddAnalyserEffect = function (tag, fftSize, smoothing)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		addEffectForTag(tag, new AnalyserEffect(fftSize, smoothing));
+	};
+	Acts.prototype.RemoveEffects = function (tag)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		var i, len, arr;
+		if (effects.hasOwnProperty(tag))
+		{
+			arr = effects[tag];
+			if (arr.length)
+			{
+				for (i = 0, len = arr.length; i < len; i++)
+					arr[i].remove();
+				arr.length = 0;
+				reconnectEffects(tag);
+			}
+		}
+	};
+	Acts.prototype.SetEffectParameter = function (tag, index, param, value, ramp, time)
+	{
+		if (api !== API_WEBAUDIO)
+			return;
+		tag = tag.toLowerCase();
+		index = Math.floor(index);
+		var arr;
+		if (!effects.hasOwnProperty(tag))
+			return;
+		arr = effects[tag];
+		if (index < 0 || index >= arr.length)
+			return;
+		arr[index].setParam(param, value, ramp, time);
+	};
+	Acts.prototype.SetListenerObject = function (obj_)
+	{
+		if (!obj_ || api !== API_WEBAUDIO)
+			return;
+		var inst = obj_.getFirstPicked();
+		if (!inst)
+			return;
+		this.listenerTracker.setObject(inst);
+		listenerX = inst.x;
+		listenerY = inst.y;
+	};
+	Acts.prototype.SetListenerZ = function (z)
+	{
+		this.listenerZ = z;
+	};
+	pluginProto.acts = new Acts();
+	function Exps() {};
+	Exps.prototype.Duration = function (ret, tag)
+	{
+		getAudioByTag(tag);
+		if (taggedAudio.length)
+			ret.set_float(taggedAudio[0].getDuration());
+		else
+			ret.set_float(0);
+	};
+	Exps.prototype.PlaybackTime = function (ret, tag)
+	{
+		getAudioByTag(tag);
+		if (taggedAudio.length)
+			ret.set_float(taggedAudio[0].getPlaybackTime());
+		else
+			ret.set_float(0);
+	};
+	Exps.prototype.Volume = function (ret, tag)
+	{
+		getAudioByTag(tag);
+		if (taggedAudio.length)
+		{
+			var v = taggedAudio[0].getVolume();
+			ret.set_float(linearToDb(v));
+		}
+		else
+			ret.set_float(0);
+	};
+	Exps.prototype.MasterVolume = function (ret)
+	{
+		ret.set_float(masterVolume);
+	};
+	Exps.prototype.EffectCount = function (ret, tag)
+	{
+		tag = tag.toLowerCase();
+		var arr = null;
+		if (effects.hasOwnProperty(tag))
+			arr = effects[tag];
+		ret.set_int(arr ? arr.length : 0);
+	};
+	function getAnalyser(tag, index)
+	{
+		var arr = null;
+		if (effects.hasOwnProperty(tag))
+			arr = effects[tag];
+		if (arr && index >= 0 && index < arr.length && arr[index].freqBins)
+			return arr[index];
+		else
+			return null;
+	};
+	Exps.prototype.AnalyserFreqBinCount = function (ret, tag, index)
+	{
+		tag = tag.toLowerCase();
+		index = Math.floor(index);
+		var analyser = getAnalyser(tag, index);
+		ret.set_int(analyser ? analyser.node["frequencyBinCount"] : 0);
+	};
+	Exps.prototype.AnalyserFreqBinAt = function (ret, tag, index, bin)
+	{
+		tag = tag.toLowerCase();
+		index = Math.floor(index);
+		bin = Math.floor(bin);
+		var analyser = getAnalyser(tag, index);
+		if (!analyser)
+			ret.set_float(0);
+		else if (bin < 0 || bin >= analyser.node["frequencyBinCount"])
+			ret.set_float(0);
+		else
+			ret.set_float(analyser.freqBins[bin]);
+	};
+	Exps.prototype.AnalyserPeakLevel = function (ret, tag, index)
+	{
+		tag = tag.toLowerCase();
+		index = Math.floor(index);
+		var analyser = getAnalyser(tag, index);
+		if (analyser)
+			ret.set_float(analyser.peak);
+		else
+			ret.set_float(0);
+	};
+	Exps.prototype.AnalyserRMSLevel = function (ret, tag, index)
+	{
+		tag = tag.toLowerCase();
+		index = Math.floor(index);
+		var analyser = getAnalyser(tag, index);
+		if (analyser)
+			ret.set_float(analyser.rms);
+		else
+			ret.set_float(0);
+	};
+	pluginProto.exps = new Exps();
+}());
 ;
 ;
 cr.plugins_.Browser = function(runtime)
@@ -30991,10 +32573,22 @@ cr.behaviors.solid = function(runtime)
 }());
 cr.getProjectModel = function() { return [
 	null,
-	null,
+	"Opening",
 	[
 	[
 		cr.plugins_.Browser,
+		true,
+		false,
+		false,
+		false,
+		false,
+		false,
+		false,
+		false,
+		false
+	]
+,	[
+		cr.plugins_.Audio,
 		true,
 		false,
 		false,
@@ -31030,18 +32624,6 @@ cr.getProjectModel = function() { return [
 		false
 	]
 ,	[
-		cr.plugins_.Sprite,
-		false,
-		true,
-		true,
-		true,
-		true,
-		true,
-		true,
-		true,
-		false
-	]
-,	[
 		cr.plugins_.Text,
 		false,
 		true,
@@ -31063,6 +32645,18 @@ cr.getProjectModel = function() { return [
 		false,
 		false,
 		false,
+		false
+	]
+,	[
+		cr.plugins_.Sprite,
+		false,
+		true,
+		true,
+		true,
+		true,
+		true,
+		true,
+		true,
 		false
 	]
 ,	[
@@ -31122,7 +32716,7 @@ cr.getProjectModel = function() { return [
 		[],
 		0,
 		0,
-		["images/backgroundtile.png", 171, 0],
+		["images/backgroundtile.png", 1680, 0],
 		null,
 		[
 		],
@@ -31142,7 +32736,7 @@ cr.getProjectModel = function() { return [
 		null,
 		[
 			[
-			"Default",
+			"Walk",
 			5,
 			true,
 			1,
@@ -31150,12 +32744,48 @@ cr.getProjectModel = function() { return [
 			false,
 			4456708571477634,
 			[
-				["images/player-sheet0.png", 1693, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[],0],
-				["images/player-sheet0.png", 1693, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[],0],
-				["images/player-sheet0.png", 1693, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[],0],
-				["images/player-sheet1.png", 1670, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[],0],
-				["images/player-sheet1.png", 1670, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[],0],
-				["images/player-sheet1.png", 1670, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[],0]
+				["images/player-sheet0.png", 1693, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet0.png", 1693, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet0.png", 1693, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet1.png", 1670, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet1.png", 1670, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet1.png", 1670, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+			]
+			]
+,			[
+			"Idle",
+			0,
+			false,
+			1,
+			0,
+			false,
+			6428032724882492,
+			[
+				["images/player-sheet2.png", 1650, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+			]
+			]
+,			[
+			"Fall",
+			0,
+			false,
+			1,
+			0,
+			false,
+			8634838423105605,
+			[
+				["images/player-sheet2.png", 1650, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+			]
+			]
+,			[
+			"Jump",
+			0,
+			false,
+			1,
+			0,
+			false,
+			1572748634966135,
+			[
+				["images/player-sheet2.png", 1650, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
 			]
 			]
 		],
@@ -31194,7 +32824,7 @@ cr.getProjectModel = function() { return [
 		[],
 		2,
 		0,
-		["images/solidtile.png", 170, 0],
+		["images/solidtile.png", 564, 0],
 		null,
 		[
 		[
@@ -31221,7 +32851,7 @@ cr.getProjectModel = function() { return [
 		[],
 		2,
 		0,
-		["images/solidtile.png", 170, 0],
+		["images/movingsolidtile.png", 170, 0],
 		null,
 		[
 		[
@@ -31322,8 +32952,8 @@ cr.getProjectModel = function() { return [
 			false,
 			7472647199375176,
 			[
-				["images/marker-sheet0.png", 2956, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0],
-				["images/marker-sheet1.png", 2971, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
+				["images/marker-sheet0.png", 245, 0, 0, 15, 15, 1, 0.466667, 0.466667,[],[0.533333,0.533333,-0.466667,0.533333,-0.466667,-0.466667,0.533333,-0.466667],0],
+				["images/marker-sheet1.png", 246, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
 			]
 			]
 		],
@@ -31452,8 +33082,8 @@ cr.getProjectModel = function() { return [
 			false,
 			84178240252615,
 			[
-				["images/marker-sheet1.png", 2971, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0],
-				["images/marker-sheet0.png", 2956, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
+				["images/uimarker-sheet0.png", 2971, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0],
+				["images/uimarker-sheet1.png", 2956, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
 			]
 			]
 		],
@@ -31721,15 +33351,15 @@ cr.getProjectModel = function() { return [
 		[
 			[
 			"Default",
-			5,
+			0,
 			false,
 			1,
 			0,
 			false,
 			267448306083113,
 			[
-				["images/runbutton-sheet0.png", 774, 1, 1, 101, 53, 1, 0.49505, 0.490566,[],[],0],
-				["images/runbutton-sheet0.png", 774, 1, 55, 101, 53, 1, 0.504951, 0.509434,[],[],0]
+				["images/runbutton-sheet0.png", 15170, 1, 132, 150, 68, 1, 0.493333, 0.485294,[],[-0.48,-0.455882,0.00666666,-0.470588,0.486667,-0.441177,0.5,0.0147059,0.486667,0.470588,0.00666666,0.5,-0.48,0.485294,-0.493333,0.0147059],0],
+				["images/runbutton-sheet0.png", 15170, 1, 1, 213, 130, 1, 0.497653, 0.5,[],[-0.370892,-0.069231,-0.00938958,-0.3,0.375586,-0.1,0.375586,0.076923,-0.00938958,0.3,-0.370892,0.046154],0]
 			]
 			]
 		],
@@ -31752,15 +33382,15 @@ cr.getProjectModel = function() { return [
 		[
 			[
 			"Default",
-			5,
+			0,
 			false,
 			1,
 			0,
 			false,
 			6424999968598002,
 			[
-				["images/jumpbutton-sheet0.png", 773, 1, 1, 101, 53, 1, 0.49505, 0.490566,[],[],0],
-				["images/jumpbutton-sheet0.png", 773, 1, 55, 101, 53, 1, 0.504951, 0.509434,[],[],0]
+				["images/jumpbutton-sheet0.png", 14885, 1, 132, 149, 67, 1, 0.496644, 0.492537,[],[-0.483222,-0.462687,-2.98023e-007,-0.492537,0.489933,-0.462687,0.503356,-3.27826e-007,0.489933,0.477612,-2.98023e-007,0.492538,-0.483222,0.477612,-0.496644,-3.27826e-007],0],
+				["images/jumpbutton-sheet0.png", 14885, 1, 1, 213, 130, 1, 0.497653, 0.5,[],[-0.370892,-0.069231,-0.00938958,-0.3,0.375586,-0.1,0.375586,0.076923,-0.00938958,0.3,-0.370892,0.046154],0]
 			]
 			]
 		],
@@ -31790,7 +33420,7 @@ cr.getProjectModel = function() { return [
 			false,
 			9959273540879391,
 			[
-				["images/exit-sheet0.png", 872, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],0]
+				["images/exit-sheet0.png", 3819, 0, 0, 100, 200, 1, 0.5, 0.5,[],[-0.35,-0.425,0,-0.5,0.35,-0.425,0.5,0,0.5,0.5,-0.5,0.5,-0.5,0],0]
 			]
 			]
 		],
@@ -31820,27 +33450,370 @@ cr.getProjectModel = function() { return [
 		null
 		,[]
 	]
+,	[
+		"t29",
+		cr.plugins_.TiledBg,
+		false,
+		[],
+		0,
+		0,
+		["images/tiledbackground.png", 4628, 0],
+		null,
+		[
+		],
+		false,
+		false,
+		7996769115670503,
+		[],
+		null
+	]
+,	[
+		"t30",
+		cr.plugins_.Sprite,
+		false,
+		[],
+		0,
+		0,
+		null,
+		[
+			[
+			"Default",
+			5,
+			false,
+			1,
+			0,
+			false,
+			6963556453550753,
+			[
+				["images/sprite4-sheet0.png", 878, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],0]
+			]
+			]
+		],
+		[
+		],
+		false,
+		false,
+		6441230360026211,
+		[],
+		null
+	]
+,	[
+		"t31",
+		cr.plugins_.TiledBg,
+		false,
+		[],
+		0,
+		0,
+		["images/tiledbackground2.png", 16860, 0],
+		null,
+		[
+		],
+		false,
+		false,
+		2961125973407691,
+		[],
+		null
+	]
+,	[
+		"t32",
+		cr.plugins_.Sprite,
+		false,
+		[],
+		0,
+		0,
+		null,
+		[
+			[
+			"Default",
+			3,
+			true,
+			1,
+			0,
+			false,
+			7864878873699658,
+			[
+				["images/titlescreen-sheet0.png", 91726, 1, 1, 320, 180, 1, 0.5, 0.5,[],[],0],
+				["images/titlescreen-sheet0.png", 91726, 1, 182, 320, 180, 1, 0.5, 0.5,[],[],0]
+			]
+			]
+		],
+		[
+		],
+		false,
+		false,
+		4896327172576182,
+		[],
+		null
+	]
+,	[
+		"t33",
+		cr.plugins_.Sprite,
+		false,
+		[],
+		2,
+		0,
+		null,
+		[
+			[
+			"Default",
+			5,
+			false,
+			1,
+			0,
+			false,
+			8902606566277508,
+			[
+				["images/deathtile-sheet0.png", 337, 0, 0, 20, 20, 1, 0.5, 0.5,[],[],0]
+			]
+			]
+		],
+		[
+		[
+			"Solid",
+			cr.behaviors.solid,
+			3281481964439688
+		]
+,		[
+			"Physics",
+			cr.behaviors.Physics,
+			7452454696724591
+		]
+		],
+		false,
+		false,
+		2117024704412194,
+		[],
+		null
+	]
+,	[
+		"t34",
+		cr.plugins_.Sprite,
+		false,
+		[],
+		1,
+		0,
+		null,
+		[
+			[
+			"Default",
+			0,
+			false,
+			1,
+			0,
+			false,
+			2953728245661681,
+			[
+				["images/crumbleblock-sheet0.png", 868, 1, 1, 20, 20, 1, 0.5, 0.5,[],[],0]
+			]
+			]
+,			[
+			"Crumble",
+			10,
+			false,
+			1,
+			0,
+			false,
+			8562027561441926,
+			[
+				["images/crumbleblock-sheet0.png", 868, 22, 1, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 868, 43, 1, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 868, 1, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 868, 22, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 868, 43, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 868, 1, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 868, 22, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 868, 43, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet1.png", 2867, 0, 0, 20, 20, 1, 0.5, 0.5,[],[],0]
+			]
+			]
+		],
+		[
+		[
+			"Solid",
+			cr.behaviors.solid,
+			495348902680068
+		]
+		],
+		false,
+		false,
+		7206514487483291,
+		[],
+		null
+	]
+,	[
+		"t35",
+		cr.plugins_.TiledBg,
+		false,
+		[],
+		2,
+		0,
+		["images/falltile.png", 567, 0],
+		null,
+		[
+		[
+			"Solid",
+			cr.behaviors.solid,
+			8164518686724866
+		]
+,		[
+			"Physics",
+			cr.behaviors.Physics,
+			7574038214828545
+		]
+		],
+		false,
+		false,
+		8638941911367337,
+		[],
+		null
+	]
+,	[
+		"t36",
+		cr.plugins_.Sprite,
+		false,
+		[],
+		0,
+		0,
+		null,
+		[
+			[
+			"Default",
+			0,
+			false,
+			1,
+			0,
+			false,
+			9856669910894166,
+			[
+				["images/undosprite-sheet1.png", 3492, 0, 0, 116, 68, 1, 0.5, 0.5,[],[-0.482759,-0.470588,0,-0.485294,0.474138,-0.455882,0.491379,0,0.474138,0.455882,0,0.485294,-0.482759,0.470588,-0.5,0],0],
+				["images/undosprite-sheet0.png", 3916, 0, 0, 117, 68, 1, 0.504274, 0.5,[],[],0]
+			]
+			]
+		],
+		[
+		],
+		false,
+		false,
+		6433464535777513,
+		[],
+		null
+	]
+,	[
+		"t37",
+		cr.plugins_.Sprite,
+		false,
+		[],
+		0,
+		0,
+		null,
+		[
+			[
+			"Default",
+			0,
+			false,
+			1,
+			0,
+			false,
+			4800915924537065,
+			[
+				["images/sprite3-sheet0.png", 3525, 0, 0, 119, 71, 1, 0.504202, 0.507042,[],[],0],
+				["images/sprite3-sheet1.png", 3085, 0, 0, 118, 70, 1, 0.5, 0.5,[],[],0]
+			]
+			]
+		],
+		[
+		],
+		false,
+		false,
+		4647733562011844,
+		[],
+		null
+	]
+,	[
+		"t38",
+		cr.plugins_.Audio,
+		false,
+		[],
+		0,
+		0,
+		null,
+		null,
+		[
+		],
+		false,
+		false,
+		7768998427217809,
+		[],
+		null
+		,[0,0,1,1,600,600,10000,1,5000,1]
+	]
 	],
 	[
 	],
 	[
 	[
-		"Layout 1",
-		2048,
+		"Opening",
+		1280,
 		720,
 		false,
-		"main",
+		"opening",
+		7274646709816716,
+		[
+		[
+			"Layer 0",
+			0,
+			9950494708777914,
+			true,
+			[255, 255, 255],
+			false,
+			1,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[640, 360, 0, 1280, 720, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				32,
+				42,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+			],
+			[			]
+		]
+		],
+		[
+		],
+		[]
+	]
+,	[
+		"Level 1",
+		3177,
+		720,
+		false,
+		"Level 1",
 		8122295692373412,
 		[
 		[
-			"Background",
+			"Background_0_P",
 			0,
 			5010637419905924,
 			true,
 			[255, 255, 255],
 			false,
-			0.5,
-			0.5,
+			1,
+			1,
 			1,
 			false,
 			1,
@@ -31848,7 +33821,7 @@ cr.getProjectModel = function() { return [
 			0,
 			[
 			[
-				[0, 0, 0, 2048, 720, 0, 0, 1, 0, 0, 0, 0, []],
+				[0, 0, 0, 3180, 720, 0, 0, 1, 0, 0, 0, 0, []],
 				0,
 				0,
 				[
@@ -31864,8 +33837,70 @@ cr.getProjectModel = function() { return [
 			[			]
 		]
 ,		[
-			"Game",
+			"Background_1_P",
 			1,
+			8602273288273826,
+			true,
+			[255, 255, 255],
+			true,
+			0.33,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[-2, 242.5, 0, 3180, 150, 0, 0, 1, 0, 0, 0, 0, []],
+				29,
+				7,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"Background_2_P",
+			2,
+			759373649177038,
+			true,
+			[255, 255, 255],
+			true,
+			0.66,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[-11, 161, 0, 3300, 300, 0, 0, 1, 0, 0, 0, 0, []],
+				31,
+				41,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"Game",
+			3,
 			5319272735918047,
 			true,
 			[255, 255, 255],
@@ -31879,7 +33914,7 @@ cr.getProjectModel = function() { return [
 			0,
 			[
 			[
-				[208, 512, 0, 78.1884, 130.966, 0, 0, 1, 0.5, 0.507463, 0, 0, []],
+				[204, 477, 0, 120, 201, 0, 0, 1, 0.5, 0.507463, 0, 0, []],
 				1,
 				1,
 				[
@@ -31921,7 +33956,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[0, 576, 0, 416, 128, 0, 0, 1, 0, 0, 0, 0, []],
+				[0, 600, 0, 422, 63, 0, 0, 1, 0, 0, 0, 0, []],
 				2,
 				2,
 				[
@@ -31949,424 +33984,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[2320, 48, 0, 96, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				2,
-				3,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[2544, -16, 0, 96, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				2,
-				4,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[848, 464, 0, 224, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				2,
-				5,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					1,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-336, 224, 0, 144, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				3,
-				6,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					1,
-					0,
-					0,
-					4,
-					0,
-					0,
-					0,
-					50,
-					0
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-512, 432, 0, 160, 16, 0, 0, 0.8, 0, 0, 0, 0, []],
-				4,
-				8,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-432, -144, 0, 372.035, 32, 0, 0.174533, 1, 0, 0, 0, 0, []],
-				2,
-				9,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-352, 32, 0, 96, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				2,
-				10,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-528, -64, 0, 219, 32, 0, 0.453596, 1, 0, 0, 0, 0, []],
-				2,
-				11,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-720, -192, 0, 96, 16, 0, 0, 0.8, 0, 0, 0, 0, []],
-				4,
-				12,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-720, -80, 0, 96, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				2,
-				13,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-560, -256, 0, 96, 16, 0, 0, 0.8, 0, 0, 0, 0, []],
-				4,
-				14,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-368, -288, 0, 96, 16, 0, 0, 0.8, 0, 0, 0, 0, []],
-				4,
-				15,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-128, -256, 0, 128, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				3,
-				16,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					1,
-					0,
-					0,
-					4,
-					0,
-					0,
-					0,
-					50,
-					0
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-144, -368, 0, 96, 16, 0, 0, 0.8, 0, 0, 0, 0, []],
-				4,
-				17,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					0,
-					0,
-					0,
-					1,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[-336, 560, 0, 96, 16, 0, 0, 1, 0, 0, 0, 0, []],
-				3,
-				18,
-				[
-				],
-				[
-				[
-					1
-				],
-				[
-					1,
-					1,
-					0,
-					4,
-					0,
-					0,
-					0,
-					50,
-					0
-				]
-				],
-				[
-					0,
-					0
-				]
-			]
-,			[
-				[2105.41, 649.408, 0, 48, 48, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
+				[2850, 720, 0, 48, 48, 0, 0, 1, 0.466667, 0.466667, 0, 0, []],
 				7,
 				21,
 				[
@@ -32383,7 +34001,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[608, 576, 0, 416, 128, 0, 0, 1, 0, 0, 0, 0, []],
+				[420, 600, 0, 420, 120, 0, 0, 1, 0, 0, 0, 0, []],
 				2,
 				23,
 				[
@@ -32411,7 +34029,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1296, 576, 0, 464, 128, 0, 0, 1, 0, 0, 0, 0, []],
+				[1020, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
 				2,
 				24,
 				[
@@ -32439,34 +34057,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[2048, 784, 0, 112, 16, 0, 0.00597382, 1, 0.496032, 0.581818, 0, 0, []],
-				9,
-				25,
-				[
-				],
-				[
-				[
-					0,
-					0,
-					0,
-					100,
-					0.5,
-					0.2,
-					0,
-					0.01,
-					0,
-					1
-				]
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[2080, 624, 0, 48, 48, 0, 0, 1, 0, 0, 0, 0, []],
+				[2760, 630, 0, 48, 48, 0, 0, 1, 0, 0, 0, 0, []],
 				10,
 				26,
 				[
@@ -32486,7 +34077,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1600, 512, 0, 112, 112, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				[3060, 510, 0, 90, 180, 0, 0, 1, 0.5, 0.5, 0, 0, []],
 				27,
 				37,
 				[
@@ -32500,12 +34091,436 @@ cr.getProjectModel = function() { return [
 					1
 				]
 			]
+,			[
+				[990, 690, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				43,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[420, 810, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				44,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[750, 900, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				45,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[570, 870, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				46,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[870, 690, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				47,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[930, 690, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				48,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[2100, 660, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				35,
+				5,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[0, 660, 0, 422, 63, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				4,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1200, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				6,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1380, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				8,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[2460, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				9,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[2640, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				10,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[2820, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				11,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[3000, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				12,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1560, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				13,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1740, 600, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				14,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
 			],
 			[			]
 		]
 ,		[
 			"UI",
-			2,
+			4,
 			2863554739696821,
 			true,
 			[255, 255, 255],
@@ -32519,7 +34534,7 @@ cr.getProjectModel = function() { return [
 			0,
 			[
 			[
-				[0, 624, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
+				[-4, 730, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
 				8,
 				22,
 				[
@@ -32568,7 +34583,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1152, 32, 0, 16, 32, 0, 0, 1, 0, 0, 0, 0, []],
+				[977, 37, 0, 120, 60, 0, 0, 1, 0, 0, 0, 0, []],
 				14,
 				32,
 				[
@@ -32578,9 +34593,9 @@ cr.getProjectModel = function() { return [
 				[
 					"3",
 					0,
-					"16pt Arial",
-					"rgb(0,0,0)",
-					0,
+					"20pt Arial",
+					"rgb(255,255,255)",
+					2,
 					0,
 					0,
 					0,
@@ -32588,7 +34603,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1152, 96, 0, 16, 48, 0, 0, 1, 0, 0, 0, 0, []],
+				[976, 123, 0, 120, 90, 0, 0, 1, 0, 0, 0, 0, []],
 				16,
 				31,
 				[
@@ -32598,9 +34613,9 @@ cr.getProjectModel = function() { return [
 				[
 					"3",
 					0,
-					"16pt Arial",
-					"rgb(0,0,0)",
-					0,
+					"20pt Arial",
+					"rgb(255,255,255)",
+					2,
 					0,
 					0,
 					0,
@@ -32648,7 +34663,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1152, 624, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
+				[1140, 732, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
 				18,
 				33,
 				[
@@ -32687,7 +34702,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1232, 32, 0, 101, 53, 0, 0, 1, 0.49505, 0.490566, 0, 0, []],
+				[1185, 50, 0, 150, 68, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
 				25,
 				35,
 				[
@@ -32702,9 +34717,2029 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1232, 112, 0, 101, 53, 0, 0, 1, 0.49505, 0.490566, 0, 0, []],
+				[1186, 140, 0, 149, 67, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
 				26,
 				36,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1204.96, 676.052, 0, 151.754, 88.9595, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				36,
+				74,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[61, 684, 0, 119, 71, 0, 0, 1, 0.504202, 0.507042, 0, 0, []],
+				37,
+				103,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+			],
+			[			]
+		]
+		],
+		[
+		],
+		[]
+	]
+,	[
+		"Level 2",
+		2800,
+		1440,
+		false,
+		"Level 2",
+		2621077932051138,
+		[
+		[
+			"Background_0_P",
+			0,
+			593207645661789,
+			true,
+			[255, 255, 255],
+			false,
+			1,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[0, 0, 0, 2820, 1440, 0, 0, 1, 0, 0, 0, 0, []],
+				0,
+				49,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"Background_1_P",
+			1,
+			7541667254977201,
+			true,
+			[255, 255, 255],
+			true,
+			0.33,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[-2, 242.5, 0, 2970, 150, 0, 0, 1, 0, 0, 0, 0, []],
+				29,
+				50,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[0, 931.5, 0, 2910, 150, 0, 0, 1, 0, 0, 0, 0, []],
+				29,
+				54,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"Background_2_P",
+			2,
+			8428997717400279,
+			true,
+			[255, 255, 255],
+			true,
+			0.66,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[-11, 161, 0, 3510, 300, 0, 0, 1, 0, 0, 0, 0, []],
+				31,
+				51,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[0, 870, 0, 2486, 304, 0, 0, 1, 0, 0, 0, 0, []],
+				31,
+				55,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"Game",
+			3,
+			9368930464799851,
+			true,
+			[255, 255, 255],
+			true,
+			1,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[210, 300, 0, 120, 201, 0, 0, 1, 0.5, 0.507463, 0, 0, []],
+				1,
+				52,
+				[
+				],
+				[
+				[
+					330,
+					1500,
+					1500,
+					650,
+					1500,
+					1000,
+					1,
+					1
+				],
+				[
+					0,
+					1,
+					1,
+					1,
+					1,
+					0,
+					1,
+					1,
+					0,
+					1
+				],
+				[
+					0
+				],
+				[
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[2310, -150, 0, 48, 48, 0, 0, 1, 0.466667, 0.466667, 0, 0, []],
+				7,
+				68,
+				[
+					[""],
+					[0]
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[2370, 180, 0, 510, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				70,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[2288, -173, 0, 48, 48, 0, 0, 1, 0, 0, 0, 0, []],
+				10,
+				72,
+				[
+				],
+				[
+				],
+				[
+					"3",
+					0,
+					"16pt Arial",
+					"rgb(0,0,0)",
+					1,
+					1,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[90, 1020, 0, 90, 120, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				27,
+				73,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[870, 2100, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				75,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[720, 2250, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				76,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[600, 2310, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				77,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1680, 300, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				35,
+				80,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[300, 2100, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				3,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[0, 390, 0, 480, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				15,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[600, 390, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				16,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1290, 2100, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				17,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[960, 390, 0, 180, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				18,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1320, 390, 0, 240, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				25,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[2010, 180, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				35,
+				53,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1440, 1080, 0, 240, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				57,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1380, 1080, 0, 60, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				58,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1320, 1080, 0, 60, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				59,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1260, 1080, 0, 60, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				60,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1140, 1080, 0, 120, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				61,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1260, 1140, 0, 60, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				62,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[990, 1170, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				63,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1050, 1170, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				64,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1110, 1170, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				65,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[840, 1080, 0, 120, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				66,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[720, 1080, 0, 120, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				67,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[-150, 1080, 0, 720, 120, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				71,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1680, 1140, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				96,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[510, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				56,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[570, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				69,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[810, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				97,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[870, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				98,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[930, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				99,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1170, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				100,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1230, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				101,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1290, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				102,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"UI",
+			4,
+			9326151904859313,
+			true,
+			[255, 255, 255],
+			true,
+			0,
+			0,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[1950, -180, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
+				12,
+				82,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1950, -90, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
+				12,
+				83,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					1,
+					1
+				]
+			]
+,			[
+				[2040, -150, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
+				17,
+				86,
+				[
+				],
+				[
+				],
+				[
+					"Run To",
+					0,
+					"16pt Arial",
+					"rgb(0,0,0)",
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[2040, -90, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
+				17,
+				87,
+				[
+				],
+				[
+				],
+				[
+					"Jump",
+					0,
+					"16pt Arial",
+					"rgb(0,0,0)",
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[16, -48, 0, 512, 32, 0, 0, 1, 0, 0, 0, 0, []],
+				24,
+				89,
+				[
+				],
+				[
+				],
+				[
+					"Text",
+					0,
+					"12pt Arial",
+					"rgb(255,0,0)",
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1207, 672, 0, 151.754, 88.9595, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				36,
+				81,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[82.843, 662.758, 0, 150.422, 89.7475, 0, 0, 1, 0.504202, 0.507042, 0, 0, []],
+				37,
+				88,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[960, 30, 0, 120, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				14,
+				84,
+				[
+				],
+				[
+				],
+				[
+					"3",
+					0,
+					"20pt Arial",
+					"rgb(255,255,255)",
+					2,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[960, 120, 0, 120, 90, 0, 0, 1, 0, 0, 0, 0, []],
+				16,
+				85,
+				[
+				],
+				[
+				],
+				[
+					"3",
+					0,
+					"20pt Arial",
+					"rgb(255,255,255)",
+					2,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1170, 60, 0, 150, 68, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
+				25,
+				90,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1170, 150, 0, 149, 67, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
+				26,
+				91,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+			],
+			[			]
+		]
+		],
+		[
+		],
+		[]
+	]
+,	[
+		"Level 3",
+		2048,
+		720,
+		false,
+		"Level 2",
+		2889027780776716,
+		[
+		[
+			"Background_0_P",
+			0,
+			6673640838946189,
+			true,
+			[255, 255, 255],
+			false,
+			1,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[0, 0, 0, 2048, 720, 0, 0, 1, 0, 0, 0, 0, []],
+				0,
+				78,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[317, 783, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				79,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"Background_1_P",
+			1,
+			1300675574660766,
+			true,
+			[255, 255, 255],
+			true,
+			0.33,
+			0.33,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[-2, 241, 0, 1985, 153, 0, 0, 1, 0, 0, 0, 0, []],
+				29,
+				92,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"Background_2_P",
+			2,
+			7604522792195857,
+			true,
+			[255, 255, 255],
+			true,
+			0.66,
+			0.66,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[-11, 159, 0, 2486, 304, 0, 0, 1, 0, 0, 0, 0, []],
+				31,
+				93,
+				[
+				],
+				[
+				],
+				[
+					0,
+					0
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"Game",
+			3,
+			4687986999976002,
+			true,
+			[255, 255, 255],
+			true,
+			1,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[204, 477, 0, 120, 201, 0, 0, 1, 0.5, 0.507463, 0, 0, []],
+				1,
+				94,
+				[
+				],
+				[
+				[
+					330,
+					1500,
+					1500,
+					650,
+					1500,
+					1000,
+					1,
+					1
+				],
+				[
+					0,
+					1,
+					1,
+					1,
+					1,
+					0,
+					1,
+					1,
+					0,
+					1
+				],
+				[
+					0
+				],
+				[
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[2, 595, 0, 422, 63, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				95,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[2105.41, 649.408, 0, 48, 48, 0, 0, 1, 0.466667, 0.466667, 0, 0, []],
+				7,
+				110,
+				[
+					[""],
+					[0]
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[606, 591, 0, 416, 128, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				111,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[1140, 600, 0, 464, 118, 0, 0, 1, 0, 0, 0, 0, []],
+				2,
+				112,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+,			[
+				[2080, 624, 0, 48, 48, 0, 0, 1, 0, 0, 0, 0, []],
+				10,
+				114,
+				[
+				],
+				[
+				],
+				[
+					"3",
+					0,
+					"16pt Arial",
+					"rgb(0,0,0)",
+					1,
+					1,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1350, 540, 0, 44.8, 89.6, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				27,
+				115,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[420, 780, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				116,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[480, 780, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				117,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[540, 780, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				34,
+				118,
+				[
+				],
+				[
+				[
+					1
+				]
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[420, 450, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				35,
+				119,
+				[
+				],
+				[
+				[
+					1
+				],
+				[
+					1,
+					0,
+					0,
+					1,
+					0.5,
+					0.2,
+					0,
+					0.01,
+					0,
+					1
+				]
+				],
+				[
+					0,
+					0
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"UI",
+			4,
+			2272279778757016,
+			true,
+			[255, 255, 255],
+			true,
+			0,
+			0,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[0, 624, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
+				8,
+				120,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Play",
+					"",
+					1,
+					1,
+					1,
+					"",
+					0
+				]
+			]
+,			[
+				[1936, 48, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
+				12,
+				121,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1936, 112, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
+				12,
+				122,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					1,
+					1
+				]
+			]
+,			[
+				[1116, 32, 0, 52, 32, 0, 0, 1, 0, 0, 0, 0, []],
+				14,
+				123,
+				[
+				],
+				[
+				],
+				[
+					"3",
+					0,
+					"16pt Arial",
+					"rgb(0,0,0)",
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1121, 96, 0, 47, 48, 0, 0, 1, 0, 0, 0, 0, []],
+				16,
+				124,
+				[
+				],
+				[
+				],
+				[
+					"3",
+					0,
+					"16pt Arial",
+					"rgb(0,0,0)",
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1968, 32, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
+				17,
+				125,
+				[
+				],
+				[
+				],
+				[
+					"Run To",
+					0,
+					"16pt Arial",
+					"rgb(0,0,0)",
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1968, 96, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
+				17,
+				126,
+				[
+				],
+				[
+				],
+				[
+					"Jump",
+					0,
+					"16pt Arial",
+					"rgb(0,0,0)",
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1152, 624, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
+				18,
+				127,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Undo",
+					"",
+					1,
+					1,
+					1,
+					"",
+					0
+				]
+			]
+,			[
+				[16, -48, 0, 512, 32, 0, 0, 1, 0, 0, 0, 0, []],
+				24,
+				128,
+				[
+				],
+				[
+				],
+				[
+					"Text",
+					0,
+					"12pt Arial",
+					"rgb(255,0,0)",
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1232, 32, 0, 101, 53, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
+				25,
+				129,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1232, 112, 0, 101, 53, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
+				26,
+				130,
 				[
 				],
 				[
@@ -32730,6 +36765,11 @@ cr.getProjectModel = function() { return [
 		"main",
 		[
 		[
+			2,
+			"locomotion",
+			false
+		]
+,		[
 			1,
 			"TIMETOMARKER",
 			0,
@@ -32856,6 +36896,19 @@ false,false,9724346976153994,false
 				]
 				]
 			]
+,			[
+				-1,
+				cr.system_object.prototype.acts.ScrollToObject,
+				null,
+				7582806651900911,
+				false
+				,[
+				[
+					4,
+					1
+				]
+				]
+			]
 			]
 		]
 ,		[
@@ -32892,6 +36945,22 @@ false,false,9724346976153994,false
 			],
 			[
 			[
+				28,
+				cr.plugins_.Browser.prototype.acts.Alert,
+				null,
+				9734879069347457,
+				false
+				,[
+				[
+					7,
+					[
+						2,
+						"fall through"
+					]
+				]
+				]
+			]
+,			[
 				-1,
 				cr.system_object.prototype.acts.RestartLayout,
 				null,
@@ -33104,8 +37173,8 @@ false,false,9724346976153994,false
 			9126252563479522,
 			[
 			[
-				8,
-				cr.plugins_.Button.prototype.cnds.OnClicked,
+				23,
+				cr.plugins_.Touch.prototype.cnds.OnTouchObject,
 				null,
 				1,
 				false,
@@ -33113,10 +37182,47 @@ false,false,9724346976153994,false
 				false,
 				2080205700683569,
 				false
+				,[
+				[
+					4,
+					37
+				]
+				]
 			]
 			],
 			[
 			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Play,
+				null,
+				6828594793292537,
+				false
+				,[
+				[
+					2,
+					["multimedia_button_click_025",false]
+				]
+,				[
+					3,
+					0
+				]
+,				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+,				[
+					1,
+					[
+						2,
+						""
+					]
+				]
+				]
+			]
+,			[
 				-1,
 				cr.system_object.prototype.acts.SetVar,
 				null,
@@ -33480,6 +37586,40 @@ false,false,9724346976153994,false
 				]
 				]
 			]
+,			[
+				-1,
+				cr.system_object.prototype.cnds.Compare,
+				null,
+				0,
+				false,
+				false,
+				false,
+				1357469517568939,
+				false
+				,[
+				[
+					7,
+					[
+						21,
+						7,
+						false,
+						null
+						,1
+					]
+				]
+,				[
+					8,
+					0
+				]
+,				[
+					7,
+					[
+						23,
+						"cMarker"
+					]
+				]
+				]
+			]
 			],
 			[
 			]
@@ -33763,71 +37903,6 @@ false,false,9724346976153994,false
 					null,
 					false,
 					null,
-					6437153618253364,
-					[
-					[
-						-1,
-						cr.system_object.prototype.cnds.Compare,
-						null,
-						0,
-						false,
-						false,
-						false,
-						7436661805567887,
-						false
-						,[
-						[
-							7,
-							[
-								23,
-								"cMarker"
-							]
-						]
-,						[
-							8,
-							5
-						]
-,						[
-							7,
-							[
-								23,
-								"maxId"
-							]
-						]
-						]
-					]
-					],
-					[
-					[
-						28,
-						cr.plugins_.Browser.prototype.acts.Alert,
-						null,
-						9023474885936576,
-						false
-						,[
-						[
-							7,
-							[
-								2,
-								"fail!"
-							]
-						]
-						]
-					]
-,					[
-						-1,
-						cr.system_object.prototype.acts.RestartLayout,
-						null,
-						2800008405043248,
-						false
-					]
-					]
-				]
-,				[
-					0,
-					null,
-					false,
-					null,
 					3827619488023732,
 					[
 					],
@@ -33908,8 +37983,8 @@ false,false,9724346976153994,false
 			5219001097164774,
 			[
 			[
-				18,
-				cr.plugins_.Button.prototype.cnds.OnClicked,
+				23,
+				cr.plugins_.Touch.prototype.cnds.OnTouchObject,
 				null,
 				1,
 				false,
@@ -33917,6 +37992,12 @@ false,false,9724346976153994,false
 				false,
 				4390623347030904,
 				false
+				,[
+				[
+					4,
+					36
+				]
+				]
 			]
 ,			[
 				-1,
@@ -34028,6 +38109,37 @@ false,false,9724346976153994,false
 				]
 				],
 				[
+				[
+					38,
+					cr.plugins_.Audio.prototype.acts.Play,
+					null,
+					3369603817182707,
+					false
+					,[
+					[
+						2,
+						["multimedia_button_click_025",false]
+					]
+,					[
+						3,
+						0
+					]
+,					[
+						0,
+						[
+							0,
+							0
+						]
+					]
+,					[
+						1,
+						[
+							2,
+							""
+						]
+					]
+					]
+				]
 				]
 				,[
 				[
@@ -34156,6 +38268,13 @@ false,false,9724346976153994,false
 							]
 							]
 						]
+,						[
+							7,
+							cr.plugins_.Sprite.prototype.acts.Destroy,
+							null,
+							2425401057895444,
+							false
+						]
 						]
 					]
 ,					[
@@ -34216,6 +38335,13 @@ false,false,9724346976153994,false
 							]
 							]
 						]
+,						[
+							7,
+							cr.plugins_.Sprite.prototype.acts.Destroy,
+							null,
+							6917106204586886,
+							false
+						]
 						]
 					]
 ,					[
@@ -34227,13 +38353,6 @@ false,false,9724346976153994,false
 						[
 						],
 						[
-						[
-							7,
-							cr.plugins_.Sprite.prototype.acts.Destroy,
-							null,
-							6917106204586886,
-							false
-						]
 						]
 					]
 					]
@@ -34272,6 +38391,37 @@ false,false,9724346976153994,false
 				],
 				[
 				[
+					38,
+					cr.plugins_.Audio.prototype.acts.Play,
+					null,
+					6322201174628919,
+					false
+					,[
+					[
+						2,
+						["multimedia_button_click_025",false]
+					]
+,					[
+						3,
+						0
+					]
+,					[
+						0,
+						[
+							0,
+							0
+						]
+					]
+,					[
+						1,
+						[
+							2,
+							""
+						]
+					]
+					]
+				]
+,				[
 					-1,
 					cr.system_object.prototype.acts.RestartLayout,
 					null,
@@ -34311,6 +38461,37 @@ false,false,9724346976153994,false
 			]
 			],
 			[
+			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Play,
+				null,
+				4125822711799363,
+				false
+				,[
+				[
+					2,
+					["multimedia_button_click_025",false]
+				]
+,				[
+					3,
+					0
+				]
+,				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+,				[
+					1,
+					[
+						2,
+						""
+					]
+				]
+				]
+			]
 			]
 			,[
 			[
@@ -34415,8 +38596,8 @@ false,false,9724346976153994,false
 ,						[
 							5,
 							[
-								0,
-								1
+								2,
+								"Game"
 							]
 						]
 ,						[
@@ -34658,8 +38839,8 @@ false,false,9724346976153994,false
 ,					[
 						5,
 						[
-							0,
-							1
+							2,
+							"Game"
 						]
 					]
 ,					[
@@ -34831,23 +39012,6 @@ false,false,9724346976153994,false
 				[
 				[
 					23,
-					cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
-					null,
-					0,
-					false,
-					false,
-					false,
-					2984779619061912,
-					false
-					,[
-					[
-						4,
-						0
-					]
-					]
-				]
-,				[
-					23,
 					cr.plugins_.Touch.prototype.cnds.CompareTouchSpeed,
 					null,
 					0,
@@ -34924,7 +39088,7 @@ false,false,9724346976153994,false
 					,[
 					[
 						4,
-						8
+						36
 					]
 					]
 				]
@@ -34941,7 +39105,7 @@ false,false,9724346976153994,false
 					,[
 					[
 						4,
-						18
+						37
 					]
 					]
 				]
@@ -35134,6 +39298,37 @@ false,false,9724346976153994,false
 			],
 			[
 			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Play,
+				null,
+				735332877877235,
+				false
+				,[
+				[
+					2,
+					["multimedia_button_click_025",false]
+				]
+,				[
+					3,
+					0
+				]
+,				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+,				[
+					1,
+					[
+						2,
+						""
+					]
+				]
+				]
+			]
+,			[
 				25,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
@@ -35214,6 +39409,37 @@ false,false,9724346976153994,false
 			],
 			[
 			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Play,
+				null,
+				2419275496788,
+				false
+				,[
+				[
+					2,
+					["multimedia_button_click_025",false]
+				]
+,				[
+					3,
+					0
+				]
+,				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+,				[
+					1,
+					[
+						2,
+						""
+					]
+				]
+				]
+			]
+,			[
 				26,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
@@ -35272,57 +39498,6 @@ false,false,9724346976153994,false
 			null,
 			false,
 			null,
-			7015899315591488,
-			[
-			[
-				1,
-				cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
-				null,
-				0,
-				false,
-				false,
-				false,
-				9786336722728924,
-				false
-				,[
-				[
-					4,
-					27
-				]
-				]
-			]
-			],
-			[
-			[
-				28,
-				cr.plugins_.Browser.prototype.acts.Alert,
-				null,
-				2649379863967719,
-				false
-				,[
-				[
-					7,
-					[
-						2,
-						"You win!"
-					]
-				]
-				]
-			]
-,			[
-				-1,
-				cr.system_object.prototype.acts.RestartLayout,
-				null,
-				9279425382272312,
-				false
-			]
-			]
-		]
-,		[
-			0,
-			null,
-			false,
-			null,
 			1059072336095674,
 			[
 			[
@@ -35369,6 +39544,464 @@ false,false,9724346976153994,false
 				null,
 				3885935617370327,
 				false
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			1728515655500697,
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.cnds.OnCollision,
+				null,
+				0,
+				false,
+				false,
+				true,
+				6573280441655532,
+				false
+				,[
+				[
+					4,
+					33
+				]
+				]
+			]
+			],
+			[
+			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Play,
+				null,
+				2605065417243949,
+				false
+				,[
+				[
+					2,
+					["death",false]
+				]
+,				[
+					3,
+					0
+				]
+,				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+,				[
+					1,
+					[
+						2,
+						""
+					]
+				]
+				]
+			]
+,			[
+				-1,
+				cr.system_object.prototype.acts.RestartLayout,
+				null,
+				7939857117256571,
+				false
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			1556958829921694,
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.cnds.IsOverlappingOffset,
+				null,
+				0,
+				false,
+				false,
+				false,
+				7089439347353751,
+				false
+				,[
+				[
+					4,
+					35
+				]
+,				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+,				[
+					0,
+					[
+						0,
+						10
+					]
+				]
+				]
+			]
+,			[
+				-1,
+				cr.system_object.prototype.cnds.Compare,
+				null,
+				0,
+				false,
+				false,
+				false,
+				1410458308623128,
+				false
+				,[
+				[
+					7,
+					[
+						20,
+						1,
+						cr.plugins_.Sprite.prototype.exps.Y,
+						false,
+						null
+					]
+				]
+,				[
+					8,
+					3
+				]
+,				[
+					7,
+					[
+						20,
+						35,
+						cr.plugins_.TiledBg.prototype.exps.Y,
+						false,
+						null
+					]
+				]
+				]
+			]
+			],
+			[
+			[
+				-1,
+				cr.system_object.prototype.acts.Wait,
+				null,
+				8385200330615928,
+				false
+				,[
+				[
+					0,
+					[
+						1,
+						0.5
+					]
+				]
+				]
+			]
+,			[
+				35,
+				cr.behaviors.Physics.prototype.acts.SetImmovable,
+				"Physics",
+				9568150088245632,
+				false
+				,[
+				[
+					3,
+					0
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			2001964900944484,
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.cnds.IsOverlappingOffset,
+				null,
+				0,
+				false,
+				false,
+				false,
+				3365500470388627,
+				false
+				,[
+				[
+					4,
+					34
+				]
+,				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+,				[
+					0,
+					[
+						0,
+						10
+					]
+				]
+				]
+			]
+,			[
+				34,
+				cr.plugins_.Sprite.prototype.cnds.IsAnimPlaying,
+				null,
+				0,
+				false,
+				false,
+				false,
+				7749537992851052,
+				false
+				,[
+				[
+					1,
+					[
+						2,
+						"Default"
+					]
+				]
+				]
+			]
+			],
+			[
+			[
+				34,
+				cr.plugins_.Sprite.prototype.acts.SetAnim,
+				null,
+				563860161158637,
+				false
+				,[
+				[
+					1,
+					[
+						2,
+						"Crumble"
+					]
+				]
+,				[
+					3,
+					1
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			5908005355719573,
+			[
+			[
+				34,
+				cr.plugins_.Sprite.prototype.cnds.OnAnimFinished,
+				null,
+				1,
+				false,
+				false,
+				false,
+				2617032612590027,
+				false
+				,[
+				[
+					1,
+					[
+						2,
+						"Crumble"
+					]
+				]
+				]
+			]
+			],
+			[
+			[
+				34,
+				cr.plugins_.Sprite.prototype.acts.Destroy,
+				null,
+				233706408366129,
+				false
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			3065662520036479,
+			[
+			[
+				23,
+				cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
+				null,
+				0,
+				false,
+				false,
+				false,
+				6838488356748662,
+				false
+				,[
+				[
+					4,
+					37
+				]
+				]
+			]
+			],
+			[
+			[
+				37,
+				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
+				null,
+				6264237826461568,
+				false
+				,[
+				[
+					0,
+					[
+						0,
+						1
+					]
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			1534633493658121,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.Else,
+				null,
+				0,
+				false,
+				false,
+				false,
+				9547934312416772,
+				false
+			]
+			],
+			[
+			[
+				37,
+				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
+				null,
+				2766829905041808,
+				false
+				,[
+				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			202644301764235,
+			[
+			[
+				23,
+				cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
+				null,
+				0,
+				false,
+				false,
+				false,
+				7617872609976256,
+				false
+				,[
+				[
+					4,
+					36
+				]
+				]
+			]
+			],
+			[
+			[
+				36,
+				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
+				null,
+				9288937114481246,
+				false
+				,[
+				[
+					0,
+					[
+						0,
+						1
+					]
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			6383600106470275,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.Else,
+				null,
+				0,
+				false,
+				false,
+				false,
+				1847550505841382,
+				false
+			]
+			],
+			[
+			[
+				36,
+				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
+				null,
+				9085396673219763,
+				false
+				,[
+				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+				]
 			]
 			]
 		]
@@ -35859,21 +40492,902 @@ false,false,6948754525846232,false
 		]
 		]
 	]
+,	[
+		"locomotion",
+		[
+		[
+			0,
+			null,
+			false,
+			null,
+			5718005744848906,
+			[
+			[
+				1,
+				cr.behaviors.Platform.prototype.cnds.IsJumping,
+				"Platform",
+				0,
+				false,
+				false,
+				false,
+				4871116020455023,
+				false
+			]
+			],
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.acts.SetAnim,
+				null,
+				4188184756668739,
+				false
+				,[
+				[
+					1,
+					[
+						2,
+						"Jump"
+					]
+				]
+,				[
+					3,
+					1
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			2909994337609827,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.Else,
+				null,
+				0,
+				false,
+				false,
+				false,
+				7268499500821702,
+				false
+			]
+			],
+			[
+			]
+			,[
+			[
+				0,
+				null,
+				false,
+				null,
+				7785467170187492,
+				[
+				[
+					1,
+					cr.behaviors.Platform.prototype.cnds.IsFalling,
+					"Platform",
+					0,
+					false,
+					false,
+					false,
+					4788010291676875,
+					false
+				]
+				],
+				[
+				[
+					1,
+					cr.plugins_.Sprite.prototype.acts.SetAnim,
+					null,
+					6519188169957973,
+					false
+					,[
+					[
+						1,
+						[
+							2,
+							"Fall"
+						]
+					]
+,					[
+						3,
+						1
+					]
+					]
+				]
+				]
+			]
+,			[
+				0,
+				null,
+				false,
+				null,
+				4877176905868426,
+				[
+				[
+					-1,
+					cr.system_object.prototype.cnds.Else,
+					null,
+					0,
+					false,
+					false,
+					false,
+					4407215039581595,
+					false
+				]
+				],
+				[
+				]
+				,[
+				[
+					0,
+					null,
+					false,
+					null,
+					9233637554680063,
+					[
+					[
+						-1,
+						cr.system_object.prototype.cnds.Compare,
+						null,
+						0,
+						false,
+						false,
+						false,
+						2195822092236029,
+						false
+						,[
+						[
+							7,
+							[
+								19,
+								cr.system_object.prototype.exps.abs
+								,[
+[
+									22,
+									1,
+									"Physics",
+									cr.behaviors.Physics.prototype.exps.VelocityX,
+									false,
+									null
+								]
+								]
+							]
+						]
+,						[
+							8,
+							3
+						]
+,						[
+							7,
+							[
+								0,
+								1
+							]
+						]
+						]
+					]
+					],
+					[
+					[
+						1,
+						cr.plugins_.Sprite.prototype.acts.SetAnim,
+						null,
+						1810390028819736,
+						false
+						,[
+						[
+							1,
+							[
+								2,
+								"Idle"
+							]
+						]
+,						[
+							3,
+							1
+						]
+						]
+					]
+					]
+				]
+,				[
+					0,
+					null,
+					false,
+					null,
+					5752226907871844,
+					[
+					[
+						-1,
+						cr.system_object.prototype.cnds.Else,
+						null,
+						0,
+						false,
+						false,
+						false,
+						3182370372385911,
+						false
+					]
+					],
+					[
+					[
+						1,
+						cr.plugins_.Sprite.prototype.acts.SetAnim,
+						null,
+						2776840477202293,
+						false
+						,[
+						[
+							1,
+							[
+								2,
+								"Walk"
+							]
+						]
+,						[
+							3,
+							1
+						]
+						]
+					]
+					]
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			6668463067414943,
+			[
+			[
+				1,
+				cr.behaviors.Physics.prototype.cnds.CompareVelocity,
+				"Physics",
+				0,
+				false,
+				false,
+				false,
+				1154179514948433,
+				false
+				,[
+				[
+					3,
+					0
+				]
+,				[
+					8,
+					4
+				]
+,				[
+					0,
+					[
+						0,
+						2
+					]
+				]
+				]
+			]
+			],
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.acts.SetMirrored,
+				null,
+				6687153472570599,
+				false
+				,[
+				[
+					3,
+					1
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			3633719242418883,
+			[
+			[
+				1,
+				cr.behaviors.Physics.prototype.cnds.CompareVelocity,
+				"Physics",
+				0,
+				false,
+				false,
+				false,
+				8963180067379391,
+				false
+				,[
+				[
+					3,
+					0
+				]
+,				[
+					8,
+					2
+				]
+,				[
+					0,
+					[
+						0,
+						-2
+					]
+				]
+				]
+			]
+			],
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.acts.SetMirrored,
+				null,
+				268195949665669,
+				false
+				,[
+				[
+					3,
+					0
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			964070256254824,
+			[
+			[
+				1,
+				cr.behaviors.Platform.prototype.cnds.OnJump,
+				"Platform",
+				1,
+				false,
+				false,
+				false,
+				1644778478318267,
+				false
+			]
+			],
+			[
+			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Play,
+				null,
+				7589065227741715,
+				false
+				,[
+				[
+					2,
+					["jump_fx",false]
+				]
+,				[
+					3,
+					0
+				]
+,				[
+					0,
+					[
+						0,
+						0
+					]
+				]
+,				[
+					1,
+					[
+						2,
+						""
+					]
+				]
+				]
+			]
+			]
+		]
+		]
+	]
+,	[
+		"opening",
+		[
+		[
+			0,
+			null,
+			false,
+			null,
+			6789030718682054,
+			[
+			[
+				23,
+				cr.plugins_.Touch.prototype.cnds.OnTouchStart,
+				null,
+				1,
+				false,
+				false,
+				false,
+				994748924710298,
+				false
+			]
+			],
+			[
+			[
+				-1,
+				cr.system_object.prototype.acts.GoToLayout,
+				null,
+				7389387111693814,
+				false
+				,[
+				[
+					6,
+					"Level 1"
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			8033399942400132,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.OnLayoutStart,
+				null,
+				1,
+				false,
+				false,
+				false,
+				5796495263955322,
+				false
+			]
+			],
+			[
+			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Preload,
+				null,
+				3492566196734433,
+				false
+				,[
+				[
+					2,
+					["ambiant",true]
+				]
+				]
+			]
+,			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Play,
+				null,
+				4614801579775736,
+				false
+				,[
+				[
+					2,
+					["ambiant",true]
+				]
+,				[
+					3,
+					1
+				]
+,				[
+					0,
+					[
+						0,
+						-15
+					]
+				]
+,				[
+					1,
+					[
+						2,
+						""
+					]
+				]
+				]
+			]
+,			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Preload,
+				null,
+				7617350806766852,
+				false
+				,[
+				[
+					2,
+					["multimedia_button_click_025",false]
+				]
+				]
+			]
+,			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Preload,
+				null,
+				657801324629976,
+				false
+				,[
+				[
+					2,
+					["death",false]
+				]
+				]
+			]
+,			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Preload,
+				null,
+				6283592193051026,
+				false
+				,[
+				[
+					2,
+					["jump_fx",false]
+				]
+				]
+			]
+,			[
+				38,
+				cr.plugins_.Audio.prototype.acts.Preload,
+				null,
+				5049661569072026,
+				false
+				,[
+				[
+					2,
+					["multimedia_button_click_029",false]
+				]
+				]
+			]
+			]
+		]
+		]
+	]
+,	[
+		"Level 1",
+		[
+		[
+			2,
+			"main",
+			false
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			1286366440606601,
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
+				null,
+				0,
+				false,
+				false,
+				false,
+				7752300992278508,
+				false
+				,[
+				[
+					4,
+					27
+				]
+				]
+			]
+			],
+			[
+			[
+				-1,
+				cr.system_object.prototype.acts.GoToLayout,
+				null,
+				7973585875021182,
+				false
+				,[
+				[
+					6,
+					"Level 2"
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			2553503943707807,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.OnLayoutStart,
+				null,
+				1,
+				false,
+				false,
+				false,
+				8138051802440972,
+				false
+			]
+			],
+			[
+			[
+				16,
+				cr.plugins_.Text.prototype.acts.SetText,
+				null,
+				8503175022188525,
+				false
+				,[
+				[
+					7,
+					[
+						2,
+						"3"
+					]
+				]
+				]
+			]
+,			[
+				14,
+				cr.plugins_.Text.prototype.acts.SetText,
+				null,
+				6460463657445816,
+				false
+				,[
+				[
+					7,
+					[
+						2,
+						"10"
+					]
+				]
+				]
+			]
+			]
+		]
+		]
+	]
+,	[
+		"Level 2",
+		[
+		[
+			2,
+			"main",
+			false
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			4038815835562736,
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
+				null,
+				0,
+				false,
+				false,
+				false,
+				8379319296154957,
+				false
+				,[
+				[
+					4,
+					27
+				]
+				]
+			]
+			],
+			[
+			[
+				-1,
+				cr.system_object.prototype.acts.GoToLayout,
+				null,
+				2582287585374751,
+				false
+				,[
+				[
+					6,
+					"Opening"
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			528688254126204,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.OnLayoutStart,
+				null,
+				1,
+				false,
+				false,
+				false,
+				9962865659168188,
+				false
+			]
+			],
+			[
+			[
+				16,
+				cr.plugins_.Text.prototype.acts.SetText,
+				null,
+				1866191735395459,
+				false
+				,[
+				[
+					7,
+					[
+						2,
+						"6"
+					]
+				]
+				]
+			]
+,			[
+				14,
+				cr.plugins_.Text.prototype.acts.SetText,
+				null,
+				5105448733437165,
+				false
+				,[
+				[
+					7,
+					[
+						2,
+						"6"
+					]
+				]
+				]
+			]
+			]
+		]
+		]
+	]
+,	[
+		"Level 3",
+		[
+		[
+			2,
+			"main",
+			false
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			1695117371217659,
+			[
+			[
+				1,
+				cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
+				null,
+				0,
+				false,
+				false,
+				false,
+				8536824655175243,
+				false
+				,[
+				[
+					4,
+					27
+				]
+				]
+			]
+			],
+			[
+			[
+				-1,
+				cr.system_object.prototype.acts.GoToLayout,
+				null,
+				2010830590444453,
+				false
+				,[
+				[
+					6,
+					"Opening"
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			4125235641877641,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.OnLayoutStart,
+				null,
+				1,
+				false,
+				false,
+				false,
+				7753639835462232,
+				false
+			]
+			],
+			[
+			[
+				16,
+				cr.plugins_.Text.prototype.acts.SetText,
+				null,
+				658862909522921,
+				false
+				,[
+				[
+					7,
+					[
+						2,
+						"12"
+					]
+				]
+				]
+			]
+,			[
+				14,
+				cr.plugins_.Text.prototype.acts.SetText,
+				null,
+				9012572651295813,
+				false
+				,[
+				[
+					7,
+					[
+						2,
+						"10"
+					]
+				]
+				]
+			]
+			]
+		]
+		]
+	]
 	],
 	"media/",
 	false,
 	1280,
 	720,
 	4,
-	true,
-	true,
+	false,
+	false,
 	true,
 	"1.0",
-	true,
+	false,
 	false,
 	0,
 	0,
-	41,
+	131,
 	false,
 	[
 		[7,10]

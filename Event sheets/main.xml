@@ -28,6 +28,9 @@
                     <param id="0" name="Variable">play</param>
                     <param id="1" name="Value">0</param>
                 </action>
+                <action id="-8" name="Scroll to object" sid="7582806651900911" type="System">
+                    <param id="0" name="Object">Player</param>
+                </action>
             </actions>
         </event-block>
         <comment>Use the down arrow to allow the player to deliberately drop down through a jump-thru platform.</comment>
@@ -40,52 +43,25 @@
                 </condition>
             </conditions>
             <actions>
+                <action id="0" name="Alert" sid="9734879069347457" type="Browser">
+                    <param id="0" name="Message">&quot;fall through&quot;</param>
+                </action>
                 <action id="-26" name="Restart layout" sid="9067646929768267" type="System" />
-            </actions>
-        </event-block>
-        <event-block sid="7524303417323834">
-            <conditions>
-                <condition id="0" name="On click" sid="657966252722935" type="Mouse">
-                    <param id="0" name="Mouse button">0</param>
-                    <param id="1" name="Click type">0</param>
-                </condition>
-                <condition id="-8" name="Compare two values" sid="172817356104203" type="System">
-                    <param id="0" name="First value">int(runToCounter.Text)</param>
-                    <param id="1" name="Comparison">4</param>
-                    <param id="2" name="Second value">0</param>
-                </condition>
-            </conditions>
-            <actions>
-                <action id="0" name="Call function" sid="5010124243363046" type="Function">
-                    <param id="0" name="Name">&quot;placeMarker&quot;</param>
-                    <param id="1" name="Parameter {n}">&quot;&quot;</param>
-                </action>
-            </actions>
-        </event-block>
-        <event-block sid="8301003565959143">
-            <conditions>
-                <condition id="0" name="On click" sid="4045086023291715" type="Mouse">
-                    <param id="0" name="Mouse button">2</param>
-                    <param id="1" name="Click type">0</param>
-                </condition>
-                <condition id="-8" name="Compare two values" sid="1826048742483267" type="System">
-                    <param id="0" name="First value">int(jumpCounter.Text)</param>
-                    <param id="1" name="Comparison">4</param>
-                    <param id="2" name="Second value">0</param>
-                </condition>
-            </conditions>
-            <actions>
-                <action id="0" name="Call function" sid="5950870964452608" type="Function">
-                    <param id="0" name="Name">&quot;placeMarker&quot;</param>
-                    <param id="1" name="Parameter {n}">&quot;jump&quot;</param>
-                </action>
             </actions>
         </event-block>
         <event-block sid="9126252563479522">
             <conditions>
-                <condition id="0" name="On clicked" sid="2080205700683569" type="PlayButton" />
+                <condition id="3" name="On touched object" sid="2080205700683569" type="Touch">
+                    <param id="0" name="Object">Sprite3</param>
+                </condition>
             </conditions>
             <actions>
+                <action id="0" name="Play" sid="6828594793292537" type="Audio">
+                    <param id="0" name="Audio file">multimedia_button_click_025</param>
+                    <param id="2" name="Loop">0</param>
+                    <param id="3" name="Volume">0</param>
+                    <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                </action>
                 <action id="-9" name="Set value" sid="1159530623337639" type="System">
                     <param id="0" name="Variable">play</param>
                     <param id="1" name="Value">1</param>
@@ -163,6 +139,11 @@
             <conditions>
                 <condition id="0" name="On collision with another object" sid="6741122540066685" type="Player">
                     <param id="0" name="Object">Marker</param>
+                </condition>
+                <condition id="-8" name="Compare two values" sid="1357469517568939" type="System">
+                    <param id="0" name="First value">Marker.id</param>
+                    <param id="1" name="Comparison">0</param>
+                    <param id="2" name="Second value">cMarker</param>
                 </condition>
             </conditions>
             <actions />
@@ -275,7 +256,9 @@
         </event-block>
         <event-block sid="5219001097164774">
             <conditions>
-                <condition id="0" name="On clicked" sid="4390623347030904" type="UndoButton" />
+                <condition id="3" name="On touched object" sid="4390623347030904" type="Touch">
+                    <param id="0" name="Object">UndoSprite</param>
+                </condition>
                 <condition id="-14" name="Compare variable" sid="2268783877116483" type="System">
                     <param id="0" name="Variable">maxId</param>
                     <param id="1" name="Comparison">4</param>
@@ -301,7 +284,14 @@
                             <param id="2" name="Second value">0</param>
                         </condition>
                     </conditions>
-                    <actions />
+                    <actions>
+                        <action id="0" name="Play" sid="3369603817182707" type="Audio">
+                            <param id="0" name="Audio file">multimedia_button_click_025</param>
+                            <param id="2" name="Loop">0</param>
+                            <param id="3" name="Volume">0</param>
+                            <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                        </action>
+                    </actions>
                     <sub-events>
                         <event-block sid="1125931618486108">
                             <conditions>
@@ -324,6 +314,7 @@
                                         <action id="0" name="Set text" sid="3166257183083118" type="jumpCounter">
                                             <param id="0" name="Text">str(int(jumpCounter.Text)+1)</param>
                                         </action>
+                                        <action id="-9" name="Destroy" sid="2425401057895444" type="Marker" />
                                     </actions>
                                 </event-block>
                                 <event-block sid="1664603303409896">
@@ -334,13 +325,12 @@
                                         <action id="0" name="Set text" sid="6737898872407703" type="runToCounter">
                                             <param id="0" name="Text">str(int(runToCounter.Text)+1)</param>
                                         </action>
+                                        <action id="-9" name="Destroy" sid="6917106204586886" type="Marker" />
                                     </actions>
                                 </event-block>
                                 <event-block sid="5100328395213183">
                                     <conditions />
-                                    <actions>
-                                        <action id="-9" name="Destroy" sid="6917106204586886" type="Marker" />
-                                    </actions>
+                                    <actions />
                                 </event-block>
                             </sub-events>
                         </event-block>
@@ -355,6 +345,12 @@
                         <condition id="-22" name="Else" sid="8182487514660399" type="System" />
                     </conditions>
                     <actions>
+                        <action id="0" name="Play" sid="6322201174628919" type="Audio">
+                            <param id="0" name="Audio file">multimedia_button_click_025</param>
+                            <param id="2" name="Loop">0</param>
+                            <param id="3" name="Volume">0</param>
+                            <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                        </action>
                         <action id="-26" name="Restart layout" sid="1304279708327636" type="System" />
                     </actions>
                 </event-block>
@@ -366,7 +362,14 @@
                     <param id="0" name="Name">&quot;placeMarker&quot;</param>
                 </condition>
             </conditions>
-            <actions />
+            <actions>
+                <action id="0" name="Play" sid="4125822711799363" type="Audio">
+                    <param id="0" name="Audio file">multimedia_button_click_025</param>
+                    <param id="2" name="Loop">0</param>
+                    <param id="3" name="Volume">0</param>
+                    <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                </action>
+            </actions>
             <sub-events>
                 <event-block sid="6589062706508949">
                     <conditions>
@@ -462,9 +465,6 @@
             <sub-events>
                 <event-block sid="6565347934604266">
                     <conditions>
-                        <condition id="4" name="Is touching object" sid="2984779619061912" type="Touch">
-                            <param id="0" name="Object">BackgroundTile</param>
-                        </condition>
                         <condition id="7" name="Compare touch speed" sid="8096356866163439" type="Touch">
                             <param id="0" name="Touch index">0</param>
                             <param id="1" name="Comparison">0</param>
@@ -477,10 +477,10 @@
                             <param id="0" name="Object">runButton</param>
                         </condition>
                         <condition id="4" inverted="1" name="Is touching object" sid="858806286678171" type="Touch">
-                            <param id="0" name="Object">PlayButton</param>
+                            <param id="0" name="Object">UndoSprite</param>
                         </condition>
                         <condition id="4" inverted="1" name="Is touching object" sid="408402438800787" type="Touch">
-                            <param id="0" name="Object">UndoButton</param>
+                            <param id="0" name="Object">Sprite3</param>
                         </condition>
                         <condition id="4" inverted="1" name="Is touching object" sid="8154965534932897" type="Touch">
                             <param id="0" name="Object">SolidTile</param>
@@ -520,6 +520,12 @@
                 </condition>
             </conditions>
             <actions>
+                <action id="0" name="Play" sid="735332877877235" type="Audio">
+                    <param id="0" name="Audio file">multimedia_button_click_025</param>
+                    <param id="2" name="Loop">0</param>
+                    <param id="3" name="Volume">0</param>
+                    <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                </action>
                 <action id="5" name="Set frame" sid="878096880058304" type="runButton">
                     <param id="0" name="Frame number">1</param>
                 </action>
@@ -539,6 +545,12 @@
                 </condition>
             </conditions>
             <actions>
+                <action id="0" name="Play" sid="2419275496788" type="Audio">
+                    <param id="0" name="Audio file">multimedia_button_click_025</param>
+                    <param id="2" name="Loop">0</param>
+                    <param id="3" name="Volume">0</param>
+                    <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                </action>
                 <action id="5" name="Set frame" sid="7960847831172939" type="jumpButton">
                     <param id="0" name="Frame number">1</param>
                 </action>
@@ -571,6 +583,12 @@
                 </condition>
             </conditions>
             <actions>
+                <action id="0" name="Play" sid="2605065417243949" type="Audio">
+                    <param id="0" name="Audio file">death</param>
+                    <param id="2" name="Loop">0</param>
+                    <param id="3" name="Volume">0</param>
+                    <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                </action>
                 <action id="-26" name="Restart layout" sid="7939857117256571" type="System" />
             </actions>
         </event-block>
@@ -622,6 +640,50 @@
             </conditions>
             <actions>
                 <action id="-9" name="Destroy" sid="233706408366129" type="CrumbleBlock" />
+            </actions>
+        </event-block>
+        <event-block sid="3065662520036479">
+            <conditions>
+                <condition id="4" name="Is touching object" sid="6838488356748662" type="Touch">
+                    <param id="0" name="Object">Sprite3</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="5" name="Set frame" sid="6264237826461568" type="Sprite3">
+                    <param id="0" name="Frame number">1</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="1534633493658121">
+            <conditions>
+                <condition id="-22" name="Else" sid="9547934312416772" type="System" />
+            </conditions>
+            <actions>
+                <action id="5" name="Set frame" sid="2766829905041808" type="Sprite3">
+                    <param id="0" name="Frame number">0</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="202644301764235">
+            <conditions>
+                <condition id="4" name="Is touching object" sid="7617872609976256" type="Touch">
+                    <param id="0" name="Object">UndoSprite</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="5" name="Set frame" sid="9288937114481246" type="UndoSprite">
+                    <param id="0" name="Frame number">1</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="6383600106470275">
+            <conditions>
+                <condition id="-22" name="Else" sid="1847550505841382" type="System" />
+            </conditions>
+            <actions>
+                <action id="5" name="Set frame" sid="9085396673219763" type="UndoSprite">
+                    <param id="0" name="Frame number">0</param>
+                </action>
             </actions>
         </event-block>
     </events>

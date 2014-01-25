@@ -16,5 +16,18 @@
                 </action>
             </actions>
         </event-block>
+        <event-block sid="2553503943707807">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="8138051802440972" type="System" />
+            </conditions>
+            <actions>
+                <action id="0" name="Set text" sid="8503175022188525" type="jumpCounter">
+                    <param id="0" name="Text">&quot;3&quot;</param>
+                </action>
+                <action id="0" name="Set text" sid="6460463657445816" type="runToCounter">
+                    <param id="0" name="Text">&quot;10&quot;</param>
+                </action>
+            </actions>
+        </event-block>
     </events>
 </c2eventsheet>

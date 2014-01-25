@@ -13,5 +13,33 @@
                 </action>
             </actions>
         </event-block>
+        <event-block sid="8033399942400132">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="5796495263955322" type="System" />
+            </conditions>
+            <actions>
+                <action id="4" name="Preload" sid="3492566196734433" type="Audio">
+                    <param id="0" name="Audio file">ambiant</param>
+                </action>
+                <action id="0" name="Play" sid="4614801579775736" type="Audio">
+                    <param id="0" name="Audio file">ambiant</param>
+                    <param id="2" name="Loop">1</param>
+                    <param id="3" name="Volume">-15</param>
+                    <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                </action>
+                <action id="4" name="Preload" sid="7617350806766852" type="Audio">
+                    <param id="0" name="Audio file">multimedia_button_click_025</param>
+                </action>
+                <action id="4" name="Preload" sid="657801324629976" type="Audio">
+                    <param id="0" name="Audio file">death</param>
+                </action>
+                <action id="4" name="Preload" sid="6283592193051026" type="Audio">
+                    <param id="0" name="Audio file">jump_fx</param>
+                </action>
+                <action id="4" name="Preload" sid="5049661569072026" type="Audio">
+                    <param id="0" name="Audio file">multimedia_button_click_029</param>
+                </action>
+            </actions>
+        </event-block>
     </events>
 </c2eventsheet>
