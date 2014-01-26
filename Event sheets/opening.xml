@@ -3,12 +3,28 @@
     <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
     <name>opening</name>
     <events>
+        <variable constant="0" name="preload" sid="8450558362585037" static="0" type="number">0</variable>
         <event-block sid="6789030718682054">
             <conditions>
                 <condition id="0" name="On any touch start" sid="994748924710298" type="Touch" />
+                <condition id="-14" name="Compare variable" sid="3707633701484554" type="System">
+                    <param id="0" name="Variable">preload</param>
+                    <param id="1" name="Comparison">0</param>
+                    <param id="2" name="Value">1</param>
+                </condition>
             </conditions>
             <actions>
-                <action id="-2" name="Go to layout" sid="7389387111693814" type="System">
+                <action id="0" name="Play" sid="4614801579775736" type="Audio">
+                    <param id="0" name="Audio file">ambiant</param>
+                    <param id="2" name="Loop">1</param>
+                    <param id="3" name="Volume">-5</param>
+                    <param id="1" name="Tag (optional)">&quot;music&quot;</param>
+                </action>
+                <action id="-4" name="Set layer visible" sid="7515530860578636" type="System">
+                    <param id="0" name="Layer">&quot;UI&quot;</param>
+                    <param id="1" name="Visibility">1</param>
+                </action>
+                <action id="-2" name="Go to layout" sid="4839032096012987" type="System">
                     <param id="0" name="Layout">Level 1</param>
                 </action>
             </actions>
@@ -21,23 +37,43 @@
                 <action id="4" name="Preload" sid="3492566196734433" type="Audio">
                     <param id="0" name="Audio file">ambiant</param>
                 </action>
-                <action id="0" name="Play" sid="4614801579775736" type="Audio">
-                    <param id="0" name="Audio file">ambiant</param>
-                    <param id="2" name="Loop">1</param>
-                    <param id="3" name="Volume">-15</param>
-                    <param id="1" name="Tag (optional)">&quot;&quot;</param>
+            </actions>
+        </event-block>
+        <event-block sid="7516257621956417">
+            <conditions />
+            <actions />
+        </event-block>
+        <event-block sid="867736197085883">
+            <conditions>
+                <condition id="-25" name="On loader layout complete" sid="1063451654515935" type="System" />
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="2175377603031369" type="System">
+                    <param id="0" name="Variable">preload</param>
+                    <param id="1" name="Value">1</param>
                 </action>
-                <action id="4" name="Preload" sid="7617350806766852" type="Audio">
-                    <param id="0" name="Audio file">multimedia_button_click_025</param>
+                <action id="6" name="Set speed" sid="197219229442497" type="titlescreen">
+                    <param id="0" name="Speed">3</param>
                 </action>
-                <action id="4" name="Preload" sid="657801324629976" type="Audio">
-                    <param id="0" name="Audio file">death</param>
+            </actions>
+        </event-block>
+        <event-block sid="5681752850130947">
+            <conditions />
+            <actions />
+        </event-block>
+        <event-block sid="2601488620946619">
+            <conditions>
+                <condition id="-6" name="Every X seconds" sid="4654645480515596" type="System">
+                    <param id="0" name="Interval (seconds)">9</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="7009898977915365" type="System">
+                    <param id="0" name="Variable">preload</param>
+                    <param id="1" name="Value">1</param>
                 </action>
-                <action id="4" name="Preload" sid="6283592193051026" type="Audio">
-                    <param id="0" name="Audio file">jump_fx</param>
-                </action>
-                <action id="4" name="Preload" sid="5049661569072026" type="Audio">
-                    <param id="0" name="Audio file">multimedia_button_click_029</param>
+                <action id="6" name="Set speed" sid="9118651439865642" type="titlescreen">
+                    <param id="0" name="Speed">3</param>
                 </action>
             </actions>
         </event-block>

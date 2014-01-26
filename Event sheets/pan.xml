@@ -30,6 +30,14 @@
                     <param id="0" name="Variable">TouchPanID</param>
                     <param id="1" name="Value">Touch.TouchID</param>
                 </action>
+                <action id="-9" name="Set value" sid="9095329283863767" type="System">
+                    <param id="0" name="Variable">lastTouchGameX</param>
+                    <param id="1" name="Value">Touch.X(&quot;UI&quot;)</param>
+                </action>
+                <action id="-9" name="Set value" sid="103578031947299" type="System">
+                    <param id="0" name="Variable">lastTouchGameY</param>
+                    <param id="1" name="Value">Touch.Y(&quot;UI&quot;)</param>
+                </action>
             </actions>
         </event-block>
         <comment>While we have a touch to pan with, offset the scroll position by the change in position of the touch. This makes the view scroll with the touch.</comment>

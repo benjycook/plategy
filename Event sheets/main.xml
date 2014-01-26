@@ -3,6 +3,8 @@
     <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
     <name>main</name>
     <events>
+        <variable constant="0" name="lastTouchGameY" sid="3743763516423134" static="0" type="number">0</variable>
+        <variable constant="0" name="lastTouchGameX" sid="4655738716653454" static="0" type="number">0</variable>
         <include>locomotion</include>
         <variable constant="1" name="timeToMarker" sid="2222258325444094" static="0" type="number">10</variable>
         <variable constant="0" name="currentAction" sid="2010925221260692" static="0" type="text"></variable>
@@ -486,7 +488,7 @@
                             <param id="0" name="Object">SolidTile</param>
                         </condition>
                         <condition id="-8" name="Compare two values" sid="5205509417479675" type="System">
-                            <param id="0" name="First value">distance(TouchLastX,TouchLastY,Touch.X(&quot;UI&quot;),Touch.Y(&quot;UI&quot;) ) </param>
+                            <param id="0" name="First value">distance(lastTouchGameX,lastTouchGameY,Touch.X(&quot;UI&quot;),Touch.Y(&quot;UI&quot;) ) </param>
                             <param id="1" name="Comparison">2</param>
                             <param id="2" name="Second value">5</param>
                         </condition>

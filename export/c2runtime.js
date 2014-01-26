@@ -1088,6 +1088,1198 @@ if (typeof Object.getPrototypeOf !== "function")
 			return a.toLowerCase() === b.toLowerCase();
 	};
 }());
+var MatrixArray=typeof Float32Array!=="undefined"?Float32Array:Array,glMatrixArrayType=MatrixArray,vec3={},mat3={},mat4={},quat4={};vec3.create=function(a){var b=new MatrixArray(3);a&&(b[0]=a[0],b[1]=a[1],b[2]=a[2]);return b};vec3.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];return b};vec3.add=function(a,b,c){if(!c||a===c)return a[0]+=b[0],a[1]+=b[1],a[2]+=b[2],a;c[0]=a[0]+b[0];c[1]=a[1]+b[1];c[2]=a[2]+b[2];return c};
+vec3.subtract=function(a,b,c){if(!c||a===c)return a[0]-=b[0],a[1]-=b[1],a[2]-=b[2],a;c[0]=a[0]-b[0];c[1]=a[1]-b[1];c[2]=a[2]-b[2];return c};vec3.negate=function(a,b){b||(b=a);b[0]=-a[0];b[1]=-a[1];b[2]=-a[2];return b};vec3.scale=function(a,b,c){if(!c||a===c)return a[0]*=b,a[1]*=b,a[2]*=b,a;c[0]=a[0]*b;c[1]=a[1]*b;c[2]=a[2]*b;return c};
+vec3.normalize=function(a,b){b||(b=a);var c=a[0],d=a[1],e=a[2],g=Math.sqrt(c*c+d*d+e*e);if(g){if(g===1)return b[0]=c,b[1]=d,b[2]=e,b}else return b[0]=0,b[1]=0,b[2]=0,b;g=1/g;b[0]=c*g;b[1]=d*g;b[2]=e*g;return b};vec3.cross=function(a,b,c){c||(c=a);var d=a[0],e=a[1],a=a[2],g=b[0],f=b[1],b=b[2];c[0]=e*b-a*f;c[1]=a*g-d*b;c[2]=d*f-e*g;return c};vec3.length=function(a){var b=a[0],c=a[1],a=a[2];return Math.sqrt(b*b+c*c+a*a)};vec3.dot=function(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]};
+vec3.direction=function(a,b,c){c||(c=a);var d=a[0]-b[0],e=a[1]-b[1],a=a[2]-b[2],b=Math.sqrt(d*d+e*e+a*a);if(!b)return c[0]=0,c[1]=0,c[2]=0,c;b=1/b;c[0]=d*b;c[1]=e*b;c[2]=a*b;return c};vec3.lerp=function(a,b,c,d){d||(d=a);d[0]=a[0]+c*(b[0]-a[0]);d[1]=a[1]+c*(b[1]-a[1]);d[2]=a[2]+c*(b[2]-a[2]);return d};vec3.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+"]"};
+mat3.create=function(a){var b=new MatrixArray(9);a&&(b[0]=a[0],b[1]=a[1],b[2]=a[2],b[3]=a[3],b[4]=a[4],b[5]=a[5],b[6]=a[6],b[7]=a[7],b[8]=a[8]);return b};mat3.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];return b};mat3.identity=function(a){a[0]=1;a[1]=0;a[2]=0;a[3]=0;a[4]=1;a[5]=0;a[6]=0;a[7]=0;a[8]=1;return a};
+mat3.transpose=function(a,b){if(!b||a===b){var c=a[1],d=a[2],e=a[5];a[1]=a[3];a[2]=a[6];a[3]=c;a[5]=a[7];a[6]=d;a[7]=e;return a}b[0]=a[0];b[1]=a[3];b[2]=a[6];b[3]=a[1];b[4]=a[4];b[5]=a[7];b[6]=a[2];b[7]=a[5];b[8]=a[8];return b};mat3.toMat4=function(a,b){b||(b=mat4.create());b[15]=1;b[14]=0;b[13]=0;b[12]=0;b[11]=0;b[10]=a[8];b[9]=a[7];b[8]=a[6];b[7]=0;b[6]=a[5];b[5]=a[4];b[4]=a[3];b[3]=0;b[2]=a[2];b[1]=a[1];b[0]=a[0];return b};
+mat3.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+", "+a[4]+", "+a[5]+", "+a[6]+", "+a[7]+", "+a[8]+"]"};mat4.create=function(a){var b=new MatrixArray(16);a&&(b[0]=a[0],b[1]=a[1],b[2]=a[2],b[3]=a[3],b[4]=a[4],b[5]=a[5],b[6]=a[6],b[7]=a[7],b[8]=a[8],b[9]=a[9],b[10]=a[10],b[11]=a[11],b[12]=a[12],b[13]=a[13],b[14]=a[14],b[15]=a[15]);return b};
+mat4.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9];b[10]=a[10];b[11]=a[11];b[12]=a[12];b[13]=a[13];b[14]=a[14];b[15]=a[15];return b};mat4.identity=function(a){a[0]=1;a[1]=0;a[2]=0;a[3]=0;a[4]=0;a[5]=1;a[6]=0;a[7]=0;a[8]=0;a[9]=0;a[10]=1;a[11]=0;a[12]=0;a[13]=0;a[14]=0;a[15]=1;return a};
+mat4.transpose=function(a,b){if(!b||a===b){var c=a[1],d=a[2],e=a[3],g=a[6],f=a[7],h=a[11];a[1]=a[4];a[2]=a[8];a[3]=a[12];a[4]=c;a[6]=a[9];a[7]=a[13];a[8]=d;a[9]=g;a[11]=a[14];a[12]=e;a[13]=f;a[14]=h;return a}b[0]=a[0];b[1]=a[4];b[2]=a[8];b[3]=a[12];b[4]=a[1];b[5]=a[5];b[6]=a[9];b[7]=a[13];b[8]=a[2];b[9]=a[6];b[10]=a[10];b[11]=a[14];b[12]=a[3];b[13]=a[7];b[14]=a[11];b[15]=a[15];return b};
+mat4.determinant=function(a){var b=a[0],c=a[1],d=a[2],e=a[3],g=a[4],f=a[5],h=a[6],i=a[7],j=a[8],k=a[9],l=a[10],n=a[11],o=a[12],m=a[13],p=a[14],a=a[15];return o*k*h*e-j*m*h*e-o*f*l*e+g*m*l*e+j*f*p*e-g*k*p*e-o*k*d*i+j*m*d*i+o*c*l*i-b*m*l*i-j*c*p*i+b*k*p*i+o*f*d*n-g*m*d*n-o*c*h*n+b*m*h*n+g*c*p*n-b*f*p*n-j*f*d*a+g*k*d*a+j*c*h*a-b*k*h*a-g*c*l*a+b*f*l*a};
+mat4.inverse=function(a,b){b||(b=a);var c=a[0],d=a[1],e=a[2],g=a[3],f=a[4],h=a[5],i=a[6],j=a[7],k=a[8],l=a[9],n=a[10],o=a[11],m=a[12],p=a[13],r=a[14],s=a[15],A=c*h-d*f,B=c*i-e*f,t=c*j-g*f,u=d*i-e*h,v=d*j-g*h,w=e*j-g*i,x=k*p-l*m,y=k*r-n*m,z=k*s-o*m,C=l*r-n*p,D=l*s-o*p,E=n*s-o*r,q=1/(A*E-B*D+t*C+u*z-v*y+w*x);b[0]=(h*E-i*D+j*C)*q;b[1]=(-d*E+e*D-g*C)*q;b[2]=(p*w-r*v+s*u)*q;b[3]=(-l*w+n*v-o*u)*q;b[4]=(-f*E+i*z-j*y)*q;b[5]=(c*E-e*z+g*y)*q;b[6]=(-m*w+r*t-s*B)*q;b[7]=(k*w-n*t+o*B)*q;b[8]=(f*D-h*z+j*x)*q;
+b[9]=(-c*D+d*z-g*x)*q;b[10]=(m*v-p*t+s*A)*q;b[11]=(-k*v+l*t-o*A)*q;b[12]=(-f*C+h*y-i*x)*q;b[13]=(c*C-d*y+e*x)*q;b[14]=(-m*u+p*B-r*A)*q;b[15]=(k*u-l*B+n*A)*q;return b};mat4.toRotationMat=function(a,b){b||(b=mat4.create());b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9];b[10]=a[10];b[11]=a[11];b[12]=0;b[13]=0;b[14]=0;b[15]=1;return b};
+mat4.toMat3=function(a,b){b||(b=mat3.create());b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[4];b[4]=a[5];b[5]=a[6];b[6]=a[8];b[7]=a[9];b[8]=a[10];return b};mat4.toInverseMat3=function(a,b){var c=a[0],d=a[1],e=a[2],g=a[4],f=a[5],h=a[6],i=a[8],j=a[9],k=a[10],l=k*f-h*j,n=-k*g+h*i,o=j*g-f*i,m=c*l+d*n+e*o;if(!m)return null;m=1/m;b||(b=mat3.create());b[0]=l*m;b[1]=(-k*d+e*j)*m;b[2]=(h*d-e*f)*m;b[3]=n*m;b[4]=(k*c-e*i)*m;b[5]=(-h*c+e*g)*m;b[6]=o*m;b[7]=(-j*c+d*i)*m;b[8]=(f*c-d*g)*m;return b};
+mat4.multiply=function(a,b,c){c||(c=a);var d=a[0],e=a[1],g=a[2],f=a[3],h=a[4],i=a[5],j=a[6],k=a[7],l=a[8],n=a[9],o=a[10],m=a[11],p=a[12],r=a[13],s=a[14],a=a[15],A=b[0],B=b[1],t=b[2],u=b[3],v=b[4],w=b[5],x=b[6],y=b[7],z=b[8],C=b[9],D=b[10],E=b[11],q=b[12],F=b[13],G=b[14],b=b[15];c[0]=A*d+B*h+t*l+u*p;c[1]=A*e+B*i+t*n+u*r;c[2]=A*g+B*j+t*o+u*s;c[3]=A*f+B*k+t*m+u*a;c[4]=v*d+w*h+x*l+y*p;c[5]=v*e+w*i+x*n+y*r;c[6]=v*g+w*j+x*o+y*s;c[7]=v*f+w*k+x*m+y*a;c[8]=z*d+C*h+D*l+E*p;c[9]=z*e+C*i+D*n+E*r;c[10]=z*g+C*
+j+D*o+E*s;c[11]=z*f+C*k+D*m+E*a;c[12]=q*d+F*h+G*l+b*p;c[13]=q*e+F*i+G*n+b*r;c[14]=q*g+F*j+G*o+b*s;c[15]=q*f+F*k+G*m+b*a;return c};mat4.multiplyVec3=function(a,b,c){c||(c=b);var d=b[0],e=b[1],b=b[2];c[0]=a[0]*d+a[4]*e+a[8]*b+a[12];c[1]=a[1]*d+a[5]*e+a[9]*b+a[13];c[2]=a[2]*d+a[6]*e+a[10]*b+a[14];return c};
+mat4.multiplyVec4=function(a,b,c){c||(c=b);var d=b[0],e=b[1],g=b[2],b=b[3];c[0]=a[0]*d+a[4]*e+a[8]*g+a[12]*b;c[1]=a[1]*d+a[5]*e+a[9]*g+a[13]*b;c[2]=a[2]*d+a[6]*e+a[10]*g+a[14]*b;c[3]=a[3]*d+a[7]*e+a[11]*g+a[15]*b;return c};
+mat4.translate=function(a,b,c){var d=b[0],e=b[1],b=b[2],g,f,h,i,j,k,l,n,o,m,p,r;if(!c||a===c)return a[12]=a[0]*d+a[4]*e+a[8]*b+a[12],a[13]=a[1]*d+a[5]*e+a[9]*b+a[13],a[14]=a[2]*d+a[6]*e+a[10]*b+a[14],a[15]=a[3]*d+a[7]*e+a[11]*b+a[15],a;g=a[0];f=a[1];h=a[2];i=a[3];j=a[4];k=a[5];l=a[6];n=a[7];o=a[8];m=a[9];p=a[10];r=a[11];c[0]=g;c[1]=f;c[2]=h;c[3]=i;c[4]=j;c[5]=k;c[6]=l;c[7]=n;c[8]=o;c[9]=m;c[10]=p;c[11]=r;c[12]=g*d+j*e+o*b+a[12];c[13]=f*d+k*e+m*b+a[13];c[14]=h*d+l*e+p*b+a[14];c[15]=i*d+n*e+r*b+a[15];
+return c};mat4.scale=function(a,b,c){var d=b[0],e=b[1],b=b[2];if(!c||a===c)return a[0]*=d,a[1]*=d,a[2]*=d,a[3]*=d,a[4]*=e,a[5]*=e,a[6]*=e,a[7]*=e,a[8]*=b,a[9]*=b,a[10]*=b,a[11]*=b,a;c[0]=a[0]*d;c[1]=a[1]*d;c[2]=a[2]*d;c[3]=a[3]*d;c[4]=a[4]*e;c[5]=a[5]*e;c[6]=a[6]*e;c[7]=a[7]*e;c[8]=a[8]*b;c[9]=a[9]*b;c[10]=a[10]*b;c[11]=a[11]*b;c[12]=a[12];c[13]=a[13];c[14]=a[14];c[15]=a[15];return c};
+mat4.rotate=function(a,b,c,d){var e=c[0],g=c[1],c=c[2],f=Math.sqrt(e*e+g*g+c*c),h,i,j,k,l,n,o,m,p,r,s,A,B,t,u,v,w,x,y,z;if(!f)return null;f!==1&&(f=1/f,e*=f,g*=f,c*=f);h=Math.sin(b);i=Math.cos(b);j=1-i;b=a[0];f=a[1];k=a[2];l=a[3];n=a[4];o=a[5];m=a[6];p=a[7];r=a[8];s=a[9];A=a[10];B=a[11];t=e*e*j+i;u=g*e*j+c*h;v=c*e*j-g*h;w=e*g*j-c*h;x=g*g*j+i;y=c*g*j+e*h;z=e*c*j+g*h;e=g*c*j-e*h;g=c*c*j+i;d?a!==d&&(d[12]=a[12],d[13]=a[13],d[14]=a[14],d[15]=a[15]):d=a;d[0]=b*t+n*u+r*v;d[1]=f*t+o*u+s*v;d[2]=k*t+m*u+A*
+v;d[3]=l*t+p*u+B*v;d[4]=b*w+n*x+r*y;d[5]=f*w+o*x+s*y;d[6]=k*w+m*x+A*y;d[7]=l*w+p*x+B*y;d[8]=b*z+n*e+r*g;d[9]=f*z+o*e+s*g;d[10]=k*z+m*e+A*g;d[11]=l*z+p*e+B*g;return d};mat4.rotateX=function(a,b,c){var d=Math.sin(b),b=Math.cos(b),e=a[4],g=a[5],f=a[6],h=a[7],i=a[8],j=a[9],k=a[10],l=a[11];c?a!==c&&(c[0]=a[0],c[1]=a[1],c[2]=a[2],c[3]=a[3],c[12]=a[12],c[13]=a[13],c[14]=a[14],c[15]=a[15]):c=a;c[4]=e*b+i*d;c[5]=g*b+j*d;c[6]=f*b+k*d;c[7]=h*b+l*d;c[8]=e*-d+i*b;c[9]=g*-d+j*b;c[10]=f*-d+k*b;c[11]=h*-d+l*b;return c};
+mat4.rotateY=function(a,b,c){var d=Math.sin(b),b=Math.cos(b),e=a[0],g=a[1],f=a[2],h=a[3],i=a[8],j=a[9],k=a[10],l=a[11];c?a!==c&&(c[4]=a[4],c[5]=a[5],c[6]=a[6],c[7]=a[7],c[12]=a[12],c[13]=a[13],c[14]=a[14],c[15]=a[15]):c=a;c[0]=e*b+i*-d;c[1]=g*b+j*-d;c[2]=f*b+k*-d;c[3]=h*b+l*-d;c[8]=e*d+i*b;c[9]=g*d+j*b;c[10]=f*d+k*b;c[11]=h*d+l*b;return c};
+mat4.rotateZ=function(a,b,c){var d=Math.sin(b),b=Math.cos(b),e=a[0],g=a[1],f=a[2],h=a[3],i=a[4],j=a[5],k=a[6],l=a[7];c?a!==c&&(c[8]=a[8],c[9]=a[9],c[10]=a[10],c[11]=a[11],c[12]=a[12],c[13]=a[13],c[14]=a[14],c[15]=a[15]):c=a;c[0]=e*b+i*d;c[1]=g*b+j*d;c[2]=f*b+k*d;c[3]=h*b+l*d;c[4]=e*-d+i*b;c[5]=g*-d+j*b;c[6]=f*-d+k*b;c[7]=h*-d+l*b;return c};
+mat4.frustum=function(a,b,c,d,e,g,f){f||(f=mat4.create());var h=b-a,i=d-c,j=g-e;f[0]=e*2/h;f[1]=0;f[2]=0;f[3]=0;f[4]=0;f[5]=e*2/i;f[6]=0;f[7]=0;f[8]=(b+a)/h;f[9]=(d+c)/i;f[10]=-(g+e)/j;f[11]=-1;f[12]=0;f[13]=0;f[14]=-(g*e*2)/j;f[15]=0;return f};mat4.perspective=function(a,b,c,d,e){a=c*Math.tan(a*Math.PI/360);b*=a;return mat4.frustum(-b,b,-a,a,c,d,e)};
+mat4.ortho=function(a,b,c,d,e,g,f){f||(f=mat4.create());var h=b-a,i=d-c,j=g-e;f[0]=2/h;f[1]=0;f[2]=0;f[3]=0;f[4]=0;f[5]=2/i;f[6]=0;f[7]=0;f[8]=0;f[9]=0;f[10]=-2/j;f[11]=0;f[12]=-(a+b)/h;f[13]=-(d+c)/i;f[14]=-(g+e)/j;f[15]=1;return f};
+mat4.lookAt=function(a,b,c,d){d||(d=mat4.create());var e,g,f,h,i,j,k,l,n=a[0],o=a[1],a=a[2];g=c[0];f=c[1];e=c[2];c=b[1];j=b[2];if(n===b[0]&&o===c&&a===j)return mat4.identity(d);c=n-b[0];j=o-b[1];k=a-b[2];l=1/Math.sqrt(c*c+j*j+k*k);c*=l;j*=l;k*=l;b=f*k-e*j;e=e*c-g*k;g=g*j-f*c;(l=Math.sqrt(b*b+e*e+g*g))?(l=1/l,b*=l,e*=l,g*=l):g=e=b=0;f=j*g-k*e;h=k*b-c*g;i=c*e-j*b;(l=Math.sqrt(f*f+h*h+i*i))?(l=1/l,f*=l,h*=l,i*=l):i=h=f=0;d[0]=b;d[1]=f;d[2]=c;d[3]=0;d[4]=e;d[5]=h;d[6]=j;d[7]=0;d[8]=g;d[9]=i;d[10]=k;d[11]=
+0;d[12]=-(b*n+e*o+g*a);d[13]=-(f*n+h*o+i*a);d[14]=-(c*n+j*o+k*a);d[15]=1;return d};mat4.fromRotationTranslation=function(a,b,c){c||(c=mat4.create());var d=a[0],e=a[1],g=a[2],f=a[3],h=d+d,i=e+e,j=g+g,a=d*h,k=d*i;d*=j;var l=e*i;e*=j;g*=j;h*=f;i*=f;f*=j;c[0]=1-(l+g);c[1]=k+f;c[2]=d-i;c[3]=0;c[4]=k-f;c[5]=1-(a+g);c[6]=e+h;c[7]=0;c[8]=d+i;c[9]=e-h;c[10]=1-(a+l);c[11]=0;c[12]=b[0];c[13]=b[1];c[14]=b[2];c[15]=1;return c};
+mat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+", "+a[4]+", "+a[5]+", "+a[6]+", "+a[7]+", "+a[8]+", "+a[9]+", "+a[10]+", "+a[11]+", "+a[12]+", "+a[13]+", "+a[14]+", "+a[15]+"]"};quat4.create=function(a){var b=new MatrixArray(4);a&&(b[0]=a[0],b[1]=a[1],b[2]=a[2],b[3]=a[3]);return b};quat4.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];return b};
+quat4.calculateW=function(a,b){var c=a[0],d=a[1],e=a[2];if(!b||a===b)return a[3]=-Math.sqrt(Math.abs(1-c*c-d*d-e*e)),a;b[0]=c;b[1]=d;b[2]=e;b[3]=-Math.sqrt(Math.abs(1-c*c-d*d-e*e));return b};quat4.inverse=function(a,b){if(!b||a===b)return a[0]*=-1,a[1]*=-1,a[2]*=-1,a;b[0]=-a[0];b[1]=-a[1];b[2]=-a[2];b[3]=a[3];return b};quat4.length=function(a){var b=a[0],c=a[1],d=a[2],a=a[3];return Math.sqrt(b*b+c*c+d*d+a*a)};
+quat4.normalize=function(a,b){b||(b=a);var c=a[0],d=a[1],e=a[2],g=a[3],f=Math.sqrt(c*c+d*d+e*e+g*g);if(f===0)return b[0]=0,b[1]=0,b[2]=0,b[3]=0,b;f=1/f;b[0]=c*f;b[1]=d*f;b[2]=e*f;b[3]=g*f;return b};quat4.multiply=function(a,b,c){c||(c=a);var d=a[0],e=a[1],g=a[2],a=a[3],f=b[0],h=b[1],i=b[2],b=b[3];c[0]=d*b+a*f+e*i-g*h;c[1]=e*b+a*h+g*f-d*i;c[2]=g*b+a*i+d*h-e*f;c[3]=a*b-d*f-e*h-g*i;return c};
+quat4.multiplyVec3=function(a,b,c){c||(c=b);var d=b[0],e=b[1],g=b[2],b=a[0],f=a[1],h=a[2],a=a[3],i=a*d+f*g-h*e,j=a*e+h*d-b*g,k=a*g+b*e-f*d,d=-b*d-f*e-h*g;c[0]=i*a+d*-b+j*-h-k*-f;c[1]=j*a+d*-f+k*-b-i*-h;c[2]=k*a+d*-h+i*-f-j*-b;return c};quat4.toMat3=function(a,b){b||(b=mat3.create());var c=a[0],d=a[1],e=a[2],g=a[3],f=c+c,h=d+d,i=e+e,j=c*f,k=c*h;c*=i;var l=d*h;d*=i;e*=i;f*=g;h*=g;g*=i;b[0]=1-(l+e);b[1]=k+g;b[2]=c-h;b[3]=k-g;b[4]=1-(j+e);b[5]=d+f;b[6]=c+h;b[7]=d-f;b[8]=1-(j+l);return b};
+quat4.toMat4=function(a,b){b||(b=mat4.create());var c=a[0],d=a[1],e=a[2],g=a[3],f=c+c,h=d+d,i=e+e,j=c*f,k=c*h;c*=i;var l=d*h;d*=i;e*=i;f*=g;h*=g;g*=i;b[0]=1-(l+e);b[1]=k+g;b[2]=c-h;b[3]=0;b[4]=k-g;b[5]=1-(j+e);b[6]=d+f;b[7]=0;b[8]=c+h;b[9]=d-f;b[10]=1-(j+l);b[11]=0;b[12]=0;b[13]=0;b[14]=0;b[15]=1;return b};
+quat4.slerp=function(a,b,c,d){d||(d=a);var e=a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3],g,f;if(Math.abs(e)>=1)return d!==a&&(d[0]=a[0],d[1]=a[1],d[2]=a[2],d[3]=a[3]),d;g=Math.acos(e);f=Math.sqrt(1-e*e);if(Math.abs(f)<0.001)return d[0]=a[0]*0.5+b[0]*0.5,d[1]=a[1]*0.5+b[1]*0.5,d[2]=a[2]*0.5+b[2]*0.5,d[3]=a[3]*0.5+b[3]*0.5,d;e=Math.sin((1-c)*g)/f;c=Math.sin(c*g)/f;d[0]=a[0]*e+b[0]*c;d[1]=a[1]*e+b[1]*c;d[2]=a[2]*e+b[2]*c;d[3]=a[3]*e+b[3]*c;return d};
+quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
+(function()
+{
+	var MAX_VERTICES = 8000;						// equates to 2500 objects being drawn
+	var MAX_INDICES = (MAX_VERTICES / 2) * 3;		// 6 indices for every 4 vertices
+	var MAX_POINTS = 8000;
+	var MULTI_BUFFERS = 4;							// cycle 4 buffers to try and avoid blocking
+	var BATCH_NULL = 0;
+	var BATCH_QUAD = 1;
+	var BATCH_SETTEXTURE = 2;
+	var BATCH_SETOPACITY = 3;
+	var BATCH_SETBLEND = 4;
+	var BATCH_UPDATEMODELVIEW = 5;
+	var BATCH_RENDERTOTEXTURE = 6;
+	var BATCH_CLEAR = 7;
+	var BATCH_POINTS = 8;
+	var BATCH_SETPROGRAM = 9;
+	var BATCH_SETPROGRAMPARAMETERS = 10;
+	var BATCH_SETTEXTURE1 = 11;
+	function GLWrap_(gl, isMobile)
+	{
+		this.isIE = /msie/i.test(navigator.userAgent) || /trident/i.test(navigator.userAgent);
+		this.width = 0;		// not yet known, wait for call to setSize()
+		this.height = 0;
+		this.cam = vec3.create([0, 0, 100]);			// camera position
+		this.look = vec3.create([0, 0, 0]);				// lookat position
+		this.up = vec3.create([0, 1, 0]);				// up vector
+		this.worldScale = vec3.create([1, 1, 1]);		// world scaling factor
+		this.matP = mat4.create();						// perspective matrix
+		this.matMV = mat4.create();						// model view matrix
+		this.lastMV = mat4.create();
+		this.currentMV = mat4.create();
+		this.gl = gl;
+		this.initState();
+	};
+	GLWrap_.prototype.initState = function ()
+	{
+		var gl = this.gl;
+		var i, len;
+		this.lastOpacity = 1;
+		this.lastTexture0 = null;			// last bound to TEXTURE0
+		this.lastTexture1 = null;			// last bound to TEXTURE1
+		this.currentOpacity = 1;
+		gl.clearColor(0, 0, 0, 0);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+		gl.disable(gl.CULL_FACE);
+		gl.disable(gl.DEPTH_TEST);
+		this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+		this.lastSrcBlend = gl.ONE;
+		this.lastDestBlend = gl.ONE_MINUS_SRC_ALPHA;
+		this.pointBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.pointBuffer);
+		this.vertexBuffers = new Array(MULTI_BUFFERS);
+		this.texcoordBuffers = new Array(MULTI_BUFFERS);
+		for (i = 0; i < MULTI_BUFFERS; i++)
+		{
+			this.vertexBuffers[i] = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffers[i]);
+			this.texcoordBuffers[i] = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.texcoordBuffers[i]);
+		}
+		this.curBuffer = 0;
+		this.indexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+		this.vertexData = new Float32Array(MAX_VERTICES * 2);
+		this.texcoordData = new Float32Array(MAX_VERTICES * 2);
+		this.pointData = new Float32Array(MAX_POINTS * 4);
+		var indexData = new Uint16Array(MAX_INDICES);
+		i = 0, len = MAX_INDICES;
+		var fv = 0;
+		while (i < len)
+		{
+			indexData[i++] = fv;		// top left
+			indexData[i++] = fv + 1;	// top right
+			indexData[i++] = fv + 2;	// bottom right (first tri)
+			indexData[i++] = fv;		// top left
+			indexData[i++] = fv + 2;	// bottom right
+			indexData[i++] = fv + 3;	// bottom left
+			fv += 4;
+		}
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
+		this.vertexPtr = 0;
+		this.pointPtr = 0;
+		var fsSource, vsSource;
+		this.shaderPrograms = [];
+		fsSource = [
+			"varying mediump vec2 vTex;",
+			"uniform lowp float opacity;",
+			"uniform lowp sampler2D samplerFront;",
+			"void main(void) {",
+			"	gl_FragColor = texture2D(samplerFront, vTex);",
+			"	gl_FragColor *= opacity;",
+			"}"
+		].join("\n");
+		vsSource = [
+			"attribute highp vec2 aPos;",
+			"attribute mediump vec2 aTex;",
+			"varying mediump vec2 vTex;",
+			"uniform highp mat4 matP;",
+			"uniform highp mat4 matMV;",
+			"void main(void) {",
+			"	gl_Position = matP * matMV * vec4(aPos.x, aPos.y, 0.0, 1.0);",
+			"	vTex = aTex;",
+			"}"
+		].join("\n");
+		var shaderProg = this.createShaderProgram({src: fsSource}, vsSource, "<default>");
+;
+		this.shaderPrograms.push(shaderProg);		// Default shader is always shader 0
+		fsSource = [
+			"uniform mediump sampler2D samplerFront;",
+			"varying lowp float opacity;",
+			"void main(void) {",
+			"	gl_FragColor = texture2D(samplerFront, gl_PointCoord);",
+			"	gl_FragColor *= opacity;",
+			"}"
+		].join("\n");
+		var pointVsSource = [
+			"attribute vec4 aPos;",
+			"varying float opacity;",
+			"uniform mat4 matP;",
+			"uniform mat4 matMV;",
+			"void main(void) {",
+			"	gl_Position = matP * matMV * vec4(aPos.x, aPos.y, 0.0, 1.0);",
+			"	gl_PointSize = aPos.z;",
+			"	opacity = aPos.w;",
+			"}"
+		].join("\n");
+		shaderProg = this.createShaderProgram({src: fsSource}, pointVsSource, "<point>");
+;
+		this.shaderPrograms.push(shaderProg);		// Point shader is always shader 1
+		for (var shader_name in cr.shaders)
+		{
+			if (cr.shaders.hasOwnProperty(shader_name))
+				this.shaderPrograms.push(this.createShaderProgram(cr.shaders[shader_name], vsSource, shader_name));
+		}
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		this.batch = [];
+		this.batchPtr = 0;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+		this.lastProgram = -1;				// start -1 so first switchProgram can do work
+		this.currentProgram = -1;			// current program during batch execution
+		this.currentShader = null;
+		this.fbo = gl.createFramebuffer();
+		this.renderToTex = null;
+		this.tmpVec3 = vec3.create([0, 0, 0]);
+;
+;
+		var pointsizes = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE);
+		this.minPointSize = pointsizes[0];
+		this.maxPointSize = pointsizes[1];
+;
+		this.switchProgram(0);
+		cr.seal(this);
+	};
+	function GLShaderProgram(gl, shaderProgram, name)
+	{
+		this.gl = gl;
+		this.shaderProgram = shaderProgram;
+		this.name = name;
+		this.locAPos = gl.getAttribLocation(shaderProgram, "aPos");
+		this.locATex = gl.getAttribLocation(shaderProgram, "aTex");
+		this.locMatP = gl.getUniformLocation(shaderProgram, "matP");
+		this.locMatMV = gl.getUniformLocation(shaderProgram, "matMV");
+		this.locOpacity = gl.getUniformLocation(shaderProgram, "opacity");
+		this.locSamplerFront = gl.getUniformLocation(shaderProgram, "samplerFront");
+		this.locSamplerBack = gl.getUniformLocation(shaderProgram, "samplerBack");
+		this.locDestStart = gl.getUniformLocation(shaderProgram, "destStart");
+		this.locDestEnd = gl.getUniformLocation(shaderProgram, "destEnd");
+		this.locSeconds = gl.getUniformLocation(shaderProgram, "seconds");
+		this.locPixelWidth = gl.getUniformLocation(shaderProgram, "pixelWidth");
+		this.locPixelHeight = gl.getUniformLocation(shaderProgram, "pixelHeight");
+		this.locLayerScale = gl.getUniformLocation(shaderProgram, "layerScale");
+		if (this.locOpacity)
+			gl.uniform1f(this.locOpacity, 1);
+		if (this.locSamplerFront)
+			gl.uniform1i(this.locSamplerFront, 0);
+		if (this.locSamplerBack)
+			gl.uniform1i(this.locSamplerBack, 1);
+		if (this.locDestStart)
+			gl.uniform2f(this.locDestStart, 0.0, 0.0);
+		if (this.locDestEnd)
+			gl.uniform2f(this.locDestEnd, 1.0, 1.0);
+		this.hasCurrentMatMV = false;		// matMV needs updating
+	};
+	GLWrap_.prototype.createShaderProgram = function(shaderEntry, vsSource, name)
+	{
+		var gl = this.gl;
+		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+		gl.shaderSource(fragmentShader, shaderEntry.src);
+		gl.compileShader(fragmentShader);
+		if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS))
+		{
+;
+			gl.deleteShader(fragmentShader);
+			return null;
+		}
+		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertexShader, vsSource);
+		gl.compileShader(vertexShader);
+		if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
+		{
+;
+			gl.deleteShader(fragmentShader);
+			gl.deleteShader(vertexShader);
+			return null;
+		}
+		var shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, fragmentShader);
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.linkProgram(shaderProgram);
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
+		{
+;
+			gl.deleteShader(fragmentShader);
+			gl.deleteShader(vertexShader);
+			gl.deleteProgram(shaderProgram);
+			return null;
+		}
+		gl.useProgram(shaderProgram);
+;
+		gl.deleteShader(fragmentShader);
+		gl.deleteShader(vertexShader);
+		var ret = new GLShaderProgram(gl, shaderProgram, name);
+		ret.extendBoxHorizontal = shaderEntry.extendBoxHorizontal || 0;
+		ret.extendBoxVertical = shaderEntry.extendBoxVertical || 0;
+		ret.crossSampling = !!shaderEntry.crossSampling;
+		ret.animated = !!shaderEntry.animated;
+		ret.parameters = shaderEntry.parameters || [];
+		var i, len;
+		for (i = 0, len = ret.parameters.length; i < len; i++)
+		{
+			ret.parameters[i][1] = gl.getUniformLocation(shaderProgram, ret.parameters[i][0]);
+			gl.uniform1f(ret.parameters[i][1], 0);
+		}
+		cr.seal(ret);
+		return ret;
+	};
+	GLWrap_.prototype.getShaderIndex = function(name_)
+	{
+		var i, len;
+		for (i = 0, len = this.shaderPrograms.length; i < len; i++)
+		{
+			if (this.shaderPrograms[i].name === name_)
+				return i;
+		}
+		return -1;
+	};
+	GLWrap_.prototype.project = function (x, y, out)
+	{
+		var viewport = [0, 0, this.width, this.height];
+		var mv = this.matMV;
+		var proj = this.matP;
+		var fTempo = [0, 0, 0, 0, 0, 0, 0, 0];
+		fTempo[0] = mv[0]*x+mv[4]*y+mv[12];
+		fTempo[1] = mv[1]*x+mv[5]*y+mv[13];
+		fTempo[2] = mv[2]*x+mv[6]*y+mv[14];
+		fTempo[3] = mv[3]*x+mv[7]*y+mv[15];
+		fTempo[4] = proj[0]*fTempo[0]+proj[4]*fTempo[1]+proj[8]*fTempo[2]+proj[12]*fTempo[3];
+		fTempo[5] = proj[1]*fTempo[0]+proj[5]*fTempo[1]+proj[9]*fTempo[2]+proj[13]*fTempo[3];
+		fTempo[6] = proj[2]*fTempo[0]+proj[6]*fTempo[1]+proj[10]*fTempo[2]+proj[14]*fTempo[3];
+		fTempo[7] = -fTempo[2];
+		if(fTempo[7]===0.0)	//The w value
+			return;
+		fTempo[7]=1.0/fTempo[7];
+		fTempo[4]*=fTempo[7];
+		fTempo[5]*=fTempo[7];
+		fTempo[6]*=fTempo[7];
+		out[0]=(fTempo[4]*0.5+0.5)*viewport[2]+viewport[0];
+		out[1]=(fTempo[5]*0.5+0.5)*viewport[3]+viewport[1];
+	};
+	GLWrap_.prototype.setSize = function(w, h, force)
+	{
+		if (this.width === w && this.height === h && !force)
+			return;
+		this.endBatch();
+		this.width = w;
+		this.height = h;
+		this.gl.viewport(0, 0, w, h);
+		mat4.perspective(45, w / h, 1, 1000, this.matP);
+		mat4.lookAt(this.cam, this.look, this.up, this.matMV);
+		var tl = [0, 0];
+		var br = [0, 0];
+		this.project(0, 0, tl);
+		this.project(1, 1, br);
+		this.worldScale[0] = 1 / (br[0] - tl[0]);
+		this.worldScale[1] = -1 / (br[1] - tl[1]);
+		var i, len, s;
+		for (i = 0, len = this.shaderPrograms.length; i < len; i++)
+		{
+			s = this.shaderPrograms[i];
+			s.hasCurrentMatMV = false;
+			if (s.locMatP)
+			{
+				this.gl.useProgram(s.shaderProgram);
+				this.gl.uniformMatrix4fv(s.locMatP, false, this.matP);
+			}
+		}
+		this.gl.useProgram(this.shaderPrograms[this.lastProgram].shaderProgram);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+		this.gl.activeTexture(this.gl.TEXTURE1);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+		this.gl.activeTexture(this.gl.TEXTURE0);
+		this.lastTexture0 = null;
+		this.lastTexture1 = null;
+	};
+	GLWrap_.prototype.resetModelView = function ()
+	{
+		mat4.lookAt(this.cam, this.look, this.up, this.matMV);
+		mat4.scale(this.matMV, this.worldScale);
+	};
+	GLWrap_.prototype.translate = function (x, y)
+	{
+		if (x === 0 && y === 0)
+			return;
+		this.tmpVec3[0] = x;// * this.worldScale[0];
+		this.tmpVec3[1] = y;// * this.worldScale[1];
+		this.tmpVec3[2] = 0;
+		mat4.translate(this.matMV, this.tmpVec3);
+	};
+	GLWrap_.prototype.scale = function (x, y)
+	{
+		if (x === 1 && y === 1)
+			return;
+		this.tmpVec3[0] = x;
+		this.tmpVec3[1] = y;
+		this.tmpVec3[2] = 1;
+		mat4.scale(this.matMV, this.tmpVec3);
+	};
+	GLWrap_.prototype.rotateZ = function (a)
+	{
+		if (a === 0)
+			return;
+		mat4.rotateZ(this.matMV, a);
+	};
+	GLWrap_.prototype.updateModelView = function()
+	{
+		var anydiff = false;
+		for (var i = 0; i < 16; i++)
+		{
+			if (this.lastMV[i] !== this.matMV[i])
+			{
+				anydiff = true;
+				break;
+			}
+		}
+		if (!anydiff)
+			return;
+		var b = this.pushBatch();
+		b.type = BATCH_UPDATEMODELVIEW;
+		if (b.mat4param)
+			mat4.set(this.matMV, b.mat4param);
+		else
+			b.mat4param = mat4.create(this.matMV);
+		mat4.set(this.matMV, this.lastMV);
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+	};
+	/*
+	var debugBatch = false;
+	jQuery(document).mousedown(
+		function(info) {
+			if (info.which === 2)
+				debugBatch = true;
+		}
+	);
+	*/
+	function GLBatchJob(type_, glwrap_)
+	{
+		this.type = type_;
+		this.glwrap = glwrap_;
+		this.gl = glwrap_.gl;
+		this.opacityParam = 0;		// for setOpacity()
+		this.startIndex = 0;		// for quad()
+		this.indexCount = 0;		// "
+		this.texParam = null;		// for setTexture()
+		this.mat4param = null;		// for updateModelView()
+		this.shaderParams = [];		// for user parameters
+		cr.seal(this);
+	};
+	GLBatchJob.prototype.doSetTexture = function ()
+	{
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texParam);
+	};
+	GLBatchJob.prototype.doSetTexture1 = function ()
+	{
+		var gl = this.gl;
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, this.texParam);
+		gl.activeTexture(gl.TEXTURE0);
+	};
+	GLBatchJob.prototype.doSetOpacity = function ()
+	{
+		var o = this.opacityParam;
+		var glwrap = this.glwrap;
+		glwrap.currentOpacity = o;
+		var curProg = glwrap.currentShader;
+		if (curProg.locOpacity)
+			this.gl.uniform1f(curProg.locOpacity, o);
+	};
+	GLBatchJob.prototype.doQuad = function ()
+	{
+		this.gl.drawElements(this.gl.TRIANGLES, this.indexCount, this.gl.UNSIGNED_SHORT, this.startIndex * 2);
+	};
+	GLBatchJob.prototype.doSetBlend = function ()
+	{
+		this.gl.blendFunc(this.startIndex, this.indexCount);
+	};
+	GLBatchJob.prototype.doUpdateModelView = function ()
+	{
+		var i, len, s, shaderPrograms = this.glwrap.shaderPrograms, currentProgram = this.glwrap.currentProgram;
+		for (i = 0, len = shaderPrograms.length; i < len; i++)
+		{
+			s = shaderPrograms[i];
+			if (i === currentProgram && s.locMatMV)
+			{
+				this.gl.uniformMatrix4fv(s.locMatMV, false, this.mat4param);
+				s.hasCurrentMatMV = true;
+			}
+			else
+				s.hasCurrentMatMV = false;
+		}
+		mat4.set(this.mat4param, this.glwrap.currentMV);
+	};
+	GLBatchJob.prototype.doRenderToTexture = function ()
+	{
+		var gl = this.gl;
+		var glwrap = this.glwrap;
+		if (this.texParam)
+		{
+			if (glwrap.lastTexture1 === this.texParam)
+			{
+				gl.activeTexture(gl.TEXTURE1);
+				gl.bindTexture(gl.TEXTURE_2D, null);
+				glwrap.lastTexture1 = null;
+				gl.activeTexture(gl.TEXTURE0);
+			}
+			gl.bindFramebuffer(gl.FRAMEBUFFER, glwrap.fbo);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texParam, 0);
+		}
+		else
+		{
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		}
+	};
+	GLBatchJob.prototype.doClear = function ()
+	{
+		var gl = this.gl;
+		if (this.startIndex === 0)		// clear whole surface
+		{
+			gl.clearColor(this.mat4param[0], this.mat4param[1], this.mat4param[2], this.mat4param[3]);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+		}
+		else							// clear rectangle
+		{
+			gl.enable(gl.SCISSOR_TEST);
+			gl.scissor(this.mat4param[0], this.mat4param[1], this.mat4param[2], this.mat4param[3]);
+			gl.clearColor(0, 0, 0, 0);
+			gl.clear(this.gl.COLOR_BUFFER_BIT);
+			gl.disable(gl.SCISSOR_TEST);
+		}
+	};
+	GLBatchJob.prototype.doPoints = function ()
+	{
+		var gl = this.gl;
+		var glwrap = this.glwrap;
+		var s = glwrap.shaderPrograms[1];
+		gl.useProgram(s.shaderProgram);
+		if (!s.hasCurrentMatMV && s.locMatMV)
+		{
+			gl.uniformMatrix4fv(s.locMatMV, false, glwrap.currentMV);
+			s.hasCurrentMatMV = true;
+		}
+		gl.enableVertexAttribArray(s.locAPos);
+		gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.pointBuffer);
+		gl.vertexAttribPointer(s.locAPos, 4, gl.FLOAT, false, 0, 0);
+		gl.drawArrays(gl.POINTS, this.startIndex / 4, this.indexCount);
+		s = glwrap.currentShader;
+		gl.useProgram(s.shaderProgram);
+		if (s.locAPos >= 0)
+		{
+			gl.enableVertexAttribArray(s.locAPos);
+			gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.vertexBuffers[glwrap.curBuffer]);
+			gl.vertexAttribPointer(s.locAPos, 2, gl.FLOAT, false, 0, 0);
+		}
+		if (s.locATex >= 0)
+		{
+			gl.enableVertexAttribArray(s.locATex);
+			gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.texcoordBuffers[glwrap.curBuffer]);
+			gl.vertexAttribPointer(s.locATex, 2, gl.FLOAT, false, 0, 0);
+		}
+	};
+	GLBatchJob.prototype.doSetProgram = function ()
+	{
+		var gl = this.gl;
+		var glwrap = this.glwrap;
+		var s = glwrap.shaderPrograms[this.startIndex];		// recycled param to save memory
+		glwrap.currentProgram = this.startIndex;			// current batch program
+		glwrap.currentShader = s;
+		gl.useProgram(s.shaderProgram);						// switch to
+		if (!s.hasCurrentMatMV && s.locMatMV)
+		{
+			gl.uniformMatrix4fv(s.locMatMV, false, glwrap.currentMV);
+			s.hasCurrentMatMV = true;
+		}
+		if (s.locOpacity)
+			gl.uniform1f(s.locOpacity, glwrap.currentOpacity);
+		if (s.locAPos >= 0)
+		{
+			gl.enableVertexAttribArray(s.locAPos);
+			gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.vertexBuffers[glwrap.curBuffer]);
+			gl.vertexAttribPointer(s.locAPos, 2, gl.FLOAT, false, 0, 0);
+		}
+		if (s.locATex >= 0)
+		{
+			gl.enableVertexAttribArray(s.locATex);
+			gl.bindBuffer(gl.ARRAY_BUFFER, glwrap.texcoordBuffers[glwrap.curBuffer]);
+			gl.vertexAttribPointer(s.locATex, 2, gl.FLOAT, false, 0, 0);
+		}
+	}
+	GLBatchJob.prototype.doSetProgramParameters = function ()
+	{
+		var i, len, s = this.glwrap.currentShader;
+		var gl = this.gl;
+		if (s.locSamplerBack && this.glwrap.lastTexture1 !== this.texParam)
+		{
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, this.texParam);
+			this.glwrap.lastTexture1 = this.texParam;
+			gl.activeTexture(gl.TEXTURE0);
+		}
+		if (s.locPixelWidth)
+			gl.uniform1f(s.locPixelWidth, this.mat4param[0]);
+		if (s.locPixelHeight)
+			gl.uniform1f(s.locPixelHeight, this.mat4param[1]);
+		if (s.locDestStart)
+			gl.uniform2f(s.locDestStart, this.mat4param[2], this.mat4param[3]);
+		if (s.locDestEnd)
+			gl.uniform2f(s.locDestEnd, this.mat4param[4], this.mat4param[5]);
+		if (s.locLayerScale)
+			gl.uniform1f(s.locLayerScale, this.mat4param[6]);
+		if (s.locSeconds)
+			gl.uniform1f(s.locSeconds, cr.performance_now() / 1000.0);
+		if (s.parameters.length)
+		{
+			for (i = 0, len = s.parameters.length; i < len; i++)
+			{
+				gl.uniform1f(s.parameters[i][1], this.shaderParams[i]);
+			}
+		}
+	};
+	GLWrap_.prototype.pushBatch = function ()
+	{
+		if (this.batchPtr === this.batch.length)
+			this.batch.push(new GLBatchJob(BATCH_NULL, this));
+		return this.batch[this.batchPtr++];
+	};
+	GLWrap_.prototype.endBatch = function ()
+	{
+		if (this.batchPtr === 0)
+			return;
+		if (this.gl.isContextLost())
+			return;
+		var gl = this.gl;
+		if (this.pointPtr > 0)
+		{
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.pointBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, this.pointData.subarray(0, this.pointPtr), gl.STREAM_DRAW);
+			if (s && s.locAPos >= 0 && s.name === "<point>")
+				gl.vertexAttribPointer(s.locAPos, 4, gl.FLOAT, false, 0, 0);
+		}
+		if (this.vertexPtr > 0)
+		{
+			var s = this.currentShader;
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffers[this.curBuffer]);
+			gl.bufferData(gl.ARRAY_BUFFER, this.vertexData.subarray(0, this.vertexPtr), gl.STREAM_DRAW);
+			if (s && s.locAPos >= 0 && s.name !== "<point>")
+				gl.vertexAttribPointer(s.locAPos, 2, gl.FLOAT, false, 0, 0);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.texcoordBuffers[this.curBuffer]);
+			gl.bufferData(gl.ARRAY_BUFFER, this.texcoordData.subarray(0, this.vertexPtr), gl.STREAM_DRAW);
+			if (s && s.locATex >= 0 && s.name !== "<point>")
+				gl.vertexAttribPointer(s.locATex, 2, gl.FLOAT, false, 0, 0);
+		}
+		var i, len, b;
+		for (i = 0, len = this.batchPtr; i < len; i++)
+		{
+			b = this.batch[i];
+			switch (b.type) {
+			case BATCH_QUAD:
+				b.doQuad();
+				break;
+			case BATCH_SETTEXTURE:
+				b.doSetTexture();
+				break;
+			case BATCH_SETOPACITY:
+				b.doSetOpacity();
+				break;
+			case BATCH_SETBLEND:
+				b.doSetBlend();
+				break;
+			case BATCH_UPDATEMODELVIEW:
+				b.doUpdateModelView();
+				break;
+			case BATCH_RENDERTOTEXTURE:
+				b.doRenderToTexture();
+				break;
+			case BATCH_CLEAR:
+				b.doClear();
+				break;
+			case BATCH_POINTS:
+				b.doPoints();
+				break;
+			case BATCH_SETPROGRAM:
+				b.doSetProgram();
+				break;
+			case BATCH_SETPROGRAMPARAMETERS:
+				b.doSetProgramParameters();
+				break;
+			case BATCH_SETTEXTURE1:
+				b.doSetTexture1();
+				break;
+			}
+		}
+		this.batchPtr = 0;
+		this.vertexPtr = 0;
+		this.pointPtr = 0;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+		this.curBuffer++;
+		if (this.curBuffer >= MULTI_BUFFERS)
+			this.curBuffer = 0;
+	};
+	GLWrap_.prototype.setOpacity = function (op)
+	{
+		if (op === this.lastOpacity)
+			return;
+		var b = this.pushBatch();
+		b.type = BATCH_SETOPACITY;
+		b.opacityParam = op;
+		this.lastOpacity = op;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+	};
+	GLWrap_.prototype.setTexture = function (tex)
+	{
+		if (tex === this.lastTexture0)
+			return;
+;
+		var b = this.pushBatch();
+		b.type = BATCH_SETTEXTURE;
+		b.texParam = tex;
+		this.lastTexture0 = tex;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+	};
+	GLWrap_.prototype.setBlend = function (s, d)
+	{
+		if (s === this.lastSrcBlend && d === this.lastDestBlend)
+			return;
+		var b = this.pushBatch();
+		b.type = BATCH_SETBLEND;
+		b.startIndex = s;		// recycle params to save memory
+		b.indexCount = d;
+		this.lastSrcBlend = s;
+		this.lastDestBlend = d;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+	};
+	GLWrap_.prototype.setAlphaBlend = function ()
+	{
+		this.setBlend(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
+	};
+	var LAST_VERTEX = MAX_VERTICES * 2 - 8;
+	GLWrap_.prototype.quad = function(tlx, tly, trx, try_, brx, bry, blx, bly)
+	{
+		if (this.vertexPtr >= LAST_VERTEX)
+			this.endBatch();
+		var v = this.vertexPtr;			// vertex cursor
+		var vd = this.vertexData;		// vertex data array
+		var td = this.texcoordData;		// texture coord data array
+		if (this.hasQuadBatchTop)
+		{
+			this.batch[this.batchPtr - 1].indexCount += 6;
+		}
+		else
+		{
+			var b = this.pushBatch();
+			b.type = BATCH_QUAD;
+			b.startIndex = (v / 4) * 3;
+			b.indexCount = 6;
+			this.hasQuadBatchTop = true;
+			this.hasPointBatchTop = false;
+		}
+		vd[v] = tlx;
+		td[v++] = 0;
+		vd[v] = tly;
+		td[v++] = 0;
+		vd[v] = trx;
+		td[v++] = 1;
+		vd[v] = try_;
+		td[v++] = 0;
+		vd[v] = brx;
+		td[v++] = 1;
+		vd[v] = bry;
+		td[v++] = 1;
+		vd[v] = blx;
+		td[v++] = 0;
+		vd[v] = bly;
+		td[v++] = 1;
+		this.vertexPtr = v;
+	};
+	GLWrap_.prototype.quadTex = function(tlx, tly, trx, try_, brx, bry, blx, bly, rcTex)
+	{
+		if (this.vertexPtr >= LAST_VERTEX)
+			this.endBatch();
+		var v = this.vertexPtr;			// vertex cursor
+		var vd = this.vertexData;		// vertex data array
+		var td = this.texcoordData;		// texture coord data array
+		if (this.hasQuadBatchTop)
+		{
+			this.batch[this.batchPtr - 1].indexCount += 6;
+		}
+		else
+		{
+			var b = this.pushBatch();
+			b.type = BATCH_QUAD;
+			b.startIndex = (v / 4) * 3;
+			b.indexCount = 6;
+			this.hasQuadBatchTop = true;
+			this.hasPointBatchTop = false;
+		}
+		var rc_left = rcTex.left;
+		var rc_top = rcTex.top;
+		var rc_right = rcTex.right;
+		var rc_bottom = rcTex.bottom;
+		vd[v] = tlx;
+		td[v++] = rc_left;
+		vd[v] = tly;
+		td[v++] = rc_top;
+		vd[v] = trx;
+		td[v++] = rc_right;
+		vd[v] = try_;
+		td[v++] = rc_top;
+		vd[v] = brx;
+		td[v++] = rc_right;
+		vd[v] = bry;
+		td[v++] = rc_bottom;
+		vd[v] = blx;
+		td[v++] = rc_left;
+		vd[v] = bly;
+		td[v++] = rc_bottom;
+		this.vertexPtr = v;
+	};
+	GLWrap_.prototype.quadTexUV = function(tlx, tly, trx, try_, brx, bry, blx, bly, tlu, tlv, tru, trv, bru, brv, blu, blv)
+	{
+		if (this.vertexPtr >= LAST_VERTEX)
+			this.endBatch();
+		var v = this.vertexPtr;			// vertex cursor
+		var vd = this.vertexData;		// vertex data array
+		var td = this.texcoordData;		// texture coord data array
+		if (this.hasQuadBatchTop)
+		{
+			this.batch[this.batchPtr - 1].indexCount += 6;
+		}
+		else
+		{
+			var b = this.pushBatch();
+			b.type = BATCH_QUAD;
+			b.startIndex = (v / 4) * 3;
+			b.indexCount = 6;
+			this.hasQuadBatchTop = true;
+			this.hasPointBatchTop = false;
+		}
+		vd[v] = tlx;
+		td[v++] = tlu;
+		vd[v] = tly;
+		td[v++] = tlv;
+		vd[v] = trx;
+		td[v++] = tru;
+		vd[v] = try_;
+		td[v++] = trv;
+		vd[v] = brx;
+		td[v++] = bru;
+		vd[v] = bry;
+		td[v++] = brv;
+		vd[v] = blx;
+		td[v++] = blu;
+		vd[v] = bly;
+		td[v++] = blv;
+		this.vertexPtr = v;
+	};
+	var LAST_POINT = MAX_POINTS - 4;
+	GLWrap_.prototype.point = function(x_, y_, size_, opacity_)
+	{
+		if (this.pointPtr >= LAST_POINT)
+			this.endBatch();
+		var p = this.pointPtr;			// point cursor
+		var pd = this.pointData;		// point data array
+		if (this.hasPointBatchTop)
+		{
+			this.batch[this.batchPtr - 1].indexCount++;
+		}
+		else
+		{
+			var b = this.pushBatch();
+			b.type = BATCH_POINTS;
+			b.startIndex = p;
+			b.indexCount = 1;
+			this.hasPointBatchTop = true;
+			this.hasQuadBatchTop = false;
+		}
+		pd[p++] = x_;
+		pd[p++] = y_;
+		pd[p++] = size_;
+		pd[p++] = opacity_;
+		this.pointPtr = p;
+	};
+	GLWrap_.prototype.switchProgram = function (progIndex)
+	{
+		if (this.lastProgram === progIndex)
+			return;			// no change
+		var shaderProg = this.shaderPrograms[progIndex];
+		if (!shaderProg)
+		{
+			if (this.lastProgram === 0)
+				return;								// already on default shader
+			progIndex = 0;
+			shaderProg = this.shaderPrograms[0];
+		}
+		var b = this.pushBatch();
+		b.type = BATCH_SETPROGRAM;
+		b.startIndex = progIndex;
+		this.lastProgram = progIndex;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+	};
+	GLWrap_.prototype.programUsesDest = function (progIndex)
+	{
+		var s = this.shaderPrograms[progIndex];
+		return !!(s.locDestStart || s.locDestEnd);
+	};
+	GLWrap_.prototype.programUsesCrossSampling = function (progIndex)
+	{
+		var s = this.shaderPrograms[progIndex];
+		return !!(s.locDestStart || s.locDestEnd || s.crossSampling);
+	};
+	GLWrap_.prototype.programExtendsBox = function (progIndex)
+	{
+		var s = this.shaderPrograms[progIndex];
+		return s.extendBoxHorizontal !== 0 || s.extendBoxVertical !== 0;
+	};
+	GLWrap_.prototype.getProgramBoxExtendHorizontal = function (progIndex)
+	{
+		return this.shaderPrograms[progIndex].extendBoxHorizontal;
+	};
+	GLWrap_.prototype.getProgramBoxExtendVertical = function (progIndex)
+	{
+		return this.shaderPrograms[progIndex].extendBoxVertical;
+	};
+	GLWrap_.prototype.getProgramParameterType = function (progIndex, paramIndex)
+	{
+		return this.shaderPrograms[progIndex].parameters[paramIndex][2];
+	};
+	GLWrap_.prototype.programIsAnimated = function (progIndex)
+	{
+		return this.shaderPrograms[progIndex].animated;
+	};
+	GLWrap_.prototype.setProgramParameters = function (backTex, pixelWidth, pixelHeight, destStartX, destStartY, destEndX, destEndY, layerScale, params)
+	{
+		var i, len, s = this.shaderPrograms[this.lastProgram];
+		if (s.locPixelWidth || s.locPixelHeight || s.locSeconds || s.locSamplerBack ||
+			s.locDestStart || s.locDestEnd || s.locLayerScale || params.length)
+		{
+			var b = this.pushBatch();
+			b.type = BATCH_SETPROGRAMPARAMETERS;
+			if (b.mat4param)
+				mat4.set(this.matMV, b.mat4param);
+			else
+				b.mat4param = mat4.create();
+			b.mat4param[0] = pixelWidth;
+			b.mat4param[1] = pixelHeight;
+			b.mat4param[2] = destStartX;
+			b.mat4param[3] = destStartY;
+			b.mat4param[4] = destEndX;
+			b.mat4param[5] = destEndY;
+			b.mat4param[6] = layerScale;
+			if (s.locSamplerBack)
+			{
+;
+				b.texParam = backTex;
+			}
+			else
+				b.texParam = null;
+			if (params.length)
+			{
+				b.shaderParams.length = params.length;
+				for (i = 0, len = params.length; i < len; i++)
+					b.shaderParams[i] = params[i];
+			}
+			this.hasQuadBatchTop = false;
+			this.hasPointBatchTop = false;
+		}
+	};
+	GLWrap_.prototype.clear = function (r, g, b_, a)
+	{
+		var b = this.pushBatch();
+		b.type = BATCH_CLEAR;
+		b.startIndex = 0;					// clear all mode
+		if (!b.mat4param)
+			b.mat4param = mat4.create();
+		b.mat4param[0] = r;
+		b.mat4param[1] = g;
+		b.mat4param[2] = b_;
+		b.mat4param[3] = a;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+	};
+	GLWrap_.prototype.clearRect = function (x, y, w, h)
+	{
+		var b = this.pushBatch();
+		b.type = BATCH_CLEAR;
+		b.startIndex = 1;					// clear rect mode
+		if (!b.mat4param)
+			b.mat4param = mat4.create();
+		b.mat4param[0] = x;
+		b.mat4param[1] = y;
+		b.mat4param[2] = w;
+		b.mat4param[3] = h;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+	};
+	GLWrap_.prototype.present = function ()
+	{
+		this.endBatch();
+		this.gl.flush();
+		/*
+		if (debugBatch)
+		{
+;
+			debugBatch = false;
+		}
+		*/
+	};
+	function nextHighestPowerOfTwo(x) {
+		--x;
+		for (var i = 1; i < 32; i <<= 1) {
+			x = x | x >> i;
+		}
+		return x + 1;
+	}
+	var all_textures = [];
+	var textures_by_src = {};
+	var BF_RGBA8 = 0;
+	var BF_RGB8 = 1;
+	var BF_RGBA4 = 2;
+	var BF_RGB5_A1 = 3;
+	var BF_RGB565 = 4;
+	GLWrap_.prototype.loadTexture = function (img, tiling, linearsampling, pixelformat, tiletype)
+	{
+		tiling = !!tiling;
+		linearsampling = !!linearsampling;
+		var tex_key = img.src + "," + tiling + "," + linearsampling + (tiling ? ("," + tiletype) : "");
+		var webGL_texture = null;
+		if (typeof img.src !== "undefined" && textures_by_src.hasOwnProperty(tex_key))
+		{
+			webGL_texture = textures_by_src[tex_key];
+			webGL_texture.c2refcount++;
+			return webGL_texture;
+		}
+		this.endBatch();
+;
+		var gl = this.gl;
+		var isPOT = (cr.isPOT(img.width) && cr.isPOT(img.height));
+		webGL_texture = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, webGL_texture);
+		gl.pixelStorei(gl["UNPACK_PREMULTIPLY_ALPHA_WEBGL"], true);
+		var internalformat = gl.RGBA;
+		var format = gl.RGBA;
+		var type = gl.UNSIGNED_BYTE;
+		if (pixelformat && !this.isIE)
+		{
+			switch (pixelformat) {
+			case BF_RGB8:
+				internalformat = gl.RGB;
+				format = gl.RGB;
+				break;
+			case BF_RGBA4:
+				type = gl.UNSIGNED_SHORT_4_4_4_4;
+				break;
+			case BF_RGB5_A1:
+				type = gl.UNSIGNED_SHORT_5_5_5_1;
+				break;
+			case BF_RGB565:
+				internalformat = gl.RGB;
+				format = gl.RGB;
+				type = gl.UNSIGNED_SHORT_5_6_5;
+				break;
+			}
+		}
+		if (!isPOT && tiling)
+		{
+			var canvas = document.createElement("canvas");
+			canvas.width = cr.nextHighestPowerOfTwo(img.width);
+			canvas.height = cr.nextHighestPowerOfTwo(img.height);
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage(img,
+						  0, 0, img.width, img.height,
+						  0, 0, canvas.width, canvas.height);
+			gl.texImage2D(gl.TEXTURE_2D, 0, internalformat, format, type, canvas);
+		}
+		else
+			gl.texImage2D(gl.TEXTURE_2D, 0, internalformat, format, type, img);
+		if (tiling)
+		{
+			if (tiletype === "repeat-x")
+			{
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			}
+			else if (tiletype === "repeat-y")
+			{
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+			}
+			else
+			{
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+			}
+		}
+		else
+		{
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		}
+		if (linearsampling)
+		{
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			if (isPOT)
+			{
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+				gl.generateMipmap(gl.TEXTURE_2D);
+			}
+			else
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		}
+		else
+		{
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		}
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		this.lastTexture0 = null;
+		webGL_texture.c2width = img.width;
+		webGL_texture.c2height = img.height;
+		webGL_texture.c2refcount = 1;
+		webGL_texture.c2texkey = tex_key;
+		all_textures.push(webGL_texture);
+		textures_by_src[tex_key] = webGL_texture;
+		return webGL_texture;
+	};
+	GLWrap_.prototype.createEmptyTexture = function (w, h, linearsampling, _16bit, tiling)
+	{
+		this.endBatch();
+		var gl = this.gl;
+		if (this.isIE)
+			_16bit = false;
+		var webGL_texture = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, webGL_texture);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, _16bit ? gl.UNSIGNED_SHORT_4_4_4_4 : gl.UNSIGNED_BYTE, null);
+		if (tiling)
+		{
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		}
+		else
+		{
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		}
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, linearsampling ? gl.LINEAR : gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, linearsampling ? gl.LINEAR : gl.NEAREST);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		this.lastTexture0 = null;
+		webGL_texture.c2width = w;
+		webGL_texture.c2height = h;
+		all_textures.push(webGL_texture);
+		return webGL_texture;
+	};
+	GLWrap_.prototype.videoToTexture = function (video_, texture_, _16bit)
+	{
+		this.endBatch();
+		var gl = this.gl;
+		if (this.isIE)
+			_16bit = false;
+		gl.bindTexture(gl.TEXTURE_2D, texture_);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, _16bit ? gl.UNSIGNED_SHORT_4_4_4_4 : gl.UNSIGNED_BYTE, video_);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		this.lastTexture0 = null;
+	};
+	GLWrap_.prototype.deleteTexture = function (tex)
+	{
+		if (!tex)
+			return;
+		if (typeof tex.c2refcount !== "undefined" && tex.c2refcount > 1)
+		{
+			tex.c2refcount--;
+			return;
+		}
+		this.endBatch();
+		if (tex === this.lastTexture0)
+		{
+			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+			this.lastTexture0 = null;
+		}
+		if (tex === this.lastTexture1)
+		{
+			this.gl.activeTexture(this.gl.TEXTURE1);
+			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+			this.gl.activeTexture(this.gl.TEXTURE0);
+			this.lastTexture1 = null;
+		}
+		cr.arrayFindRemove(all_textures, tex);
+		if (typeof tex.c2texkey !== "undefined")
+			delete textures_by_src[tex.c2texkey];
+		this.gl.deleteTexture(tex);
+	};
+	GLWrap_.prototype.estimateVRAM = function ()
+	{
+		var total = this.width * this.height * 4 * 2;
+		var i, len, t;
+		for (i = 0, len = all_textures.length; i < len; i++)
+		{
+			t = all_textures[i];
+			total += (t.c2width * t.c2height * 4);
+		}
+		return total;
+	};
+	GLWrap_.prototype.textureCount = function ()
+	{
+		return all_textures.length;
+	};
+	GLWrap_.prototype.setRenderingToTexture = function (tex)
+	{
+		if (tex === this.renderToTex)
+			return;
+;
+		var b = this.pushBatch();
+		b.type = BATCH_RENDERTOTEXTURE;
+		b.texParam = tex;
+		this.renderToTex = tex;
+		this.hasQuadBatchTop = false;
+		this.hasPointBatchTop = false;
+	};
+	cr.GLWrap = GLWrap_;
+}());
 ;
 (function()
 {
@@ -13827,281 +15019,6 @@ cr.plugins_.Browser = function(runtime)
 	{
 		ret.set_float(this.runtime.devicePixelRatio);
 	};
-	pluginProto.exps = new Exps();
-}());
-;
-;
-cr.plugins_.Button = function(runtime)
-{
-	this.runtime = runtime;
-};
-(function ()
-{
-	var pluginProto = cr.plugins_.Button.prototype;
-	pluginProto.Type = function(plugin)
-	{
-		this.plugin = plugin;
-		this.runtime = plugin.runtime;
-	};
-	var typeProto = pluginProto.Type.prototype;
-	typeProto.onCreate = function()
-	{
-	};
-	pluginProto.Instance = function(type)
-	{
-		this.type = type;
-		this.runtime = type.runtime;
-	};
-	var instanceProto = pluginProto.Instance.prototype;
-	instanceProto.onCreate = function()
-	{
-		if (this.runtime.isDomFree)
-		{
-			cr.logexport("[Construct 2] Button plugin not supported on this platform - the object will not be created");
-			return;
-		}
-		this.isCheckbox = (this.properties[0] === 1);
-		this.inputElem = document.createElement("input");
-		if (this.isCheckbox)
-			this.elem = document.createElement("label");
-		else
-			this.elem = this.inputElem;
-		this.labelText = null;
-		this.inputElem.type = (this.isCheckbox ? "checkbox" : "button");
-		this.inputElem.id = this.properties[6];
-		jQuery(this.elem).appendTo(this.runtime.canvasdiv ? this.runtime.canvasdiv : "body");
-		if (this.isCheckbox)
-		{
-			jQuery(this.inputElem).appendTo(this.elem);
-			this.labelText = document.createTextNode(this.properties[1]);
-			jQuery(this.elem).append(this.labelText);
-			this.inputElem.checked = (this.properties[7] !== 0);
-			jQuery(this.elem).css("font-family", "sans-serif");
-			jQuery(this.elem).css("display", "inline-block");
-			jQuery(this.elem).css("color", "black");
-		}
-		else
-			this.inputElem.value = this.properties[1];
-		this.elem.title = this.properties[2];
-		this.inputElem.disabled = (this.properties[4] === 0);
-		this.autoFontSize = (this.properties[5] !== 0);
-		this.element_hidden = false;
-		if (this.properties[3] === 0)
-		{
-			jQuery(this.elem).hide();
-			this.visible = false;
-			this.element_hidden = true;
-		}
-		this.inputElem.onclick = (function (self) {
-			return function(e) {
-				e.stopPropagation();
-				self.runtime.trigger(cr.plugins_.Button.prototype.cnds.OnClicked, self);
-			};
-		})(this);
-		this.elem.addEventListener("touchstart", function (e) {
-			e.stopPropagation();
-		}, false);
-		this.elem.addEventListener("touchmove", function (e) {
-			e.stopPropagation();
-		}, false);
-		this.elem.addEventListener("touchend", function (e) {
-			e.stopPropagation();
-		}, false);
-		jQuery(this.elem).mousedown(function (e) {
-			e.stopPropagation();
-		});
-		jQuery(this.elem).mouseup(function (e) {
-			e.stopPropagation();
-		});
-		jQuery(this.elem).keydown(function (e) {
-			e.stopPropagation();
-		});
-		jQuery(this.elem).keyup(function (e) {
-			e.stopPropagation();
-		});
-		this.lastLeft = 0;
-		this.lastTop = 0;
-		this.lastRight = 0;
-		this.lastBottom = 0;
-		this.lastWinWidth = 0;
-		this.lastWinHeight = 0;
-		this.updatePosition(true);
-		this.runtime.tickMe(this);
-	};
-	instanceProto.saveToJSON = function ()
-	{
-		var o = {
-			"tooltip": this.elem.title,
-			"disabled": !!this.inputElem.disabled
-		};
-		if (this.isCheckbox)
-		{
-			o["checked"] = !!this.inputElem.checked;
-			o["text"] = this.labelText.nodeValue;
-		}
-		else
-		{
-			o["text"] = this.elem.value;
-		}
-		return o;
-	};
-	instanceProto.loadFromJSON = function (o)
-	{
-		this.elem.title = o["tooltip"];
-		this.inputElem.disabled = o["disabled"];
-		if (this.isCheckbox)
-		{
-			this.inputElem.checked = o["checked"];
-			this.labelText.nodeValue = o["text"];
-		}
-		else
-		{
-			this.elem.value = o["text"];
-		}
-	};
-	instanceProto.onDestroy = function ()
-	{
-		if (this.runtime.isDomFree)
-			return;
-		jQuery(this.elem).remove();
-		this.elem = null;
-	};
-	instanceProto.tick = function ()
-	{
-		this.updatePosition();
-	};
-	var last_canvas_offset = null;
-	var last_checked_tick = -1;
-	instanceProto.updatePosition = function (first)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		var left = this.layer.layerToCanvas(this.x, this.y, true);
-		var top = this.layer.layerToCanvas(this.x, this.y, false);
-		var right = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, true);
-		var bottom = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, false);
-		if (!this.visible || !this.layer.visible || right <= 0 || bottom <= 0 || left >= this.runtime.width || top >= this.runtime.height)
-		{
-			if (!this.element_hidden)
-				jQuery(this.elem).hide();
-			this.element_hidden = true;
-			return;
-		}
-		if (left < 1)
-			left = 1;
-		if (top < 1)
-			top = 1;
-		if (right >= this.runtime.width)
-			right = this.runtime.width - 1;
-		if (bottom >= this.runtime.height)
-			bottom = this.runtime.height - 1;
-		var curWinWidth = window.innerWidth;
-		var curWinHeight = window.innerHeight;
-		if (!first && this.lastLeft === left && this.lastTop === top && this.lastRight === right && this.lastBottom === bottom && this.lastWinWidth === curWinWidth && this.lastWinHeight === curWinHeight)
-		{
-			if (this.element_hidden)
-			{
-				jQuery(this.elem).show();
-				this.element_hidden = false;
-			}
-			return;
-		}
-		this.lastLeft = left;
-		this.lastTop = top;
-		this.lastRight = right;
-		this.lastBottom = bottom;
-		this.lastWinWidth = curWinWidth;
-		this.lastWinHeight = curWinHeight;
-		if (this.element_hidden)
-		{
-			jQuery(this.elem).show();
-			this.element_hidden = false;
-		}
-		var offx = Math.round(left) + jQuery(this.runtime.canvas).offset().left;
-		var offy = Math.round(top) + jQuery(this.runtime.canvas).offset().top;
-		jQuery(this.elem).css("position", "absolute");
-		jQuery(this.elem).offset({left: offx, top: offy});
-		jQuery(this.elem).width(Math.round(right - left));
-		jQuery(this.elem).height(Math.round(bottom - top));
-		if (this.autoFontSize)
-			jQuery(this.elem).css("font-size", ((this.layer.getScale() / this.runtime.devicePixelRatio) - 0.2) + "em");
-	};
-	instanceProto.draw = function(ctx)
-	{
-	};
-	instanceProto.drawGL = function(glw)
-	{
-	};
-	function Cnds() {};
-	Cnds.prototype.OnClicked = function ()
-	{
-		return true;
-	};
-	Cnds.prototype.IsChecked = function ()
-	{
-		return this.isCheckbox && this.inputElem.checked;
-	};
-	pluginProto.cnds = new Cnds();
-	function Acts() {};
-	Acts.prototype.SetText = function (text)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		if (this.isCheckbox)
-			this.labelText.nodeValue = text;
-		else
-			this.elem.value = text;
-	};
-	Acts.prototype.SetTooltip = function (text)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.elem.title = text;
-	};
-	Acts.prototype.SetVisible = function (vis)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.visible = (vis !== 0);
-	};
-	Acts.prototype.SetEnabled = function (en)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.inputElem.disabled = (en === 0);
-	};
-	Acts.prototype.SetFocus = function ()
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.inputElem.focus();
-	};
-	Acts.prototype.SetBlur = function ()
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.inputElem.blur();
-	};
-	Acts.prototype.SetCSSStyle = function (p, v)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		jQuery(this.elem).css(p, v);
-	};
-	Acts.prototype.SetChecked = function (c)
-	{
-		if (this.runtime.isDomFree || !this.isCheckbox)
-			return;
-		this.inputElem.checked = (c === 1);
-	};
-	Acts.prototype.ToggleChecked = function ()
-	{
-		if (this.runtime.isDomFree || !this.isCheckbox)
-			return;
-		this.inputElem.checked = !this.inputElem.checked;
-	};
-	pluginProto.acts = new Acts();
-	function Exps() {};
 	pluginProto.exps = new Exps();
 }());
 ;
@@ -32695,18 +33612,6 @@ cr.getProjectModel = function() { return [
 		false,
 		false
 	]
-,	[
-		cr.plugins_.Button,
-		false,
-		true,
-		true,
-		true,
-		false,
-		false,
-		false,
-		false,
-		false
-	]
 	],
 	[
 	[
@@ -32716,7 +33621,7 @@ cr.getProjectModel = function() { return [
 		[],
 		0,
 		0,
-		["images/backgroundtile.png", 1680, 0],
+		["images/backgroundtile.png", 885, 1],
 		null,
 		[
 		],
@@ -32744,12 +33649,12 @@ cr.getProjectModel = function() { return [
 			false,
 			4456708571477634,
 			[
-				["images/player-sheet0.png", 1693, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet0.png", 1693, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet0.png", 1693, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet1.png", 1670, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet1.png", 1670, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet1.png", 1670, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+				["images/player-sheet0.png", 753, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet0.png", 753, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet0.png", 753, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet1.png", 744, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet1.png", 744, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
+				["images/player-sheet1.png", 744, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
 			]
 			]
 ,			[
@@ -32761,7 +33666,7 @@ cr.getProjectModel = function() { return [
 			false,
 			6428032724882492,
 			[
-				["images/player-sheet2.png", 1650, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+				["images/player-sheet2.png", 890, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
 			]
 			]
 ,			[
@@ -32773,7 +33678,7 @@ cr.getProjectModel = function() { return [
 			false,
 			8634838423105605,
 			[
-				["images/player-sheet2.png", 1650, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+				["images/player-sheet2.png", 890, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
 			]
 			]
 ,			[
@@ -32785,7 +33690,7 @@ cr.getProjectModel = function() { return [
 			false,
 			1572748634966135,
 			[
-				["images/player-sheet2.png", 1650, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+				["images/player-sheet2.png", 890, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
 			]
 			]
 		],
@@ -32824,7 +33729,7 @@ cr.getProjectModel = function() { return [
 		[],
 		2,
 		0,
-		["images/solidtile.png", 564, 0],
+		["images/solidtile.png", 287, 1],
 		null,
 		[
 		[
@@ -32851,7 +33756,7 @@ cr.getProjectModel = function() { return [
 		[],
 		2,
 		0,
-		["images/movingsolidtile.png", 170, 0],
+		["images/movingsolidtile.png", 100, 1],
 		null,
 		[
 		[
@@ -32878,7 +33783,7 @@ cr.getProjectModel = function() { return [
 		[],
 		2,
 		0,
-		["images/jumpthrutile.png", 169, 0],
+		["images/jumpthrutile.png", 100, 1],
 		null,
 		[
 		[
@@ -32952,8 +33857,8 @@ cr.getProjectModel = function() { return [
 			false,
 			7472647199375176,
 			[
-				["images/marker-sheet0.png", 245, 0, 0, 15, 15, 1, 0.466667, 0.466667,[],[0.533333,0.533333,-0.466667,0.533333,-0.466667,-0.466667,0.533333,-0.466667],0],
-				["images/marker-sheet1.png", 246, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
+				["images/marker-sheet0.png", 229, 0, 0, 15, 15, 1, 0.466667, 0.466667,[],[0.533333,0.533333,-0.466667,0.533333,-0.466667,-0.466667,0.533333,-0.466667],0],
+				["images/marker-sheet1.png", 228, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
 			]
 			]
 		],
@@ -32967,23 +33872,6 @@ cr.getProjectModel = function() { return [
 	]
 ,	[
 		"t8",
-		cr.plugins_.Button,
-		false,
-		[],
-		0,
-		0,
-		null,
-		null,
-		[
-		],
-		false,
-		false,
-		7959847635091705,
-		[],
-		null
-	]
-,	[
-		"t9",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33000,7 +33888,7 @@ cr.getProjectModel = function() { return [
 			false,
 			5668872769627354,
 			[
-				["images/sprite2-sheet0.png", 586, 0, 0, 252, 55, 1, 0.496032, 0.581818,[],[],0]
+				["images/sprite2-sheet0.png", 338, 0, 0, 252, 55, 1, 0.496032, 0.581818,[],[],0]
 			]
 			]
 		],
@@ -33018,7 +33906,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t10",
+		"t9",
 		cr.plugins_.Text,
 		false,
 		[],
@@ -33035,7 +33923,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t11",
+		"t10",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33052,7 +33940,7 @@ cr.getProjectModel = function() { return [
 			false,
 			3165047605577534,
 			[
-				["images/sprite4-sheet0.png", 878, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],0]
+				["images/sprite4-sheet0.png", 168, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],3]
 			]
 			]
 		],
@@ -33065,7 +33953,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t12",
+		"t11",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33082,8 +33970,8 @@ cr.getProjectModel = function() { return [
 			false,
 			84178240252615,
 			[
-				["images/uimarker-sheet0.png", 2971, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0],
-				["images/uimarker-sheet1.png", 2956, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
+				["images/uimarker-sheet0.png", 256, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0],
+				["images/uimarker-sheet1.png", 252, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
 			]
 			]
 		],
@@ -33096,7 +33984,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t13",
+		"t12",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33113,7 +34001,7 @@ cr.getProjectModel = function() { return [
 			false,
 			2984295428189085,
 			[
-				["images/sprite4-sheet0.png", 878, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],0]
+				["images/sprite4-sheet0.png", 168, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],3]
 			]
 			]
 		],
@@ -33126,7 +34014,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t14",
+		"t13",
 		cr.plugins_.Text,
 		false,
 		[],
@@ -33136,14 +34024,14 @@ cr.getProjectModel = function() { return [
 		null,
 		[
 		],
-		false,
-		false,
+		true,
+		true,
 		2366225855577835,
 		[],
 		null
 	]
 ,	[
-		"t15",
+		"t14",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33160,7 +34048,7 @@ cr.getProjectModel = function() { return [
 			false,
 			7284582363757587,
 			[
-				["images/sprite4-sheet0.png", 878, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],0]
+				["images/sprite4-sheet0.png", 168, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],3]
 			]
 			]
 		],
@@ -33169,6 +34057,23 @@ cr.getProjectModel = function() { return [
 		false,
 		false,
 		5505920898984713,
+		[],
+		null
+	]
+,	[
+		"t15",
+		cr.plugins_.Text,
+		false,
+		[],
+		0,
+		0,
+		null,
+		null,
+		[
+		],
+		true,
+		true,
+		4293221327558532,
 		[],
 		null
 	]
@@ -33185,46 +34090,12 @@ cr.getProjectModel = function() { return [
 		],
 		false,
 		false,
-		4293221327558532,
-		[],
-		null
-	]
-,	[
-		"t17",
-		cr.plugins_.Text,
-		false,
-		[],
-		0,
-		0,
-		null,
-		null,
-		[
-		],
-		false,
-		false,
 		7734662665649906,
 		[],
 		null
 	]
 ,	[
-		"t18",
-		cr.plugins_.Button,
-		false,
-		[],
-		0,
-		0,
-		null,
-		null,
-		[
-		],
-		false,
-		false,
-		9572217053227254,
-		[],
-		null
-	]
-,	[
-		"t19",
+		"t17",
 		cr.plugins_.Function,
 		false,
 		[],
@@ -33242,30 +34113,13 @@ cr.getProjectModel = function() { return [
 		,[]
 	]
 ,	[
-		"t20",
-		cr.plugins_.Button,
-		false,
-		[],
-		0,
-		0,
-		null,
-		null,
-		[
-		],
-		false,
-		false,
-		5413549080988882,
-		[],
-		null
-	]
-,	[
-		"t21",
+		"t18",
 		cr.plugins_.Spritefont2,
 		false,
 		[],
 		0,
 		0,
-		["images/spritefont.png", 5679, 0],
+		["images/spritefont.png", 1427, 3],
 		null,
 		[
 		],
@@ -33276,7 +34130,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t22",
+		"t19",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33293,7 +34147,7 @@ cr.getProjectModel = function() { return [
 			false,
 			9897998461922579,
 			[
-				["images/sprite8-sheet0.png", 810, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],0]
+				["images/sprite8-sheet0.png", 155, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],1]
 			]
 			]
 		],
@@ -33306,7 +34160,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t23",
+		"t20",
 		cr.plugins_.Touch,
 		false,
 		[],
@@ -33324,7 +34178,7 @@ cr.getProjectModel = function() { return [
 		,[1]
 	]
 ,	[
-		"t24",
+		"t21",
 		cr.plugins_.Text,
 		false,
 		[],
@@ -33341,7 +34195,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t25",
+		"t22",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33365,14 +34219,14 @@ cr.getProjectModel = function() { return [
 		],
 		[
 		],
-		false,
-		false,
+		true,
+		true,
 		1229796417648603,
 		[],
 		null
 	]
 ,	[
-		"t26",
+		"t23",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33396,9 +34250,74 @@ cr.getProjectModel = function() { return [
 		],
 		[
 		],
-		false,
-		false,
+		true,
+		true,
 		5922659352532611,
+		[],
+		null
+	]
+,	[
+		"t24",
+		cr.plugins_.Sprite,
+		false,
+		[],
+		0,
+		0,
+		null,
+		[
+			[
+			"Default",
+			5,
+			false,
+			1,
+			0,
+			false,
+			9959273540879391,
+			[
+				["images/exit-sheet0.png", 727, 0, 0, 100, 200, 1, 0.5, 0.5,[],[-0.35,-0.425,0,-0.5,0.35,-0.425,0.5,0,0.5,0.5,-0.5,0.5,-0.5,0],0]
+			]
+			]
+		],
+		[
+		],
+		false,
+		false,
+		5639984892501222,
+		[],
+		null
+	]
+,	[
+		"t25",
+		cr.plugins_.Browser,
+		false,
+		[],
+		0,
+		0,
+		null,
+		null,
+		[
+		],
+		false,
+		false,
+		6468759734758261,
+		[],
+		null
+		,[]
+	]
+,	[
+		"t26",
+		cr.plugins_.TiledBg,
+		false,
+		[],
+		0,
+		0,
+		["images/tiledbackground.png", 874, 0],
+		null,
+		[
+		],
+		false,
+		false,
+		7996769115670503,
 		[],
 		null
 	]
@@ -33418,74 +34337,9 @@ cr.getProjectModel = function() { return [
 			1,
 			0,
 			false,
-			9959273540879391,
-			[
-				["images/exit-sheet0.png", 3819, 0, 0, 100, 200, 1, 0.5, 0.5,[],[-0.35,-0.425,0,-0.5,0.35,-0.425,0.5,0,0.5,0.5,-0.5,0.5,-0.5,0],0]
-			]
-			]
-		],
-		[
-		],
-		false,
-		false,
-		5639984892501222,
-		[],
-		null
-	]
-,	[
-		"t28",
-		cr.plugins_.Browser,
-		false,
-		[],
-		0,
-		0,
-		null,
-		null,
-		[
-		],
-		false,
-		false,
-		6468759734758261,
-		[],
-		null
-		,[]
-	]
-,	[
-		"t29",
-		cr.plugins_.TiledBg,
-		false,
-		[],
-		0,
-		0,
-		["images/tiledbackground.png", 4628, 0],
-		null,
-		[
-		],
-		false,
-		false,
-		7996769115670503,
-		[],
-		null
-	]
-,	[
-		"t30",
-		cr.plugins_.Sprite,
-		false,
-		[],
-		0,
-		0,
-		null,
-		[
-			[
-			"Default",
-			5,
-			false,
-			1,
-			0,
-			false,
 			6963556453550753,
 			[
-				["images/sprite4-sheet0.png", 878, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],0]
+				["images/sprite4-sheet0.png", 168, 0, 0, 250, 250, 1, 0.5, 0.5,[],[],3]
 			]
 			]
 		],
@@ -33498,13 +34352,13 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t31",
+		"t28",
 		cr.plugins_.TiledBg,
 		false,
 		[],
 		0,
 		0,
-		["images/tiledbackground2.png", 16860, 0],
+		["images/tiledbackground2.png", 2322, 0],
 		null,
 		[
 		],
@@ -33515,7 +34369,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t32",
+		"t29",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33525,28 +34379,28 @@ cr.getProjectModel = function() { return [
 		[
 			[
 			"Default",
-			3,
+			0,
 			true,
 			1,
 			0,
 			false,
 			7864878873699658,
 			[
-				["images/titlescreen-sheet0.png", 91726, 1, 1, 320, 180, 1, 0.5, 0.5,[],[],0],
-				["images/titlescreen-sheet0.png", 91726, 1, 182, 320, 180, 1, 0.5, 0.5,[],[],0]
+				["images/titlescreen-sheet0.png", 79404, 1, 1, 320, 180, 1, 0.5, 0.5,[],[],0],
+				["images/titlescreen-sheet0.png", 79404, 1, 182, 320, 180, 1, 0.5, 0.5,[],[],0]
 			]
 			]
 		],
 		[
 		],
 		false,
-		false,
+		true,
 		4896327172576182,
 		[],
 		null
 	]
 ,	[
-		"t33",
+		"t30",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33563,7 +34417,7 @@ cr.getProjectModel = function() { return [
 			false,
 			8902606566277508,
 			[
-				["images/deathtile-sheet0.png", 337, 0, 0, 20, 20, 1, 0.5, 0.5,[],[],0]
+				["images/deathtile-sheet0.png", 246, 0, 0, 20, 20, 1, 0.5, 0.5,[],[],1]
 			]
 			]
 		],
@@ -33586,7 +34440,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t34",
+		"t31",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33603,7 +34457,7 @@ cr.getProjectModel = function() { return [
 			false,
 			2953728245661681,
 			[
-				["images/crumbleblock-sheet0.png", 868, 1, 1, 20, 20, 1, 0.5, 0.5,[],[],0]
+				["images/crumbleblock-sheet0.png", 457, 1, 1, 20, 20, 1, 0.5, 0.5,[],[],0]
 			]
 			]
 ,			[
@@ -33615,15 +34469,15 @@ cr.getProjectModel = function() { return [
 			false,
 			8562027561441926,
 			[
-				["images/crumbleblock-sheet0.png", 868, 22, 1, 20, 20, 1, 0.5, 0.5,[],[],0],
-				["images/crumbleblock-sheet0.png", 868, 43, 1, 20, 20, 1, 0.5, 0.5,[],[],0],
-				["images/crumbleblock-sheet0.png", 868, 1, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
-				["images/crumbleblock-sheet0.png", 868, 22, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
-				["images/crumbleblock-sheet0.png", 868, 43, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
-				["images/crumbleblock-sheet0.png", 868, 1, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
-				["images/crumbleblock-sheet0.png", 868, 22, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
-				["images/crumbleblock-sheet0.png", 868, 43, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
-				["images/crumbleblock-sheet1.png", 2867, 0, 0, 20, 20, 1, 0.5, 0.5,[],[],0]
+				["images/crumbleblock-sheet0.png", 457, 22, 1, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 457, 43, 1, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 457, 1, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 457, 22, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 457, 43, 22, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 457, 1, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 457, 22, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet0.png", 457, 43, 43, 20, 20, 1, 0.5, 0.5,[],[],0],
+				["images/crumbleblock-sheet1.png", 131, 0, 0, 20, 20, 1, 0.5, 0.5,[],[],0]
 			]
 			]
 		],
@@ -33641,13 +34495,13 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t35",
+		"t32",
 		cr.plugins_.TiledBg,
 		false,
 		[],
 		2,
 		0,
-		["images/falltile.png", 567, 0],
+		["images/falltile.png", 287, 1],
 		null,
 		[
 		[
@@ -33668,7 +34522,7 @@ cr.getProjectModel = function() { return [
 		null
 	]
 ,	[
-		"t36",
+		"t33",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33692,14 +34546,14 @@ cr.getProjectModel = function() { return [
 		],
 		[
 		],
-		false,
-		false,
+		true,
+		true,
 		6433464535777513,
 		[],
 		null
 	]
 ,	[
-		"t37",
+		"t34",
 		cr.plugins_.Sprite,
 		false,
 		[],
@@ -33723,14 +34577,14 @@ cr.getProjectModel = function() { return [
 		],
 		[
 		],
-		false,
-		false,
+		true,
+		true,
 		4647733562011844,
 		[],
 		null
 	]
 ,	[
-		"t38",
+		"t35",
 		cr.plugins_.Audio,
 		false,
 		[],
@@ -33760,24 +34614,196 @@ cr.getProjectModel = function() { return [
 		7274646709816716,
 		[
 		[
-			"Layer 0",
+			"Layer 3",
 			0,
-			9950494708777914,
+			8260009364160142,
 			true,
 			[255, 255, 255],
-			false,
+			true,
 			1,
 			1,
 			1,
 			false,
+			1,
+			0,
+			0,
+			[
+			],
+			[			]
+		]
+,		[
+			"Layer 2",
+			1,
+			6970423428588903,
+			true,
+			[255, 255, 255],
+			true,
+			1,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			],
+			[			]
+		]
+,		[
+			"Layer 1",
+			2,
+			9054401766349468,
+			true,
+			[255, 255, 255],
+			true,
+			1,
+			1,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			],
+			[			]
+		]
+,		[
+			"Layer 0",
+			3,
+			9950494708777914,
+			true,
+			[0, 0, 0],
+			false,
+			1,
+			1,
+			1,
+			true,
 			1,
 			0,
 			0,
 			[
 			[
 				[640, 360, 0, 1280, 720, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				32,
+				29,
 				42,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+			],
+			[			]
+		]
+,		[
+			"UI",
+			4,
+			9799963991867761,
+			false,
+			[255, 255, 255],
+			true,
+			0,
+			0,
+			1,
+			false,
+			1,
+			0,
+			0,
+			[
+			[
+				[935, 40, 0, 120, 60, 0, 0, 1, 0, 0, 0, 0, []],
+				13,
+				21,
+				[
+				],
+				[
+				],
+				[
+					"3",
+					0,
+					"20pt Arial",
+					"rgb(255,255,255)",
+					2,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[938, 132, 0, 120, 90, 0, 0, 1, 0, 0, 0, 0, []],
+				15,
+				22,
+				[
+				],
+				[
+				],
+				[
+					"3",
+					0,
+					"20pt Arial",
+					"rgb(255,255,255)",
+					2,
+					0,
+					0,
+					0,
+					0
+				]
+			]
+,			[
+				[1171, 56, 0, 177.88, 80.6388, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
+				22,
+				27,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1169, 153, 0, 183.838, 82.6653, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
+				23,
+				28,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[1177, 660, 0, 207.451, 121.609, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				33,
+				29,
+				[
+				],
+				[
+				],
+				[
+					0,
+					"Default",
+					0,
+					1
+				]
+			]
+,			[
+				[107, 657, 0, 210.988, 125.884, 0, 0, 1, 0.504202, 0.507042, 0, 0, []],
+				34,
+				30,
 				[
 				],
 				[
@@ -33853,7 +34879,7 @@ cr.getProjectModel = function() { return [
 			[
 			[
 				[-2, 242.5, 0, 3180, 150, 0, 0, 1, 0, 0, 0, 0, []],
-				29,
+				26,
 				7,
 				[
 				],
@@ -33884,7 +34910,7 @@ cr.getProjectModel = function() { return [
 			[
 			[
 				[-11, 161, 0, 3300, 300, 0, 0, 1, 0, 0, 0, 0, []],
-				31,
+				28,
 				41,
 				[
 				],
@@ -33927,7 +34953,7 @@ cr.getProjectModel = function() { return [
 					650,
 					1500,
 					1000,
-					1,
+					0,
 					1
 				],
 				[
@@ -33981,23 +35007,6 @@ cr.getProjectModel = function() { return [
 				[
 					0,
 					0
-				]
-			]
-,			[
-				[2850, 720, 0, 48, 48, 0, 0, 1, 0.466667, 0.466667, 0, 0, []],
-				7,
-				21,
-				[
-					[""],
-					[0]
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
 				]
 			]
 ,			[
@@ -34058,7 +35067,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[2760, 630, 0, 48, 48, 0, 0, 1, 0, 0, 0, 0, []],
-				10,
+				9,
 				26,
 				[
 				],
@@ -34078,7 +35087,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[3060, 510, 0, 90, 180, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				27,
+				24,
 				37,
 				[
 				],
@@ -34093,7 +35102,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[990, 690, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				43,
 				[
 				],
@@ -34123,7 +35132,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[420, 810, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				44,
 				[
 				],
@@ -34141,7 +35150,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[750, 900, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				45,
 				[
 				],
@@ -34159,7 +35168,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[570, 870, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				46,
 				[
 				],
@@ -34177,7 +35186,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[870, 690, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				47,
 				[
 				],
@@ -34207,7 +35216,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[930, 690, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				48,
 				[
 				],
@@ -34237,7 +35246,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[2100, 660, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
-				35,
+				32,
 				5,
 				[
 				],
@@ -34533,234 +35542,6 @@ cr.getProjectModel = function() { return [
 			0,
 			0,
 			[
-			[
-				[-4, 730, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
-				8,
-				22,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Play",
-					"",
-					1,
-					1,
-					1,
-					"",
-					0
-				]
-			]
-,			[
-				[1936, 48, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
-				12,
-				28,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[1936, 112, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
-				12,
-				29,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					1,
-					1
-				]
-			]
-,			[
-				[977, 37, 0, 120, 60, 0, 0, 1, 0, 0, 0, 0, []],
-				14,
-				32,
-				[
-				],
-				[
-				],
-				[
-					"3",
-					0,
-					"20pt Arial",
-					"rgb(255,255,255)",
-					2,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[976, 123, 0, 120, 90, 0, 0, 1, 0, 0, 0, 0, []],
-				16,
-				31,
-				[
-				],
-				[
-				],
-				[
-					"3",
-					0,
-					"20pt Arial",
-					"rgb(255,255,255)",
-					2,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[1968, 32, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
-				17,
-				27,
-				[
-				],
-				[
-				],
-				[
-					"Run To",
-					0,
-					"16pt Arial",
-					"rgb(0,0,0)",
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[1968, 96, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
-				17,
-				30,
-				[
-				],
-				[
-				],
-				[
-					"Jump",
-					0,
-					"16pt Arial",
-					"rgb(0,0,0)",
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[1140, 732, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
-				18,
-				33,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Undo",
-					"",
-					1,
-					1,
-					1,
-					"",
-					0
-				]
-			]
-,			[
-				[16, -48, 0, 512, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				24,
-				39,
-				[
-				],
-				[
-				],
-				[
-					"Text",
-					0,
-					"12pt Arial",
-					"rgb(255,0,0)",
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[1185, 50, 0, 150, 68, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
-				25,
-				35,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[1186, 140, 0, 149, 67, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
-				26,
-				36,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[1204.96, 676.052, 0, 151.754, 88.9595, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				36,
-				74,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[61, 684, 0, 119, 71, 0, 0, 1, 0.504202, 0.507042, 0, 0, []],
-				37,
-				103,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
 			],
 			[			]
 		]
@@ -34825,7 +35606,7 @@ cr.getProjectModel = function() { return [
 			[
 			[
 				[-2, 242.5, 0, 2970, 150, 0, 0, 1, 0, 0, 0, 0, []],
-				29,
+				26,
 				50,
 				[
 				],
@@ -34838,7 +35619,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[0, 931.5, 0, 2910, 150, 0, 0, 1, 0, 0, 0, 0, []],
-				29,
+				26,
 				54,
 				[
 				],
@@ -34869,7 +35650,7 @@ cr.getProjectModel = function() { return [
 			[
 			[
 				[-11, 161, 0, 3510, 300, 0, 0, 1, 0, 0, 0, 0, []],
-				31,
+				28,
 				51,
 				[
 				],
@@ -34882,7 +35663,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[0, 870, 0, 2486, 304, 0, 0, 1, 0, 0, 0, 0, []],
-				31,
+				28,
 				55,
 				[
 				],
@@ -34954,23 +35735,6 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[2310, -150, 0, 48, 48, 0, 0, 1, 0.466667, 0.466667, 0, 0, []],
-				7,
-				68,
-				[
-					[""],
-					[0]
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
 				[2370, 180, 0, 510, 60, 0, 0, 1, 0, 0, 0, 0, []],
 				2,
 				70,
@@ -34999,28 +35763,8 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[2288, -173, 0, 48, 48, 0, 0, 1, 0, 0, 0, 0, []],
-				10,
-				72,
-				[
-				],
-				[
-				],
-				[
-					"3",
-					0,
-					"16pt Arial",
-					"rgb(0,0,0)",
-					1,
-					1,
-					0,
-					0,
-					0
-				]
-			]
-,			[
 				[90, 1020, 0, 90, 120, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				27,
+				24,
 				73,
 				[
 				],
@@ -35035,7 +35779,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[870, 2100, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				75,
 				[
 				],
@@ -35053,7 +35797,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[720, 2250, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				76,
 				[
 				],
@@ -35071,7 +35815,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[600, 2310, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				77,
 				[
 				],
@@ -35089,7 +35833,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1680, 300, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
-				35,
+				32,
 				80,
 				[
 				],
@@ -35117,7 +35861,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[300, 2100, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				3,
 				[
 				],
@@ -35191,7 +35935,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1290, 2100, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				17,
 				[
 				],
@@ -35277,7 +36021,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[2010, 180, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
-				35,
+				32,
 				53,
 				[
 				],
@@ -35473,7 +36217,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[990, 1170, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				63,
 				[
 				],
@@ -35503,7 +36247,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1050, 1170, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				64,
 				[
 				],
@@ -35533,7 +36277,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1110, 1170, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				65,
 				[
 				],
@@ -35675,7 +36419,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[510, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				56,
 				[
 				],
@@ -35705,7 +36449,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[570, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				69,
 				[
 				],
@@ -35735,7 +36479,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[810, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				97,
 				[
 				],
@@ -35765,7 +36509,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[870, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				98,
 				[
 				],
@@ -35795,7 +36539,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[930, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				99,
 				[
 				],
@@ -35825,7 +36569,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1170, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				100,
 				[
 				],
@@ -35855,7 +36599,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1230, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				101,
 				[
 				],
@@ -35885,7 +36629,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1290, 480, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				102,
 				[
 				],
@@ -35931,196 +36675,6 @@ cr.getProjectModel = function() { return [
 			0,
 			0,
 			[
-			[
-				[1950, -180, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
-				12,
-				82,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[1950, -90, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
-				12,
-				83,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					1,
-					1
-				]
-			]
-,			[
-				[2040, -150, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
-				17,
-				86,
-				[
-				],
-				[
-				],
-				[
-					"Run To",
-					0,
-					"16pt Arial",
-					"rgb(0,0,0)",
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[2040, -90, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
-				17,
-				87,
-				[
-				],
-				[
-				],
-				[
-					"Jump",
-					0,
-					"16pt Arial",
-					"rgb(0,0,0)",
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[16, -48, 0, 512, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				24,
-				89,
-				[
-				],
-				[
-				],
-				[
-					"Text",
-					0,
-					"12pt Arial",
-					"rgb(255,0,0)",
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[1207, 672, 0, 151.754, 88.9595, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				36,
-				81,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[82.843, 662.758, 0, 150.422, 89.7475, 0, 0, 1, 0.504202, 0.507042, 0, 0, []],
-				37,
-				88,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[960, 30, 0, 120, 60, 0, 0, 1, 0, 0, 0, 0, []],
-				14,
-				84,
-				[
-				],
-				[
-				],
-				[
-					"3",
-					0,
-					"20pt Arial",
-					"rgb(255,255,255)",
-					2,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[960, 120, 0, 120, 90, 0, 0, 1, 0, 0, 0, 0, []],
-				16,
-				85,
-				[
-				],
-				[
-				],
-				[
-					"3",
-					0,
-					"20pt Arial",
-					"rgb(255,255,255)",
-					2,
-					0,
-					0,
-					0,
-					0
-				]
-			]
-,			[
-				[1170, 60, 0, 150, 68, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
-				25,
-				90,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
-,			[
-				[1170, 150, 0, 149, 67, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
-				26,
-				91,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Default",
-					0,
-					1
-				]
-			]
 			],
 			[			]
 		]
@@ -36130,7 +36684,7 @@ cr.getProjectModel = function() { return [
 		[]
 	]
 ,	[
-		"Level 3",
+		"Lab",
 		2048,
 		720,
 		false,
@@ -36167,7 +36721,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[317, 783, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				33,
+				30,
 				79,
 				[
 				],
@@ -36215,7 +36769,7 @@ cr.getProjectModel = function() { return [
 			[
 			[
 				[-2, 241, 0, 1985, 153, 0, 0, 1, 0, 0, 0, 0, []],
-				29,
+				26,
 				92,
 				[
 				],
@@ -36246,7 +36800,7 @@ cr.getProjectModel = function() { return [
 			[
 			[
 				[-11, 159, 0, 2486, 304, 0, 0, 1, 0, 0, 0, 0, []],
-				31,
+				28,
 				93,
 				[
 				],
@@ -36420,7 +36974,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[2080, 624, 0, 48, 48, 0, 0, 1, 0, 0, 0, 0, []],
-				10,
+				9,
 				114,
 				[
 				],
@@ -36440,7 +36994,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1350, 540, 0, 44.8, 89.6, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				27,
+				24,
 				115,
 				[
 				],
@@ -36455,7 +37009,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[420, 780, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				116,
 				[
 				],
@@ -36473,7 +37027,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[480, 780, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				117,
 				[
 				],
@@ -36491,7 +37045,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[540, 780, 0, 60, 60, 0, 0, 1, 0.5, 0.5, 0, 0, []],
-				34,
+				31,
 				118,
 				[
 				],
@@ -36509,7 +37063,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[420, 450, 0, 180, 60, 0, 0, 1, 0, 0, 0, 0, []],
-				35,
+				32,
 				119,
 				[
 				],
@@ -36554,27 +37108,8 @@ cr.getProjectModel = function() { return [
 			0,
 			[
 			[
-				[0, 624, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
-				8,
-				120,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Play",
-					"",
-					1,
-					1,
-					1,
-					"",
-					0
-				]
-			]
-,			[
 				[1936, 48, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
-				12,
+				11,
 				121,
 				[
 				],
@@ -36589,7 +37124,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1936, 112, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
-				12,
+				11,
 				122,
 				[
 				],
@@ -36604,7 +37139,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1116, 32, 0, 52, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				14,
+				13,
 				123,
 				[
 				],
@@ -36624,7 +37159,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1121, 96, 0, 47, 48, 0, 0, 1, 0, 0, 0, 0, []],
-				16,
+				15,
 				124,
 				[
 				],
@@ -36644,7 +37179,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1968, 32, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
-				17,
+				16,
 				125,
 				[
 				],
@@ -36664,7 +37199,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1968, 96, 0, 200, 30, 0, 0, 1, 0, 0, 0, 0, []],
-				17,
+				16,
 				126,
 				[
 				],
@@ -36683,27 +37218,8 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1152, 624, 0, 128, 96, 0, 0, 1, 0, 0, 0, 0, []],
-				18,
-				127,
-				[
-				],
-				[
-				],
-				[
-					0,
-					"Undo",
-					"",
-					1,
-					1,
-					1,
-					"",
-					0
-				]
-			]
-,			[
 				[16, -48, 0, 512, 32, 0, 0, 1, 0, 0, 0, 0, []],
-				24,
+				21,
 				128,
 				[
 				],
@@ -36723,7 +37239,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1232, 32, 0, 101, 53, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
-				25,
+				22,
 				129,
 				[
 				],
@@ -36738,7 +37254,7 @@ cr.getProjectModel = function() { return [
 			]
 ,			[
 				[1232, 112, 0, 101, 53, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
-				26,
+				23,
 				130,
 				[
 				],
@@ -36765,6 +37281,20 @@ cr.getProjectModel = function() { return [
 		"main",
 		[
 		[
+			1,
+			"lastTouchGameY",
+			0,
+			0,
+false,false,3743763516423134,false
+		]
+,		[
+			1,
+			"lastTouchGameX",
+			0,
+			0,
+false,false,4655738716653454,false
+		]
+,		[
 			2,
 			"locomotion",
 			false
@@ -36945,7 +37475,7 @@ false,false,9724346976153994,false
 			],
 			[
 			[
-				28,
+				25,
 				cr.plugins_.Browser.prototype.acts.Alert,
 				null,
 				9734879069347457,
@@ -36977,7 +37507,7 @@ false,false,9724346976153994,false
 			9126252563479522,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.OnTouchObject,
 				null,
 				1,
@@ -36989,14 +37519,14 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					37
+					34
 				]
 				]
 			]
 			],
 			[
 			[
-				38,
+				35,
 				cr.plugins_.Audio.prototype.acts.Play,
 				null,
 				6828594793292537,
@@ -37787,7 +38317,7 @@ false,false,9724346976153994,false
 			5219001097164774,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.OnTouchObject,
 				null,
 				1,
@@ -37799,7 +38329,7 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					36
+					33
 				]
 				]
 			]
@@ -37914,7 +38444,7 @@ false,false,9724346976153994,false
 				],
 				[
 				[
-					38,
+					35,
 					cr.plugins_.Audio.prototype.acts.Play,
 					null,
 					3369603817182707,
@@ -38035,7 +38565,7 @@ false,false,9724346976153994,false
 						],
 						[
 						[
-							16,
+							15,
 							cr.plugins_.Text.prototype.acts.SetText,
 							null,
 							3166257183083118,
@@ -38055,7 +38585,7 @@ false,false,9724346976153994,false
 											,[
 [
 												20,
-												16,
+												15,
 												cr.plugins_.Text.prototype.exps.Text,
 												true,
 												null
@@ -38102,7 +38632,7 @@ false,false,9724346976153994,false
 						],
 						[
 						[
-							14,
+							13,
 							cr.plugins_.Text.prototype.acts.SetText,
 							null,
 							6737898872407703,
@@ -38122,7 +38652,7 @@ false,false,9724346976153994,false
 											,[
 [
 												20,
-												14,
+												13,
 												cr.plugins_.Text.prototype.exps.Text,
 												true,
 												null
@@ -38195,7 +38725,7 @@ false,false,9724346976153994,false
 				],
 				[
 				[
-					38,
+					35,
 					cr.plugins_.Audio.prototype.acts.Play,
 					null,
 					6322201174628919,
@@ -38244,7 +38774,7 @@ false,false,9724346976153994,false
 			479838664316745,
 			[
 			[
-				19,
+				17,
 				cr.plugins_.Function.prototype.cnds.OnFunction,
 				null,
 				2,
@@ -38266,7 +38796,7 @@ false,false,9724346976153994,false
 			],
 			[
 			[
-				38,
+				35,
 				cr.plugins_.Audio.prototype.acts.Play,
 				null,
 				4125822711799363,
@@ -38363,7 +38893,7 @@ false,false,9724346976153994,false
 								,[
 [
 									20,
-									16,
+									15,
 									cr.plugins_.Text.prototype.exps.Text,
 									true,
 									null
@@ -38408,7 +38938,7 @@ false,false,9724346976153994,false
 							0,
 							[
 								20,
-								23,
+								20,
 								cr.plugins_.Touch.prototype.exps.X,
 								false,
 								null
@@ -38418,7 +38948,7 @@ false,false,9724346976153994,false
 							0,
 							[
 								20,
-								23,
+								20,
 								cr.plugins_.Touch.prototype.exps.Y,
 								false,
 								null
@@ -38467,7 +38997,7 @@ false,false,9724346976153994,false
 						]
 					]
 ,					[
-						10,
+						9,
 						cr.plugins_.Text.prototype.acts.SetText,
 						null,
 						3055168514792386,
@@ -38528,7 +39058,7 @@ false,false,9724346976153994,false
 						]
 					]
 ,					[
-						16,
+						15,
 						cr.plugins_.Text.prototype.acts.SetText,
 						null,
 						4982624400368029,
@@ -38548,7 +39078,7 @@ false,false,9724346976153994,false
 										,[
 [
 											20,
-											16,
+											15,
 											cr.plugins_.Text.prototype.exps.Text,
 											true,
 											null
@@ -38606,7 +39136,7 @@ false,false,9724346976153994,false
 							,[
 [
 								20,
-								14,
+								13,
 								cr.plugins_.Text.prototype.exps.Text,
 								true,
 								null
@@ -38651,7 +39181,7 @@ false,false,9724346976153994,false
 						0,
 						[
 							20,
-							23,
+							20,
 							cr.plugins_.Touch.prototype.exps.X,
 							false,
 							null
@@ -38661,7 +39191,7 @@ false,false,9724346976153994,false
 						0,
 						[
 							20,
-							23,
+							20,
 							cr.plugins_.Touch.prototype.exps.Y,
 							false,
 							null
@@ -38710,7 +39240,7 @@ false,false,9724346976153994,false
 					]
 				]
 ,				[
-					10,
+					9,
 					cr.plugins_.Text.prototype.acts.SetText,
 					null,
 					597892041118422,
@@ -38735,7 +39265,7 @@ false,false,9724346976153994,false
 					]
 				]
 ,				[
-					14,
+					13,
 					cr.plugins_.Text.prototype.acts.SetText,
 					null,
 					7144708881801278,
@@ -38755,7 +39285,7 @@ false,false,9724346976153994,false
 									,[
 [
 										20,
-										14,
+										13,
 										cr.plugins_.Text.prototype.exps.Text,
 										true,
 										null
@@ -38784,7 +39314,7 @@ false,false,9724346976153994,false
 			6732344872942024,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.OnNthTouchEnd,
 				null,
 				1,
@@ -38815,7 +39345,7 @@ false,false,9724346976153994,false
 				6565347934604266,
 				[
 				[
-					23,
+					20,
 					cr.plugins_.Touch.prototype.cnds.CompareTouchSpeed,
 					null,
 					0,
@@ -38846,7 +39376,7 @@ false,false,9724346976153994,false
 					]
 				]
 ,				[
-					23,
+					20,
 					cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
 					null,
 					0,
@@ -38858,12 +39388,12 @@ false,false,9724346976153994,false
 					,[
 					[
 						4,
-						26
+						23
 					]
 					]
 				]
 ,				[
-					23,
+					20,
 					cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
 					null,
 					0,
@@ -38875,12 +39405,12 @@ false,false,9724346976153994,false
 					,[
 					[
 						4,
-						25
+						22
 					]
 					]
 				]
 ,				[
-					23,
+					20,
 					cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
 					null,
 					0,
@@ -38892,12 +39422,12 @@ false,false,9724346976153994,false
 					,[
 					[
 						4,
-						36
+						33
 					]
 					]
 				]
 ,				[
-					23,
+					20,
 					cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
 					null,
 					0,
@@ -38909,12 +39439,12 @@ false,false,9724346976153994,false
 					,[
 					[
 						4,
-						37
+						34
 					]
 					]
 				]
 ,				[
-					23,
+					20,
 					cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
 					null,
 					0,
@@ -38949,15 +39479,15 @@ false,false,9724346976153994,false
 							,[
 [
 								23,
-								"TouchLastX"
+								"lastTouchGameX"
 							]
 ,[
 								23,
-								"TouchLastY"
+								"lastTouchGameY"
 							]
 ,[
 								20,
-								23,
+								20,
 								cr.plugins_.Touch.prototype.exps.X,
 								false,
 								null
@@ -38970,7 +39500,7 @@ false,false,9724346976153994,false
 							]
 ,[
 								20,
-								23,
+								20,
 								cr.plugins_.Touch.prototype.exps.Y,
 								false,
 								null
@@ -39031,7 +39561,7 @@ false,false,9724346976153994,false
 				],
 				[
 				[
-					19,
+					17,
 					cr.plugins_.Function.prototype.acts.CallFunction,
 					null,
 					2299346272493035,
@@ -39083,7 +39613,7 @@ false,false,9724346976153994,false
 			6175548220700343,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.OnTouchObject,
 				null,
 				1,
@@ -39095,14 +39625,14 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					25
+					22
 				]
 				]
 			]
 			],
 			[
 			[
-				38,
+				35,
 				cr.plugins_.Audio.prototype.acts.Play,
 				null,
 				735332877877235,
@@ -39133,7 +39663,7 @@ false,false,9724346976153994,false
 				]
 			]
 ,			[
-				25,
+				22,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
 				878096880058304,
@@ -39149,7 +39679,7 @@ false,false,9724346976153994,false
 				]
 			]
 ,			[
-				26,
+				23,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
 				9483481161178176,
@@ -39194,7 +39724,7 @@ false,false,9724346976153994,false
 			3032452355207492,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.OnTouchObject,
 				null,
 				1,
@@ -39206,14 +39736,14 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					26
+					23
 				]
 				]
 			]
 			],
 			[
 			[
-				38,
+				35,
 				cr.plugins_.Audio.prototype.acts.Play,
 				null,
 				2419275496788,
@@ -39244,7 +39774,7 @@ false,false,9724346976153994,false
 				]
 			]
 ,			[
-				26,
+				23,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
 				7960847831172939,
@@ -39260,7 +39790,7 @@ false,false,9724346976153994,false
 				]
 			]
 ,			[
-				25,
+				22,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
 				3643863408758573,
@@ -39327,7 +39857,7 @@ false,false,9724346976153994,false
 			],
 			[
 			[
-				28,
+				25,
 				cr.plugins_.Browser.prototype.acts.Alert,
 				null,
 				7317170457471333,
@@ -39371,14 +39901,14 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					33
+					30
 				]
 				]
 			]
 			],
 			[
 			[
-				38,
+				35,
 				cr.plugins_.Audio.prototype.acts.Play,
 				null,
 				2605065417243949,
@@ -39437,7 +39967,7 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					35
+					32
 				]
 ,				[
 					0,
@@ -39484,7 +40014,7 @@ false,false,9724346976153994,false
 					7,
 					[
 						20,
-						35,
+						32,
 						cr.plugins_.TiledBg.prototype.exps.Y,
 						false,
 						null
@@ -39511,7 +40041,7 @@ false,false,9724346976153994,false
 				]
 			]
 ,			[
-				35,
+				32,
 				cr.behaviors.Physics.prototype.acts.SetImmovable,
 				"Physics",
 				9568150088245632,
@@ -39545,7 +40075,7 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					34
+					31
 				]
 ,				[
 					0,
@@ -39564,7 +40094,7 @@ false,false,9724346976153994,false
 				]
 			]
 ,			[
-				34,
+				31,
 				cr.plugins_.Sprite.prototype.cnds.IsAnimPlaying,
 				null,
 				0,
@@ -39586,7 +40116,7 @@ false,false,9724346976153994,false
 			],
 			[
 			[
-				34,
+				31,
 				cr.plugins_.Sprite.prototype.acts.SetAnim,
 				null,
 				563860161158637,
@@ -39615,7 +40145,7 @@ false,false,9724346976153994,false
 			5908005355719573,
 			[
 			[
-				34,
+				31,
 				cr.plugins_.Sprite.prototype.cnds.OnAnimFinished,
 				null,
 				1,
@@ -39637,7 +40167,7 @@ false,false,9724346976153994,false
 			],
 			[
 			[
-				34,
+				31,
 				cr.plugins_.Sprite.prototype.acts.Destroy,
 				null,
 				233706408366129,
@@ -39653,7 +40183,7 @@ false,false,9724346976153994,false
 			3065662520036479,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
 				null,
 				0,
@@ -39665,14 +40195,14 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					37
+					34
 				]
 				]
 			]
 			],
 			[
 			[
-				37,
+				34,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
 				6264237826461568,
@@ -39710,7 +40240,7 @@ false,false,9724346976153994,false
 			],
 			[
 			[
-				37,
+				34,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
 				2766829905041808,
@@ -39735,7 +40265,7 @@ false,false,9724346976153994,false
 			202644301764235,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.IsTouchingObject,
 				null,
 				0,
@@ -39747,14 +40277,14 @@ false,false,9724346976153994,false
 				,[
 				[
 					4,
-					36
+					33
 				]
 				]
 			]
 			],
 			[
 			[
-				36,
+				33,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
 				9288937114481246,
@@ -39792,7 +40322,7 @@ false,false,9724346976153994,false
 			],
 			[
 			[
-				36,
+				33,
 				cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 				null,
 				9085396673219763,
@@ -39843,7 +40373,7 @@ false,false,6948754525846232,false
 			6644939458668234,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.OnNthTouchStart,
 				null,
 				1,
@@ -39907,7 +40437,7 @@ false,false,6948754525846232,false
 					7,
 					[
 						20,
-						23,
+						20,
 						cr.plugins_.Touch.prototype.exps.X,
 						false,
 						null
@@ -39936,7 +40466,7 @@ false,false,6948754525846232,false
 					7,
 					[
 						20,
-						23,
+						20,
 						cr.plugins_.Touch.prototype.exps.Y,
 						false,
 						null
@@ -39965,10 +40495,68 @@ false,false,6948754525846232,false
 					7,
 					[
 						20,
-						23,
+						20,
 						cr.plugins_.Touch.prototype.exps.TouchID,
 						false,
 						null
+					]
+				]
+				]
+			]
+,			[
+				-1,
+				cr.system_object.prototype.acts.SetVar,
+				null,
+				9095329283863767,
+				false
+				,[
+				[
+					11,
+					"lastTouchGameX"
+				]
+,				[
+					7,
+					[
+						20,
+						20,
+						cr.plugins_.Touch.prototype.exps.X,
+						false,
+						null
+						,[
+[
+							2,
+							"UI"
+						]
+						]
+					]
+				]
+				]
+			]
+,			[
+				-1,
+				cr.system_object.prototype.acts.SetVar,
+				null,
+				103578031947299,
+				false
+				,[
+				[
+					11,
+					"lastTouchGameY"
+				]
+,				[
+					7,
+					[
+						20,
+						20,
+						cr.plugins_.Touch.prototype.exps.Y,
+						false,
+						null
+						,[
+[
+							2,
+							"UI"
+						]
+						]
 					]
 				]
 				]
@@ -40033,7 +40621,7 @@ false,false,6948754525846232,false
 								5,
 								[
 									20,
-									23,
+									20,
 									cr.plugins_.Touch.prototype.exps.X,
 									false,
 									null
@@ -40076,7 +40664,7 @@ false,false,6948754525846232,false
 								5,
 								[
 									20,
-									23,
+									20,
 									cr.plugins_.Touch.prototype.exps.Y,
 									false,
 									null
@@ -40122,7 +40710,7 @@ false,false,6948754525846232,false
 					7,
 					[
 						20,
-						23,
+						20,
 						cr.plugins_.Touch.prototype.exps.X,
 						false,
 						null
@@ -40151,7 +40739,7 @@ false,false,6948754525846232,false
 					7,
 					[
 						20,
-						23,
+						20,
 						cr.plugins_.Touch.prototype.exps.Y,
 						false,
 						null
@@ -40175,7 +40763,7 @@ false,false,6948754525846232,false
 			3313446056468386,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.OnNthTouchEnd,
 				null,
 				1,
@@ -40217,7 +40805,7 @@ false,false,6948754525846232,false
 					7,
 					[
 						20,
-						23,
+						20,
 						cr.plugins_.Touch.prototype.exps.TouchID,
 						false,
 						null
@@ -40270,7 +40858,7 @@ false,false,6948754525846232,false
 			],
 			[
 			[
-				24,
+				21,
 				cr.plugins_.Text.prototype.acts.SetText,
 				null,
 				1493532204888552,
@@ -40670,7 +41258,7 @@ false,false,6948754525846232,false
 			],
 			[
 			[
-				38,
+				35,
 				cr.plugins_.Audio.prototype.acts.Play,
 				null,
 				7589065227741715,
@@ -40708,6 +41296,13 @@ false,false,6948754525846232,false
 		"opening",
 		[
 		[
+			1,
+			"preload",
+			0,
+			0,
+false,false,8450558362585037,false
+		]
+,		[
 			0,
 			null,
 			false,
@@ -40715,7 +41310,7 @@ false,false,6948754525846232,false
 			6789030718682054,
 			[
 			[
-				23,
+				20,
 				cr.plugins_.Touch.prototype.cnds.OnTouchStart,
 				null,
 				1,
@@ -40725,13 +41320,92 @@ false,false,6948754525846232,false
 				994748924710298,
 				false
 			]
+,			[
+				-1,
+				cr.system_object.prototype.cnds.CompareVar,
+				null,
+				0,
+				false,
+				false,
+				false,
+				3707633701484554,
+				false
+				,[
+				[
+					11,
+					"preload"
+				]
+,				[
+					8,
+					0
+				]
+,				[
+					7,
+					[
+						0,
+						1
+					]
+				]
+				]
+			]
 			],
 			[
 			[
+				35,
+				cr.plugins_.Audio.prototype.acts.Play,
+				null,
+				4614801579775736,
+				false
+				,[
+				[
+					2,
+					["ambiant",true]
+				]
+,				[
+					3,
+					1
+				]
+,				[
+					0,
+					[
+						0,
+						-5
+					]
+				]
+,				[
+					1,
+					[
+						2,
+						"music"
+					]
+				]
+				]
+			]
+,			[
+				-1,
+				cr.system_object.prototype.acts.SetLayerVisible,
+				null,
+				7515530860578636,
+				false
+				,[
+				[
+					5,
+					[
+						2,
+						"UI"
+					]
+				]
+,				[
+					3,
+					1
+				]
+				]
+			]
+,			[
 				-1,
 				cr.system_object.prototype.acts.GoToLayout,
 				null,
-				7389387111693814,
+				4839032096012987,
 				false
 				,[
 				[
@@ -40763,7 +41437,7 @@ false,false,6948754525846232,false
 			],
 			[
 			[
-				38,
+				35,
 				cr.plugins_.Audio.prototype.acts.Preload,
 				null,
 				3492566196734433,
@@ -40775,86 +41449,150 @@ false,false,6948754525846232,false
 				]
 				]
 			]
-,			[
-				38,
-				cr.plugins_.Audio.prototype.acts.Play,
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			7516257621956417,
+			[
+			],
+			[
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			867736197085883,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.OnLoadFinished,
 				null,
-				4614801579775736,
+				1,
+				false,
+				false,
+				false,
+				1063451654515935,
+				false
+			]
+			],
+			[
+			[
+				-1,
+				cr.system_object.prototype.acts.SetVar,
+				null,
+				2175377603031369,
 				false
 				,[
 				[
-					2,
-					["ambiant",true]
+					11,
+					"preload"
 				]
 ,				[
-					3,
-					1
+					7,
+					[
+						0,
+						1
+					]
 				]
-,				[
+				]
+			]
+,			[
+				29,
+				cr.plugins_.Sprite.prototype.acts.SetAnimSpeed,
+				null,
+				197219229442497,
+				false
+				,[
+				[
 					0,
 					[
 						0,
-						-15
+						3
 					]
+				]
+				]
+			]
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			5681752850130947,
+			[
+			],
+			[
+			]
+		]
+,		[
+			0,
+			null,
+			false,
+			null,
+			2601488620946619,
+			[
+			[
+				-1,
+				cr.system_object.prototype.cnds.Every,
+				null,
+				0,
+				false,
+				false,
+				false,
+				4654645480515596,
+				false
+				,[
+				[
+					0,
+					[
+						0,
+						9
+					]
+				]
+				]
+			]
+			],
+			[
+			[
+				-1,
+				cr.system_object.prototype.acts.SetVar,
+				null,
+				7009898977915365,
+				false
+				,[
+				[
+					11,
+					"preload"
 				]
 ,				[
-					1,
+					7,
 					[
-						2,
-						""
+						0,
+						1
 					]
 				]
 				]
 			]
 ,			[
-				38,
-				cr.plugins_.Audio.prototype.acts.Preload,
+				29,
+				cr.plugins_.Sprite.prototype.acts.SetAnimSpeed,
 				null,
-				7617350806766852,
+				9118651439865642,
 				false
 				,[
 				[
-					2,
-					["multimedia_button_click_025",false]
-				]
-				]
-			]
-,			[
-				38,
-				cr.plugins_.Audio.prototype.acts.Preload,
-				null,
-				657801324629976,
-				false
-				,[
-				[
-					2,
-					["death",false]
-				]
-				]
-			]
-,			[
-				38,
-				cr.plugins_.Audio.prototype.acts.Preload,
-				null,
-				6283592193051026,
-				false
-				,[
-				[
-					2,
-					["jump_fx",false]
-				]
-				]
-			]
-,			[
-				38,
-				cr.plugins_.Audio.prototype.acts.Preload,
-				null,
-				5049661569072026,
-				false
-				,[
-				[
-					2,
-					["multimedia_button_click_029",false]
+					0,
+					[
+						0,
+						3
+					]
 				]
 				]
 			]
@@ -40890,7 +41628,7 @@ false,false,6948754525846232,false
 				,[
 				[
 					4,
-					27
+					24
 				]
 				]
 			]
@@ -40932,7 +41670,7 @@ false,false,6948754525846232,false
 			],
 			[
 			[
-				16,
+				15,
 				cr.plugins_.Text.prototype.acts.SetText,
 				null,
 				8503175022188525,
@@ -40948,7 +41686,7 @@ false,false,6948754525846232,false
 				]
 			]
 ,			[
-				14,
+				13,
 				cr.plugins_.Text.prototype.acts.SetText,
 				null,
 				6460463657445816,
@@ -40995,7 +41733,7 @@ false,false,6948754525846232,false
 				,[
 				[
 					4,
-					27
+					24
 				]
 				]
 			]
@@ -41037,7 +41775,7 @@ false,false,6948754525846232,false
 			],
 			[
 			[
-				16,
+				15,
 				cr.plugins_.Text.prototype.acts.SetText,
 				null,
 				1866191735395459,
@@ -41053,7 +41791,7 @@ false,false,6948754525846232,false
 				]
 			]
 ,			[
-				14,
+				13,
 				cr.plugins_.Text.prototype.acts.SetText,
 				null,
 				5105448733437165,
@@ -41100,7 +41838,7 @@ false,false,6948754525846232,false
 				,[
 				[
 					4,
-					27
+					24
 				]
 				]
 			]
@@ -41142,7 +41880,7 @@ false,false,6948754525846232,false
 			],
 			[
 			[
-				16,
+				15,
 				cr.plugins_.Text.prototype.acts.SetText,
 				null,
 				658862909522921,
@@ -41158,7 +41896,7 @@ false,false,6948754525846232,false
 				]
 			]
 ,			[
-				14,
+				13,
 				cr.plugins_.Text.prototype.acts.SetText,
 				null,
 				9012572651295813,
@@ -41183,17 +41921,17 @@ false,false,6948754525846232,false
 	1280,
 	720,
 	4,
-	false,
+	true,
 	false,
 	true,
 	"1.0",
 	false,
-	false,
+	true,
 	0,
 	0,
 	131,
 	false,
 	[
-		[7,10]
+		[7,9]
 	]
 ];};
