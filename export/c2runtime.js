@@ -73,7 +73,10 @@ if (typeof Object.getPrototypeOf !== "function")
 	};
 	cr.floor = function (x)
 	{
-		return x | 0;
+		if (x >= 0)
+			return x | 0;
+		else
+			return (x | 0) - 1;		// correctly round down when negative
 	};
 	cr.ceil = function (x)
 	{
@@ -171,6 +174,13 @@ if (typeof Object.getPrototypeOf !== "function")
 		this.right = right;
 		this.bottom = bottom;
 	};
+	Rect.prototype.copy = function (r)
+	{
+		this.left = r.left;
+		this.top = r.top;
+		this.right = r.right;
+		this.bottom = r.bottom;
+	};
 	Rect.prototype.width = function ()
 	{
 		return this.right - this.left;
@@ -187,6 +197,22 @@ if (typeof Object.getPrototypeOf !== "function")
 		this.bottom += py;
 		return this;
 	};
+	Rect.prototype.normalize = function ()
+	{
+		var temp = 0;
+		if (this.left > this.right)
+		{
+			temp = this.left;
+			this.left = this.right;
+			this.right = temp;
+		}
+		if (this.top > this.bottom)
+		{
+			temp = this.top;
+			this.top = this.bottom;
+			this.bottom = temp;
+		}
+	};
 	Rect.prototype.intersects_rect = function (rc)
 	{
 		return !(rc.right < this.left || rc.bottom < this.top || rc.left > this.right || rc.top > this.bottom);
@@ -198,6 +224,10 @@ if (typeof Object.getPrototypeOf !== "function")
 	Rect.prototype.contains_pt = function (x, y)
 	{
 		return (x >= this.left && x <= this.right) && (y >= this.top && y <= this.bottom);
+	};
+	Rect.prototype.equals = function (r)
+	{
+		return this.left === r.left && this.top === r.top && this.right === r.right && this.bottom === r.bottom;
 	};
 	cr.rect = Rect;
 	function Quad()
@@ -263,12 +293,69 @@ if (typeof Object.getPrototypeOf !== "function")
 		this.bly += py;
 		return this;
 	};
+	var minresult = 0;
+	var maxresult = 0;
+	function minmax4(a, b, c, d)
+	{
+		if (a < b)
+		{
+			if (c < d)
+			{
+				if (a < c)
+					minresult = a;
+				else
+					minresult = c;
+				if (b > d)
+					maxresult = b;
+				else
+					maxresult = d;
+			}
+			else
+			{
+				if (a < d)
+					minresult = a;
+				else
+					minresult = d;
+				if (b > c)
+					maxresult = b;
+				else
+					maxresult = c;
+			}
+		}
+		else
+		{
+			if (c < d)
+			{
+				if (b < c)
+					minresult = b;
+				else
+					minresult = c;
+				if (a > d)
+					maxresult = a;
+				else
+					maxresult = d;
+			}
+			else
+			{
+				if (b < d)
+					minresult = b;
+				else
+					minresult = d;
+				if (a > c)
+					maxresult = a;
+				else
+					maxresult = c;
+			}
+		}
+	};
 	Quad.prototype.bounding_box = function (rc)
 	{
-		rc.left =   cr.min(cr.min(this.tlx, this.trx),  cr.min(this.brx, this.blx));
-		rc.top =    cr.min(cr.min(this.tly, this.try_), cr.min(this.bry, this.bly));
-		rc.right =  cr.max(cr.max(this.tlx, this.trx),  cr.max(this.brx, this.blx));
-		rc.bottom = cr.max(cr.max(this.tly, this.try_), cr.max(this.bry, this.bly));
+		minmax4(this.tlx, this.trx, this.brx, this.blx);
+		rc.left = minresult;
+		rc.right = maxresult;
+		minmax4(this.tly, this.try_, this.bry, this.bly);
+		rc.top = minresult;
+		rc.bottom = maxresult;
 	};
 	Quad.prototype.contains_pt = function (x, y)
 	{
@@ -429,12 +516,16 @@ if (typeof Object.getPrototypeOf !== "function")
 			arr.length = len;
 		}
 	};
-	cr.shallowAssignArray = function(dest, src)
+	cr.shallowAssignArray = function (dest, src)
 	{
 		dest.length = src.length;
 		var i, len;
 		for (i = 0, len = src.length; i < len; i++)
 			dest[i] = src[i];
+	};
+	cr.appendArray = function (a, b)
+	{
+		a.push.apply(a, b);
 	};
 	cr.arrayFindRemove = function (arr, item)
 	{
@@ -597,6 +688,9 @@ if (typeof Object.getPrototypeOf !== "function")
 	var supports_set = (typeof Set !== "undefined" && typeof Set.prototype["forEach"] !== "undefined");
 	function ObjectSet_()
 	{
+		this.s = null;
+		this.items = null;
+		this.item_count = 0;
 		if (supports_set)
 		{
 			this.s = new Set();
@@ -604,7 +698,6 @@ if (typeof Object.getPrototypeOf !== "function")
 		else
 		{
 			this.items = {};
-			this.item_count = 0;
 		}
 		this.values_cache = [];
 		this.cache_valid = true;
@@ -768,6 +861,7 @@ if (typeof Object.getPrototypeOf !== "function")
 		this.bboxTop = 0;
 		this.bboxRight = 0;
 		this.bboxBottom = 0;
+		this.convexpolys = null;		// for physics behavior to cache separated polys
 		this.set_pts(pts_array_);
 		cr.seal(this);
 	};
@@ -992,6 +1086,151 @@ if (typeof Object.getPrototypeOf !== "function")
 		}
 	};
 	cr.CollisionPoly = CollisionPoly_;
+	function SparseGrid_(cellwidth_, cellheight_)
+	{
+		this.cellwidth = cellwidth_;
+		this.cellheight = cellheight_;
+		this.cells = {};
+	};
+	SparseGrid_.prototype.totalCellCount = 0;
+	SparseGrid_.prototype.getCell = function (x_, y_, create_if_missing)
+	{
+		var ret;
+		var col = this.cells[x_];
+		if (!col)
+		{
+			if (create_if_missing)
+			{
+				ret = allocGridCell(this, x_, y_);
+				this.cells[x_] = {};
+				this.cells[x_][y_] = ret;
+				return ret;
+			}
+			else
+				return null;
+		}
+		ret = col[y_];
+		if (ret)
+			return ret;
+		else if (create_if_missing)
+		{
+			ret = allocGridCell(this, x_, y_);
+			this.cells[x_][y_] = ret;
+			return ret;
+		}
+		else
+			return null;
+	};
+	SparseGrid_.prototype.XToCell = function (x_)
+	{
+		return cr.floor(x_ / this.cellwidth);
+	};
+	SparseGrid_.prototype.YToCell = function (y_)
+	{
+		return cr.floor(y_ / this.cellheight);
+	};
+	SparseGrid_.prototype.update = function (inst, oldrange, newrange)
+	{
+		var x, lenx, y, leny, cell;
+		if (oldrange)
+		{
+			for (x = oldrange.left, lenx = oldrange.right; x <= lenx; ++x)
+			{
+				for (y = oldrange.top, leny = oldrange.bottom; y <= leny; ++y)
+				{
+					if (newrange && newrange.contains_pt(x, y))
+						continue;	// is still in this cell
+					cell = this.getCell(x, y, false);	// don't create if missing
+					if (!cell)
+						continue;	// cell does not exist yet
+					cell.remove(inst);
+					if (cell.isEmpty())
+					{
+						freeGridCell(cell);
+						this.cells[x][y] = null;
+					}
+				}
+			}
+		}
+		if (newrange)
+		{
+			for (x = newrange.left, lenx = newrange.right; x <= lenx; ++x)
+			{
+				for (y = newrange.top, leny = newrange.bottom; y <= leny; ++y)
+				{
+					if (oldrange && oldrange.contains_pt(x, y))
+						continue;	// is still in this cell
+					this.getCell(x, y, true).insert(inst);
+				}
+			}
+		}
+	};
+	SparseGrid_.prototype.queryRange = function (rc, result)
+	{
+		var x, lenx, ystart, y, leny, cell;
+		x = this.XToCell(rc.left);
+		ystart = this.YToCell(rc.top);
+		lenx = this.XToCell(rc.right);
+		leny = this.YToCell(rc.bottom);
+		for ( ; x <= lenx; ++x)
+		{
+			for (y = ystart; y <= leny; ++y)
+			{
+				cell = this.getCell(x, y, false);
+				if (!cell)
+					continue;
+				cell.dump(result);
+			}
+		}
+	};
+	cr.SparseGrid = SparseGrid_;
+	var gridcellcache = [];
+	function allocGridCell(grid_, x_, y_)
+	{
+		var ret;
+		SparseGrid_.prototype.totalCellCount++;
+		if (gridcellcache.length)
+		{
+			ret = gridcellcache.pop();
+			ret.grid = grid_;
+			ret.x = x_;
+			ret.y = y_;
+			return ret;
+		}
+		else
+			return new cr.GridCell(grid_, x_, y_);
+	};
+	function freeGridCell(c)
+	{
+		SparseGrid_.prototype.totalCellCount--;
+		c.objects.clear();
+		if (gridcellcache.length < 1000)
+			gridcellcache.push(c);
+	};
+	function GridCell_(grid_, x_, y_)
+	{
+		this.grid = grid_;
+		this.x = x_;
+		this.y = y_;
+		this.objects = new cr.ObjectSet();
+	};
+	GridCell_.prototype.isEmpty = function ()
+	{
+		return this.objects.isEmpty();
+	};
+	GridCell_.prototype.insert = function (inst)
+	{
+		this.objects.add(inst);
+	};
+	GridCell_.prototype.remove = function (inst)
+	{
+		this.objects.remove(inst);
+	};
+	GridCell_.prototype.dump = function (result)
+	{
+		cr.appendArray(result, this.objects.valuesRef());
+	};
+	cr.GridCell = GridCell_;
 	var fxNames = [ "lighter",
 					"xor",
 					"copy",
@@ -1373,7 +1612,6 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 	};
 	GLWrap_.prototype.project = function (x, y, out)
 	{
-		var viewport = [0, 0, this.width, this.height];
 		var mv = this.matMV;
 		var proj = this.matP;
 		var fTempo = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -1391,8 +1629,8 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		fTempo[4]*=fTempo[7];
 		fTempo[5]*=fTempo[7];
 		fTempo[6]*=fTempo[7];
-		out[0]=(fTempo[4]*0.5+0.5)*viewport[2]+viewport[0];
-		out[1]=(fTempo[5]*0.5+0.5)*viewport[3]+viewport[1];
+		out[0]=(fTempo[4]*0.5+0.5)*this.width;
+		out[1]=(fTempo[5]*0.5+0.5)*this.height;
 	};
 	GLWrap_.prototype.setSize = function(w, h, force)
 	{
@@ -2292,7 +2530,8 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		else
 			canvas["c2runtime"] = this;
 		var self = this;
-		this.isPhoneGap = (typeof window["device"] !== "undefined" && (typeof window["device"]["cordova"] !== "undefined" || typeof window["device"]["phonegap"] !== "undefined"));
+		this.isCrosswalk = /crosswalk/i.test(navigator.userAgent) || /xwalk/i.test(navigator.userAgent) || !!(typeof window["c2isCrosswalk"] !== "undefined" && window["c2isCrosswalk"]);
+		this.isPhoneGap = (!this.isCrosswalk && (typeof window["device"] !== "undefined" && (typeof window["device"]["cordova"] !== "undefined" || typeof window["device"]["phonegap"] !== "undefined")));
 		this.isDirectCanvas = !!canvas["dc"];
 		this.isAppMobi = (typeof window["AppMobi"] !== "undefined" || this.isDirectCanvas);
 		this.isCocoonJs = !!window["c2cocoonjs"];
@@ -2313,19 +2552,18 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.isiPad = /ipad/i.test(navigator.userAgent);
 		this.isiOS = this.isiPhone || this.isiPad;
 		this.isChrome = /chrome/i.test(navigator.userAgent) || /chromium/i.test(navigator.userAgent);
-		this.isCrosswalk = /crosswalk/i.test(navigator.userAgent) || /xwalk/i.test(navigator.userAgent);
 		this.isAmazonWebApp = /amazonwebappplatform/i.test(navigator.userAgent);
 		this.isFirefox = /firefox/i.test(navigator.userAgent);
 		this.isSafari = !this.isChrome && /safari/i.test(navigator.userAgent);		// Chrome includes Safari in UA
 		this.isWindows = /windows/i.test(navigator.userAgent);
-		this.isNodeWebkit = (typeof window["c2nodewebkit"] !== "undefined");
+		this.isNodeWebkit = (typeof window["c2nodewebkit"] !== "undefined" || /nodewebkit/i.test(navigator.userAgent));
 		this.isArcade = (typeof window["is_scirra_arcade"] !== "undefined");
 		this.isWindows8App = !!(typeof window["c2isWindows8"] !== "undefined" && window["c2isWindows8"]);
 		this.isWindowsPhone8 = !!(typeof window["c2isWindowsPhone8"] !== "undefined" && window["c2isWindowsPhone8"]);
 		this.isBlackberry10 = !!(typeof window["c2isBlackberry10"] !== "undefined" && window["c2isBlackberry10"]);
 		this.isAndroidStockBrowser = (this.isAndroid && !this.isChrome && !this.isFirefox && !this.isAmazonWebApp && !this.isDomFree);
 		this.devicePixelRatio = 1;
-		this.isMobile = (this.isPhoneGap || this.isAppMobi || this.isCocoonJs || this.isAndroid || this.isiOS || this.isWindowsPhone8 || this.isBlackberry10 || this.isTizen);
+		this.isMobile = (this.isPhoneGap || this.isCrosswalk || this.isAppMobi || this.isCocoonJs || this.isAndroid || this.isiOS || this.isWindowsPhone8 || this.isBlackberry10 || this.isTizen);
 		if (!this.isMobile)
 			this.isMobile = /(blackberry|bb10|playbook|palm|symbian|nokia|windows\s+ce|phone|mobile|tablet)/i.test(navigator.userAgent);
 		if (typeof cr_is_preview !== "undefined" && !this.isNodeWebkit && (window.location.search === "?nw" || /nodewebkit/i.test(navigator.userAgent)))
@@ -2354,10 +2592,12 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		}
 		this.width = canvas.width;
 		this.height = canvas.height;
-		this.lastwidth = this.width;
-		this.lastheight = this.height;
+		this.draw_width = this.width;
+		this.draw_height = this.height;
 		this.cssWidth = this.width;
 		this.cssHeight = this.height;
+		this.lastWindowWidth = window.innerWidth;
+		this.lastWindowHeight = window.innerHeight;
 		this.redraw = true;
 		this.isSuspended = false;
 		if (!Date.now) {
@@ -2377,6 +2617,8 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.triggers_to_postinit = [];
 		this.all_global_vars = [];
 		this.all_local_vars = [];
+		this.solidBehavior = null;
+		this.jumpthruBehavior = null;
 		this.deathRow = new cr.ObjectSet();
 		this.isInClearDeathRow = false;
 		this.isInOnDestroy = 0;					// needs to support recursion so increments and decrements and is true if > 0
@@ -2429,6 +2671,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.lastRafTime = 0;		// time of last requestAnimationFrame call
 		this.ranLastRaf = false;	// false if last requestAnimationFrame was skipped for half framerate mode
 		this.had_a_click = false;
+		this.isInUserInputEvent = false;
         this.objects_to_tick = new cr.ObjectSet();
 		this.objects_to_tick2 = new cr.ObjectSet();
 		this.registered_collisions = [];
@@ -2445,6 +2688,8 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.layer_ctx = null;
 		this.layer_tex = null;
 		this.layout_tex = null;
+		this.layout_canvas = null;
+		this.layout_ctx = null;
 		this.is_WebGL_context_lost = false;
 		this.uses_background_blending = false;	// if any shader uses background blending, so entire layout renders to texture
 		this.fx_tex = [null, null];
@@ -2460,29 +2705,18 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.ClearDeathRow();
 		var attribs;
 		var alpha_canvas = this.alphaBackground && !(this.isNodeWebkit || this.isWindows8App || this.isWindowsPhone8);
-		if (typeof jQuery !== "undefined" && this.fullscreen_mode > 0)
-			this["setSize"](jQuery(window).width(), jQuery(window).height());
+		if (this.fullscreen_mode > 0)
+			this["setSize"](window.innerWidth, window.innerHeight, true);
 		try {
 			if (this.enableWebGL && (this.isCocoonJs || !this.isDomFree))
 			{
 				attribs = {
 					"alpha": alpha_canvas,
 					"depth": false,
-					"antialias": false
+					"antialias": false,
+					"failIfMajorPerformanceCaveat": true
 				};
-				var use_webgl = true;
-				if (this.isChrome && this.isWindows)
-				{
-					var tempcanvas = document.createElement("canvas");
-					var tempgl = (tempcanvas.getContext("webgl", attribs) || tempcanvas.getContext("experimental-webgl", attribs));
-					if (tempgl.getSupportedExtensions().toString() === "OES_texture_float,OES_standard_derivatives,WEBKIT_WEBGL_lose_context")
-					{
-;
-						use_webgl = false;
-					}
-				}
-				if (use_webgl)
-					this.gl = (canvas.getContext("webgl", attribs) || canvas.getContext("experimental-webgl", attribs));
+				this.gl = (canvas.getContext("webgl", attribs) || canvas.getContext("experimental-webgl", attribs));
 			}
 		}
 		catch (e) {
@@ -2648,7 +2882,12 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 	{
 		var offx = 0, offy = 0;
 		var neww = 0, newh = 0, intscale = 0;
+		if (this.lastWindowWidth === w && this.lastWindowHeight === h && !force)
+			return;
+		this.lastWindowWidth = w;
+		this.lastWindowHeight = h;
 		var mode = this.fullscreen_mode;
+		var orig_aspect, cur_aspect;
 		var isfullscreen = (document["mozFullScreen"] || document["webkitIsFullScreen"] || !!document["msFullscreenElement"] || document["fullScreen"] || this.isNodeFullscreen);
 		if (!isfullscreen && this.fullscreen_mode === 0 && !force)
 			return;			// ignore size events when not fullscreen and not using a fullscreen-in-browser mode
@@ -2656,8 +2895,8 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 			mode = this.fullscreen_scaling;
 		if (mode >= 4)
 		{
-			var orig_aspect = this.original_width / this.original_height;
-			var cur_aspect = w / h;
+			orig_aspect = this.original_width / this.original_height;
+			cur_aspect = w / h;
 			if (cur_aspect > orig_aspect)
 			{
 				neww = h * orig_aspect;
@@ -2736,6 +2975,51 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.width = Math.round(w * multiplier);
 		this.height = Math.round(h * multiplier);
 		this.redraw = true;
+		if (this.wantFullscreenScalingQuality)
+		{
+			this.draw_width = this.width;
+			this.draw_height = this.height;
+			this.fullscreenScalingQuality = true;
+		}
+		else
+		{
+			if ((this.width < this.original_width && this.height < this.original_height) || mode === 1)
+			{
+				this.draw_width = this.width;
+				this.draw_height = this.height;
+				this.fullscreenScalingQuality = true;
+			}
+			else
+			{
+				this.draw_width = this.original_width;
+				this.draw_height = this.original_height;
+				this.fullscreenScalingQuality = false;
+				/*var orig_aspect = this.original_width / this.original_height;
+				var cur_aspect = this.width / this.height;
+				if ((this.fullscreen_mode !== 2 && cur_aspect > orig_aspect) || (this.fullscreen_mode === 2 && cur_aspect < orig_aspect))
+					this.aspect_scale = this.height / this.original_height;
+				else
+					this.aspect_scale = this.width / this.original_width;*/
+				if (mode === 2)		// scale inner
+				{
+					orig_aspect = this.original_width / this.original_height;
+					cur_aspect = this.lastWindowWidth / this.lastWindowHeight;
+					if (cur_aspect < orig_aspect)
+						this.draw_width = this.draw_height * cur_aspect;
+					else if (cur_aspect > orig_aspect)
+						this.draw_height = this.draw_width / cur_aspect;
+				}
+				else if (mode === 3)
+				{
+					orig_aspect = this.original_width / this.original_height;
+					cur_aspect = this.lastWindowWidth / this.lastWindowHeight;
+					if (cur_aspect > orig_aspect)
+						this.draw_width = this.draw_height * cur_aspect;
+					else if (cur_aspect < orig_aspect)
+						this.draw_height = this.draw_width / cur_aspect;
+				}
+			}
+		}
 		if (this.canvasdiv && !this.isDomFree)
 		{
 			jQuery(this.canvasdiv).css({"width": w + "px",
@@ -2766,7 +3050,9 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 											"height": h + "px"});
 		}
 		if (this.glwrap)
+		{
 			this.glwrap.setSize(Math.round(w * multiplier), Math.round(h * multiplier));
+		}
 		if (this.isDirectCanvas && this.ctx)
 		{
 			this.ctx.width = w;
@@ -2872,6 +3158,10 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.first_layout = pm[1];
 		this.fullscreen_mode = pm[11];	// 0 = off, 1 = crop, 2 = scale inner, 3 = scale outer, 4 = letterbox scale, 5 = integer letterbox scale
 		this.fullscreen_mode_set = pm[11];
+		this.original_width = pm[9];
+		this.original_height = pm[10];
+		this.parallax_x_origin = this.original_width / 2;
+		this.parallax_y_origin = this.original_height / 2;
 		if (this.isDomFree && (pm[11] >= 4 || pm[11] === 0))
 		{
 			cr.logexport("[Construct 2] Letterbox scale fullscreen modes are not supported on this platform - falling back to 'Scale outer'");
@@ -2985,6 +3275,9 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 			type_inst.getEffectIndexByName = cr.type_getEffectIndexByName;
 			type_inst.applySolToContainer = cr.type_applySolToContainer;
 			type_inst.getInstanceByIID = cr.type_getInstanceByIID;
+			type_inst.collision_grid = new cr.SparseGrid(this.original_width, this.original_height);
+			type_inst.any_bbox_changed = true;
+			type_inst.any_instance_parallaxed = false;
 			type_inst.extra = {};
 			type_inst.toString = cr.type_toString;
 			type_inst.behaviors = [];
@@ -3004,12 +3297,19 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 				if (!behavior_plugin)
 				{
 					behavior_plugin = new behavior_ctor(this);
+					behavior_plugin.my_types = [];						// types using this behavior
 					behavior_plugin.my_instances = new cr.ObjectSet(); 	// instances of this behavior
 					if (behavior_plugin.onCreate)
 						behavior_plugin.onCreate();
 					cr.seal(behavior_plugin);
 					this.behaviors.push(behavior_plugin);
+					if (cr.behaviors.solid && behavior_plugin instanceof cr.behaviors.solid)
+						this.solidBehavior = behavior_plugin;
+					if (cr.behaviors.jumpthru && behavior_plugin instanceof cr.behaviors.jumpthru)
+						this.jumpthruBehavior = behavior_plugin;
 				}
+				if (behavior_plugin.my_types.indexOf(type_inst) === -1)
+					behavior_plugin.my_types.push(type_inst);
 				var behavior_type = new behavior_plugin.Type(behavior_plugin, type_inst);
 				behavior_type.name = b[0];
 				behavior_type.sid = b[2];
@@ -3066,9 +3366,9 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 				familytype.members.push(familymember);
 			}
 		}
-		for (i = 0, len = pm[22].length; i < len; i++)
+		for (i = 0, len = pm[23].length; i < len; i++)
 		{
-			var containerdata = pm[22][i];
+			var containerdata = pm[23][i];
 			var containertypes = [];
 			for (j = 0, lenj = containerdata.length; j < lenj; j++)
 				containertypes.push(this.types_by_index[containerdata[j]]);
@@ -3132,8 +3432,6 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.triggers_to_postinit.length = 0;
 		this.files_subfolder = pm[7];
 		this.pixel_rounding = pm[8];
-		this.original_width = pm[9];
-		this.original_height = pm[10];
 		this.aspect_scale = 1.0;
 		this.enableWebGL = pm[12];
 		this.linearSampling = pm[13];
@@ -3143,6 +3441,8 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.orientations = pm[19];		// 0 = any, 1 = portrait, 2 = landscape
 		this.autoLockOrientation = (this.orientations > 0);
 		this.pauseOnBlur = pm[21];
+		this.wantFullscreenScalingQuality = pm[22];		// false = low quality, true = high quality
+		this.fullscreenScalingQuality = this.wantFullscreenScalingQuality;
 		this.start_time = Date.now();
 	};
 	Runtime.prototype.findWaitingTexture = function (src_)
@@ -3298,6 +3598,8 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 			this.loadingprogress = 1;
 			this.trigger(cr.system_object.prototype.cnds.OnLoadFinished, null);
 		}
+		if (navigator["splashscreen"] && navigator["splashscreen"]["hide"])
+			navigator["splashscreen"]["hide"]();
 		this.tick();
 		if (this.isDirectCanvas)
 			AppMobi["webview"]["execute"]("onGameReady();");
@@ -3327,27 +3629,21 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		}
 		this.ranLastRaf = true;
 		this.lastRafTime = logic_start;
-		if (this.isTizen || (!this.isDomFree && window != window.top))
+		var fsmode = this.fullscreen_mode;
+		var isfullscreen = (document["mozFullScreen"] || document["webkitIsFullScreen"] || document["fullScreen"] || !!document["msFullscreenElement"]);
+		if ((isfullscreen || this.isNodeFullscreen) && this.fullscreen_scaling > 0)
+			fsmode = this.fullscreen_scaling;
+		if (fsmode > 0 && !this.isiPhone)
 		{
-			var mode = this.fullscreen_mode;
-			var isfullscreen = (document["mozFullScreen"] || document["webkitIsFullScreen"] || document["fullScreen"] || !!document["msFullscreenElement"] || this.isNodeFullscreen);
-			if (isfullscreen && this.fullscreen_scaling > 0)
-				mode = this.fullscreen_scaling;
-			if (mode > 0)
+			var curwidth = window.innerWidth;
+			var curheight = window.innerHeight;
+			if (this.lastWindowWidth !== curwidth || this.lastWindowHeight !== curheight)
 			{
-				var curwidth = window.innerWidth;
-				var curheight = window.innerHeight;
-				if (this.lastwidth !== curwidth || this.lastheight !== curheight)
-				{
-					this.lastwidth = curwidth;
-					this.lastheight = curheight;
 					this["setSize"](curwidth, curheight);
-				}
 			}
 		}
 		if (!this.isDomFree)
 		{
-			var isfullscreen = (document["mozFullScreen"] || document["webkitIsFullScreen"] || !!document["msFullscreenElement"] || document["fullScreen"]);
 			if (isfullscreen)
 			{
 				if (!this.firstInFullscreen)
@@ -3706,6 +4002,12 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 			for (j = 0, lenj = this.destroycallbacks.length; j < lenj; j++)
 				this.destroycallbacks[j](inst);
 			cr.arrayFindRemove(instances, inst);
+			if (instances.length === 0)
+				type.any_instance_parallaxed = false;
+			if (inst.collcells)
+			{
+				type.collision_grid.update(inst, inst.collcells, null);
+			}
 			if (inst.layer)
 			{
 				cr.arrayRemove(inst.layer.instances, inst.get_zindex());
@@ -3862,6 +4164,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 						inst.effect_params[i][j] = wm[12][i][j];
 				}
 				inst.bbox.set(0, 0, 0, 0);
+				inst.collcells.set(0, 0, -1, -1);
 				inst.bquad.set_from_rect(inst.bbox);
 				inst.bbox_changed_callbacks.length = 0;
 			}
@@ -3874,6 +4177,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 				inst.active_effect_flags = [];
 				inst.active_effect_flags.length = type.effect_types.length;
 				inst.bbox = new cr.rect(0, 0, 0, 0);
+				inst.collcells = new cr.rect(0, 0, -1, -1);
 				inst.bquad = new cr.quad();
 				inst.bbox_changed_callbacks = [];
 				inst.set_bbox_changed = cr.set_bbox_changed;
@@ -3899,6 +4203,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 			inst.updateActiveEffects();
 			inst.uses_shaders = !!inst.active_effect_types.length;
 			inst.bbox_changed = true;
+			type.any_bbox_changed = true;
 			inst.visible = true;
             inst.my_timescale = -1.0;
 			inst.layer = layer;
@@ -3959,6 +4264,8 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		{
 ;
 			layer.instances.push(inst);
+			if (layer.parallaxX !== 1 || layer.parallaxY !== 1)
+				type.any_instance_parallaxed = true;
 		}
 		this.objectcount++;
 		if (type.is_contained)
@@ -4064,6 +4371,72 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		{
 			solModifiers[i].popSol();
 		}
+	};
+	Runtime.prototype.updateAllBBoxes = function (type)
+	{
+		if (!type.any_bbox_changed)
+			return;		// all instances must already be up-to-date
+		var i, len, instances = type.instances;
+		for (i = 0, len = instances.length; i < len; ++i)
+		{
+			instances[i].update_bbox();
+		}
+		type.any_bbox_changed = false;
+	};
+	Runtime.prototype.getCollisionCandidates = function (layer, rtype, bbox, candidates)
+	{
+		var i, len, t;
+		var is_parallaxed = (layer ? (layer.parallaxX !== 1 || layer.parallaxY !== 1) : false);
+		if (rtype.is_family)
+		{
+			for (i = 0, len = rtype.members.length; i < len; ++i)
+			{
+				t = rtype.members[i];
+				if (is_parallaxed || t.any_instance_parallaxed)
+				{
+					cr.appendArray(candidates, t.instances);
+				}
+				else
+				{
+					this.updateAllBBoxes(t);
+					t.collision_grid.queryRange(bbox, candidates);
+				}
+			}
+		}
+		else
+		{
+			if (is_parallaxed || rtype.any_instance_parallaxed)
+			{
+				cr.appendArray(candidates, rtype.instances);
+			}
+			else
+			{
+				this.updateAllBBoxes(rtype);
+				rtype.collision_grid.queryRange(bbox, candidates);
+			}
+		}
+	};
+	Runtime.prototype.getTypesCollisionCandidates = function (layer, types, bbox, candidates)
+	{
+		var i, len;
+		for (i = 0, len = types.length; i < len; ++i)
+		{
+			this.getCollisionCandidates(layer, types[i], bbox, candidates);
+		}
+	};
+	Runtime.prototype.getSolidCollisionCandidates = function (layer, bbox, candidates)
+	{
+		var solid = this.getSolidBehavior();
+		if (!solid)
+			return null;
+		this.getTypesCollisionCandidates(layer, solid.my_types, bbox, candidates);
+	};
+	Runtime.prototype.getJumpthruCollisionCandidates = function (layer, bbox, candidates)
+	{
+		var jumpthru = this.getJumpthruBehavior();
+		if (!jumpthru)
+			return null;
+		this.getTypesCollisionCandidates(layer, jumpthru.my_types, bbox, candidates);
 	};
 	Runtime.prototype.testAndSelectCanvasPointOverlap = function (type, ptx, pty, inverted)
 	{
@@ -4403,87 +4776,79 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 	};
 	Runtime.prototype.getSolidBehavior = function ()
 	{
-		if (!cr.behaviors.solid)
-			return null;
-		var i, len;
-		for (i = 0, len = this.behaviors.length; i < len; i++)
-		{
-			if (this.behaviors[i] instanceof cr.behaviors.solid)
-				return this.behaviors[i];
-		}
-		return null;
+		return this.solidBehavior;
 	};
+	Runtime.prototype.getJumpthruBehavior = function ()
+	{
+		return this.jumpthruBehavior;
+	};
+	var candidates = [];
 	Runtime.prototype.testOverlapSolid = function (inst)
 	{
-		var solid = this.getSolidBehavior();
-		if (!solid)
-			return null;
 		var i, len, s;
-		var solids = solid.my_instances.valuesRef();
-		for (i = 0, len = solids.length; i < len; ++i)
+		inst.update_bbox();
+		this.getSolidCollisionCandidates(inst.layer, inst.bbox, candidates);
+		for (i = 0, len = candidates.length; i < len; ++i)
 		{
-			s = solids[i];
+			s = candidates[i];
 			if (!s.extra.solidEnabled)
 				continue;
 			if (this.testOverlap(inst, s))
+			{
+				candidates.length = 0;
 				return s;
+			}
 		}
+		candidates.length = 0;
 		return null;
 	};
 	Runtime.prototype.testRectOverlapSolid = function (r)
 	{
-		var solid = this.getSolidBehavior();
-		if (!solid)
-			return null;
 		var i, len, s;
-		var solids = solid.my_instances.valuesRef();
-		for (i = 0, len = solids.length; i < len; ++i)
+		this.getSolidCollisionCandidates(null, r, candidates);
+		for (i = 0, len = candidates.length; i < len; ++i)
 		{
-			s = solids[i];
+			s = candidates[i];
 			if (!s.extra.solidEnabled)
 				continue;
 			if (this.testRectOverlap(r, s))
+			{
+				candidates.length = 0;
 				return s;
+			}
 		}
+		candidates.length = 0;
 		return null;
 	};
 	var jumpthru_array_ret = [];
 	Runtime.prototype.testOverlapJumpThru = function (inst, all)
 	{
-		var jumpthru = null;
-		var i, len, s;
-		if (!cr.behaviors.jumpthru)
-			return null;
-		for (i = 0, len = this.behaviors.length; i < len; i++)
-		{
-			if (this.behaviors[i] instanceof cr.behaviors.jumpthru)
-			{
-				jumpthru = this.behaviors[i];
-				break;
-			}
-		}
-		if (!jumpthru)
-			return null;
 		var ret = null;
 		if (all)
 		{
 			ret = jumpthru_array_ret;
 			ret.length = 0;
 		}
-		var jumpthrus = jumpthru.my_instances.valuesRef();
-		for (i = 0, len = jumpthrus.length; i < len; ++i)
+		inst.update_bbox();
+		this.getJumpthruCollisionCandidates(inst.layer, inst.bbox, candidates);
+		var i, len, j;
+		for (i = 0, len = candidates.length; i < len; ++i)
 		{
-			s = jumpthrus[i];
-			if (!s.extra.jumpthruEnabled)
+			j = candidates[i];
+			if (!j.extra.jumpthruEnabled)
 				continue;
-			if (this.testOverlap(inst, s))
+			if (this.testOverlap(inst, j))
 			{
 				if (all)
-					ret.push(s);
+					ret.push(j);
 				else
-					return s;
+				{
+					candidates.length = 0;
+					return j;
+				}
 			}
 		}
+		candidates.length = 0;
 		return ret;
 	};
 	Runtime.prototype.pushOutSolid = function (inst, xdir, ydir, dist, include_jumpthrus, specific_jumpthru)
@@ -5631,6 +5996,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 	{
 		window["c2cocoonjs"] = true;
 		var canvas = document.createElement("screencanvas") || document.createElement("canvas");
+		canvas.screencanvas = true;
 		document.body.appendChild(canvas);
 		var rt = new Runtime(canvas);
 		window["c2runtime"] = rt;
@@ -5801,8 +6167,8 @@ window["cr_setSuspended"] = function(s)
 			layer = this.layers[i];
 			layer.createInitialInstances();		// fills created_instances
 			layer.disableAngle = true;
-			var px = layer.canvasToLayer(0, 0, true);
-			var py = layer.canvasToLayer(0, 0, false);
+			var px = layer.canvasToLayer(0, 0, true, true);
+			var py = layer.canvasToLayer(0, 0, false, true);
 			layer.disableAngle = false;
 			if (this.runtime.pixel_rounding)
 			{
@@ -5970,33 +6336,87 @@ window["cr_setSuspended"] = function(s)
 	};
 	Layout.prototype.draw = function (ctx)
 	{
-		ctx.globalAlpha = 1;
-		ctx.globalCompositeOperation = "source-over";
+		var layout_canvas;
+		var layout_ctx = ctx;
+		var ctx_changed = false;
+		var render_offscreen = !this.runtime.fullscreenScalingQuality;
+		if (render_offscreen)
+		{
+			if (!this.runtime.layout_canvas)
+			{
+				this.runtime.layout_canvas = document.createElement("canvas");
+				layout_canvas = this.runtime.layout_canvas;
+				layout_canvas.width = this.runtime.draw_width;
+				layout_canvas.height = this.runtime.draw_height;
+				this.runtime.layout_ctx = layout_canvas.getContext("2d");
+				ctx_changed = true;
+			}
+			layout_canvas = this.runtime.layout_canvas;
+			layout_ctx = this.runtime.layout_ctx;
+			if (layout_canvas.width !== this.runtime.draw_width)
+			{
+				layout_canvas.width = this.runtime.draw_width;
+				ctx_changed = true;
+			}
+			if (layout_canvas.height !== this.runtime.draw_height)
+			{
+				layout_canvas.height = this.runtime.draw_height;
+				ctx_changed = true;
+			}
+			if (ctx_changed)
+			{
+				layout_ctx["webkitImageSmoothingEnabled"] = this.runtime.linearSampling;
+				layout_ctx["mozImageSmoothingEnabled"] = this.runtime.linearSampling;
+				layout_ctx["msImageSmoothingEnabled"] = this.runtime.linearSampling;
+				layout_ctx["imageSmoothingEnabled"] = this.runtime.linearSampling;
+			}
+		}
+		layout_ctx.globalAlpha = 1;
+		layout_ctx.globalCompositeOperation = "source-over";
 		if (this.runtime.alphaBackground && !this.hasOpaqueBottomLayer())
-			ctx.clearRect(0, 0, this.runtime.width, this.runtime.height);
+			layout_ctx.clearRect(0, 0, this.runtime.draw_width, this.runtime.draw_height);
 		var i, len, l;
 		for (i = 0, len = this.layers.length; i < len; i++)
 		{
 			l = this.layers[i];
 			if (l.visible && l.opacity > 0 && l.blend_mode !== 11)
-				l.draw(ctx);
+				l.draw(layout_ctx);
+		}
+		if (render_offscreen)
+		{
+			ctx.drawImage(layout_canvas, 0, 0, this.runtime.width, this.runtime.height);
 		}
 	};
 	Layout.prototype.drawGL = function (glw)
 	{
-		var render_to_texture = (this.active_effect_types.length > 0 || this.runtime.uses_background_blending);
+		var render_to_texture = (this.active_effect_types.length > 0 ||
+								 this.runtime.uses_background_blending ||
+								 !this.runtime.fullscreenScalingQuality);
 		if (render_to_texture)
 		{
 			if (!this.runtime.layout_tex)
 			{
-				this.runtime.layout_tex = glw.createEmptyTexture(this.runtime.width, this.runtime.height, this.runtime.linearSampling);
+				this.runtime.layout_tex = glw.createEmptyTexture(this.runtime.draw_width, this.runtime.draw_height, this.runtime.linearSampling);
 			}
-			if (this.runtime.layout_tex.c2width !== this.runtime.width || this.runtime.layout_tex.c2height !== this.runtime.height)
+			if (this.runtime.layout_tex.c2width !== this.runtime.draw_width || this.runtime.layout_tex.c2height !== this.runtime.draw_height)
 			{
 				glw.deleteTexture(this.runtime.layout_tex);
-				this.runtime.layout_tex = glw.createEmptyTexture(this.runtime.width, this.runtime.height, this.runtime.linearSampling);
+				this.runtime.layout_tex = glw.createEmptyTexture(this.runtime.draw_width, this.runtime.draw_height, this.runtime.linearSampling);
 			}
 			glw.setRenderingToTexture(this.runtime.layout_tex);
+			if (!this.runtime.fullscreenScalingQuality)
+			{
+				glw.setSize(this.runtime.draw_width, this.runtime.draw_height);
+			}
+		}
+		else
+		{
+			if (this.runtime.layout_tex)
+			{
+				glw.setRenderingToTexture(null);
+				glw.deleteTexture(this.runtime.layout_tex);
+				this.runtime.layout_tex = null;
+			}
 		}
 		if (this.runtime.alphaBackground && !this.hasOpaqueBottomLayer())
 			glw.clear(0, 0, 0, 0);
@@ -6008,15 +6428,16 @@ window["cr_setSuspended"] = function(s)
 		}
 		if (render_to_texture)
 		{
-			if (this.active_effect_types.length <= 1)
+			if (this.active_effect_types.length === 0 ||
+				(this.active_effect_types.length === 1 && this.runtime.fullscreenScalingQuality))
 			{
 				if (this.active_effect_types.length === 1)
 				{
 					var etindex = this.active_effect_types[0].index;
 					glw.switchProgram(this.active_effect_types[0].shaderindex);
 					glw.setProgramParameters(null,								// backTex
-											 1.0 / this.runtime.width,			// pixelWidth
-											 1.0 / this.runtime.height,			// pixelHeight
+											 1.0 / this.runtime.draw_width,		// pixelWidth
+											 1.0 / this.runtime.draw_height,	// pixelHeight
 											 0.0, 0.0,							// destStart
 											 1.0, 1.0,							// destEnd
 											 this.scale,						// layerScale
@@ -6026,6 +6447,10 @@ window["cr_setSuspended"] = function(s)
 				}
 				else
 					glw.switchProgram(0);
+				if (!this.runtime.fullscreenScalingQuality)
+				{
+					glw.setSize(this.runtime.width, this.runtime.height);
+				}
 				glw.setRenderingToTexture(null);				// to backbuffer
 				glw.setOpacity(1);
 				glw.setTexture(this.runtime.layout_tex);
@@ -6045,7 +6470,9 @@ window["cr_setSuspended"] = function(s)
 	};
 	Layout.prototype.getRenderTarget = function()
 	{
-		return (this.active_effect_types.length > 0 || this.runtime.uses_background_blending) ? this.runtime.layout_tex : null;
+		return (this.active_effect_types.length > 0 ||
+				this.runtime.uses_background_blending ||
+				!this.runtime.fullscreenScalingQuality) ? this.runtime.layout_tex : null;
 	};
 	Layout.prototype.getMinLayerScale = function ()
 	{
@@ -6065,7 +6492,7 @@ window["cr_setSuspended"] = function(s)
 	{
 		if (!this.unbounded_scrolling)
 		{
-			var widthBoundary = (this.runtime.width * (1 / this.getMinLayerScale()) / 2);
+			var widthBoundary = (this.runtime.draw_width * (1 / this.getMinLayerScale()) / 2);
 			if (x > this.width - widthBoundary)
 				x = this.width - widthBoundary;
 			if (x < widthBoundary)
@@ -6081,7 +6508,7 @@ window["cr_setSuspended"] = function(s)
 	{
 		if (!this.unbounded_scrolling)
 		{
-			var heightBoundary = (this.runtime.height * (1 / this.getMinLayerScale()) / 2);
+			var heightBoundary = (this.runtime.draw_height * (1 / this.getMinLayerScale()) / 2);
 			if (y > this.height - heightBoundary)
 				y = this.height - heightBoundary;
 			if (y < heightBoundary)
@@ -6110,8 +6537,8 @@ window["cr_setSuspended"] = function(s)
 		var fx_tex = this.runtime.fx_tex;
 		var i, len, last, temp, fx_index = 0, other_fx_index = 1;
 		var y, h;
-		var windowWidth = this.runtime.width;
-		var windowHeight = this.runtime.height;
+		var windowWidth = this.runtime.draw_width;
+		var windowHeight = this.runtime.draw_height;
 		var halfw = windowWidth / 2;
 		var halfh = windowHeight / 2;
 		var rcTex = layer ? layer.rcTex : this.rcTex;
@@ -6131,21 +6558,21 @@ window["cr_setSuspended"] = function(s)
 				boxExtendVertical += glw.getProgramBoxExtendVertical(active_effect_types[i].shaderindex);
 			}
 			var bbox = inst.bbox;
-			screenleft = layer.layerToCanvas(bbox.left, bbox.top, true);
-			screentop = layer.layerToCanvas(bbox.left, bbox.top, false);
-			screenright = layer.layerToCanvas(bbox.right, bbox.bottom, true);
-			screenbottom = layer.layerToCanvas(bbox.right, bbox.bottom, false);
+			screenleft = layer.layerToCanvas(bbox.left, bbox.top, true, true);
+			screentop = layer.layerToCanvas(bbox.left, bbox.top, false, true);
+			screenright = layer.layerToCanvas(bbox.right, bbox.bottom, true, true);
+			screenbottom = layer.layerToCanvas(bbox.right, bbox.bottom, false, true);
 			if (inst_layer_angle !== 0)
 			{
-				var screentrx = layer.layerToCanvas(bbox.right, bbox.top, true);
-				var screentry = layer.layerToCanvas(bbox.right, bbox.top, false);
-				var screenblx = layer.layerToCanvas(bbox.left, bbox.bottom, true);
-				var screenbly = layer.layerToCanvas(bbox.left, bbox.bottom, false);
-				temp = cr.min(screenleft, screenright, screentrx, screenblx);
-				screenright = cr.max(screenleft, screenright, screentrx, screenblx);
+				var screentrx = layer.layerToCanvas(bbox.right, bbox.top, true, true);
+				var screentry = layer.layerToCanvas(bbox.right, bbox.top, false, true);
+				var screenblx = layer.layerToCanvas(bbox.left, bbox.bottom, true, true);
+				var screenbly = layer.layerToCanvas(bbox.left, bbox.bottom, false, true);
+				temp = Math.min(screenleft, screenright, screentrx, screenblx);
+				screenright = Math.max(screenleft, screenright, screentrx, screenblx);
 				screenleft = temp;
-				temp = cr.min(screentop, screenbottom, screentry, screenbly);
-				screenbottom = cr.max(screentop, screenbottom, screentry, screenbly);
+				temp = Math.min(screentop, screenbottom, screentry, screenbly);
+				screenbottom = Math.max(screentop, screenbottom, screentry, screenbly);
 				screentop = temp;
 			}
 			screenleft -= boxExtendHorizontal;
@@ -6228,7 +6655,8 @@ window["cr_setSuspended"] = function(s)
 		}
 		glw.setOpacity(1);
 		var last = active_effect_types.length - 1;
-		var post_draw = glw.programUsesCrossSampling(active_effect_types[last].shaderindex);
+		var post_draw = glw.programUsesCrossSampling(active_effect_types[last].shaderindex) ||
+						(!layer && !inst && !this.runtime.fullscreenScalingQuality);
 		var etindex = 0;
 		for (i = 0, len = active_effect_types.length; i < len; i++)
 		{
@@ -6335,6 +6763,19 @@ window["cr_setSuspended"] = function(s)
 				glw.setBlend(inst.srcBlend, inst.destBlend);
 			else if (layer)
 				glw.setBlend(layer.srcBlend, layer.destBlend);
+			else
+			{
+				if (!this.runtime.fullscreenScalingQuality)
+				{
+					glw.setSize(this.runtime.width, this.runtime.height);
+					halfw = this.runtime.width / 2;
+					halfh = this.runtime.height / 2;
+					screenleft = 0;
+					screentop = 0;
+					screenright = this.runtime.width;
+					screenbottom = this.runtime.height;
+				}
+			}
 			glw.setRenderingToTexture(rendertarget);
 			glw.setTexture(fx_tex[other_fx_index]);
 			glw.resetModelView();
@@ -6550,9 +6991,9 @@ window["cr_setSuspended"] = function(s)
 		}
 		this.zindices_stale = false;
 	};
-	Layer.prototype.getScale = function ()
+	Layer.prototype.getScale = function (include_aspect)
 	{
-		return this.getNormalScale() * this.runtime.aspect_scale;
+		return this.getNormalScale() * (this.runtime.fullscreenScalingQuality || include_aspect ? this.runtime.aspect_scale : 1);
 	};
 	Layer.prototype.getNormalScale = function ()
 	{
@@ -6569,6 +7010,7 @@ window["cr_setSuspended"] = function(s)
 		this.render_offscreen = (this.forceOwnTexture || this.opacity !== 1.0 || this.blend_mode !== 0);
 		var layer_canvas = this.runtime.canvas;
 		var layer_ctx = ctx;
+		var ctx_changed = false;
 		ctx.globalAlpha = 1;
 		ctx.globalCompositeOperation = "source-over";
 		if (this.render_offscreen)
@@ -6578,29 +7020,43 @@ window["cr_setSuspended"] = function(s)
 				this.runtime.layer_canvas = document.createElement("canvas");
 ;
 				layer_canvas = this.runtime.layer_canvas;
-				layer_canvas.width = this.runtime.width;
-				layer_canvas.height = this.runtime.height;
+				layer_canvas.width = this.runtime.draw_width;
+				layer_canvas.height = this.runtime.draw_height;
 				this.runtime.layer_ctx = layer_canvas.getContext("2d");
 ;
+				ctx_changed = true;
 			}
 			layer_canvas = this.runtime.layer_canvas;
 			layer_ctx = this.runtime.layer_ctx;
-			if (layer_canvas.width !== this.runtime.width)
-				layer_canvas.width = this.runtime.width;
-			if (layer_canvas.height !== this.runtime.height)
-				layer_canvas.height = this.runtime.height;
+			if (layer_canvas.width !== this.runtime.draw_width)
+			{
+				layer_canvas.width = this.runtime.draw_width;
+				ctx_changed = true;
+			}
+			if (layer_canvas.height !== this.runtime.draw_height)
+			{
+				layer_canvas.height = this.runtime.draw_height;
+				ctx_changed = true;
+			}
+			if (ctx_changed)
+			{
+				layer_ctx["webkitImageSmoothingEnabled"] = this.runtime.linearSampling;
+				layer_ctx["mozImageSmoothingEnabled"] = this.runtime.linearSampling;
+				layer_ctx["msImageSmoothingEnabled"] = this.runtime.linearSampling;
+				layer_ctx["imageSmoothingEnabled"] = this.runtime.linearSampling;
+			}
 			if (this.transparent)
-				layer_ctx.clearRect(0, 0, this.runtime.width, this.runtime.height);
+				layer_ctx.clearRect(0, 0, this.runtime.draw_width, this.runtime.draw_height);
 		}
 		if (!this.transparent)
 		{
 			layer_ctx.fillStyle = "rgb(" + this.background_color[0] + "," + this.background_color[1] + "," + this.background_color[2] + ")";
-			layer_ctx.fillRect(0, 0, this.runtime.width, this.runtime.height);
+			layer_ctx.fillRect(0, 0, this.runtime.draw_width, this.runtime.draw_height);
 		}
 		layer_ctx.save();
 		this.disableAngle = true;
-		var px = this.canvasToLayer(0, 0, true);
-		var py = this.canvasToLayer(0, 0, false);
+		var px = this.canvasToLayer(0, 0, true, true);
+		var py = this.canvasToLayer(0, 0, false, true);
 		this.disableAngle = false;
 		if (this.runtime.pixel_rounding)
 		{
@@ -6637,16 +7093,16 @@ window["cr_setSuspended"] = function(s)
 		var myscale = this.getScale();
 		this.viewLeft = px;
 		this.viewTop = py;
-		this.viewRight = px + (this.runtime.width * (1 / myscale));
-		this.viewBottom = py + (this.runtime.height * (1 / myscale));
+		this.viewRight = px + (this.runtime.draw_width * (1 / myscale));
+		this.viewBottom = py + (this.runtime.draw_height * (1 / myscale));
 		var myAngle = this.getAngle();
 		if (myAngle !== 0)
 		{
 			if (ctx)
 			{
-				ctx.translate(this.runtime.width / 2, this.runtime.height / 2);
+				ctx.translate(this.runtime.draw_width / 2, this.runtime.draw_height / 2);
 				ctx.rotate(-myAngle);
-				ctx.translate(this.runtime.width / -2, this.runtime.height / -2);
+				ctx.translate(this.runtime.draw_width / -2, this.runtime.draw_height / -2);
 			}
 			this.tmprect.set(this.viewLeft, this.viewTop, this.viewRight, this.viewBottom);
 			this.tmprect.offset((this.viewLeft + this.viewRight) / -2, (this.viewTop + this.viewBottom) / -2);
@@ -6661,8 +7117,8 @@ window["cr_setSuspended"] = function(s)
 	}
 	Layer.prototype.drawGL = function (glw)
 	{
-		var windowWidth = this.runtime.width;
-		var windowHeight = this.runtime.height;
+		var windowWidth = this.runtime.draw_width;
+		var windowHeight = this.runtime.draw_height;
 		var shaderindex = 0;
 		var etindex = 0;
 		this.render_offscreen = (this.forceOwnTexture || this.opacity !== 1.0 || this.active_effect_types.length > 0 || this.blend_mode !== 0);
@@ -6670,12 +7126,12 @@ window["cr_setSuspended"] = function(s)
 		{
 			if (!this.runtime.layer_tex)
 			{
-				this.runtime.layer_tex = glw.createEmptyTexture(this.runtime.width, this.runtime.height, this.runtime.linearSampling);
+				this.runtime.layer_tex = glw.createEmptyTexture(this.runtime.draw_width, this.runtime.draw_height, this.runtime.linearSampling);
 			}
-			if (this.runtime.layer_tex.c2width !== this.runtime.width || this.runtime.layer_tex.c2height !== this.runtime.height)
+			if (this.runtime.layer_tex.c2width !== this.runtime.draw_width || this.runtime.layer_tex.c2height !== this.runtime.draw_height)
 			{
 				glw.deleteTexture(this.runtime.layer_tex);
-				this.runtime.layer_tex = glw.createEmptyTexture(this.runtime.width, this.runtime.height, this.runtime.linearSampling);
+				this.runtime.layer_tex = glw.createEmptyTexture(this.runtime.draw_width, this.runtime.draw_height, this.runtime.linearSampling);
 			}
 			glw.setRenderingToTexture(this.runtime.layer_tex);
 			if (this.transparent)
@@ -6686,8 +7142,8 @@ window["cr_setSuspended"] = function(s)
 			glw.clear(this.background_color[0] / 255, this.background_color[1] / 255, this.background_color[2] / 255, 1);
 		}
 		this.disableAngle = true;
-		var px = this.canvasToLayer(0, 0, true);
-		var py = this.canvasToLayer(0, 0, false);
+		var px = this.canvasToLayer(0, 0, true, true);
+		var py = this.canvasToLayer(0, 0, false, true);
 		this.disableAngle = false;
 		if (this.runtime.pixel_rounding)
 		{
@@ -6727,10 +7183,10 @@ window["cr_setSuspended"] = function(s)
 					if (glw.programUsesDest(shaderindex))
 					{
 						var bbox = inst.bbox;
-						var screenleft = this.layerToCanvas(bbox.left, bbox.top, true);
-						var screentop = this.layerToCanvas(bbox.left, bbox.top, false);
-						var screenright = this.layerToCanvas(bbox.right, bbox.bottom, true);
-						var screenbottom = this.layerToCanvas(bbox.right, bbox.bottom, false);
+						var screenleft = this.layerToCanvas(bbox.left, bbox.top, true, true);
+						var screentop = this.layerToCanvas(bbox.left, bbox.top, false, true);
+						var screenright = this.layerToCanvas(bbox.right, bbox.bottom, true, true);
+						var screenbottom = this.layerToCanvas(bbox.right, bbox.bottom, false, true);
 						destStartX = screenleft / windowWidth;
 						destStartY = 1 - screentop / windowHeight;
 						destEndX = screenright / windowWidth;
@@ -6773,8 +7229,8 @@ window["cr_setSuspended"] = function(s)
 				{
 					glw.switchProgram(shaderindex);
 					glw.setProgramParameters(this.layout.getRenderTarget(),		// backTex
-											 1.0 / this.runtime.width,			// pixelWidth
-											 1.0 / this.runtime.height,			// pixelHeight
+											 1.0 / this.runtime.draw_width,		// pixelWidth
+											 1.0 / this.runtime.draw_height,	// pixelHeight
 											 0.0, 0.0,							// destStart
 											 1.0, 1.0,							// destEnd
 											 this.getScale(),					// layerScale
@@ -6790,8 +7246,8 @@ window["cr_setSuspended"] = function(s)
 				glw.setBlend(this.srcBlend, this.destBlend);
 				glw.resetModelView();
 				glw.updateModelView();
-				var halfw = this.runtime.width / 2;
-				var halfh = this.runtime.height / 2;
+				var halfw = this.runtime.draw_width / 2;
+				var halfh = this.runtime.draw_height / 2;
 				glw.quad(-halfw, halfh, halfw, halfh, halfw, -halfh, -halfw, -halfh);
 				glw.setTexture(null);
 			}
@@ -6801,7 +7257,7 @@ window["cr_setSuspended"] = function(s)
 			}
 		}
 	};
-	Layer.prototype.canvasToLayer = function (ptx, pty, getx)
+	Layer.prototype.canvasToLayer = function (ptx, pty, getx, using_draw_area)
 	{
 		var multiplier = this.runtime.devicePixelRatio;
 		if (this.runtime.isRetina)
@@ -6809,13 +7265,21 @@ window["cr_setSuspended"] = function(s)
 			ptx *= multiplier;
 			pty *= multiplier;
 		}
-		var ox = (this.runtime.original_width / 2);
-		var oy = (this.runtime.original_height / 2);
+		var ox = this.runtime.parallax_x_origin;
+		var oy = this.runtime.parallax_y_origin;
 		var x = ((this.layout.scrollX - ox) * this.parallaxX) + ox;
 		var y = ((this.layout.scrollY - oy) * this.parallaxY) + oy;
-		var invScale = 1 / this.getScale();
-		x -= (this.runtime.width * invScale) / 2;
-		y -= (this.runtime.height * invScale) / 2;
+		var invScale = 1 / this.getScale(!using_draw_area);
+		if (using_draw_area)
+		{
+			x -= (this.runtime.draw_width * invScale) / 2;
+			y -= (this.runtime.draw_height * invScale) / 2;
+		}
+		else
+		{
+			x -= (this.runtime.width * invScale) / 2;
+			y -= (this.runtime.height * invScale) / 2;
+		}
 		x += ptx * invScale;
 		y += pty * invScale;
 		var a = this.getAngle();
@@ -6833,7 +7297,7 @@ window["cr_setSuspended"] = function(s)
 		}
 		return getx ? x : y;
 	};
-	Layer.prototype.layerToCanvas = function (ptx, pty, getx)
+	Layer.prototype.layerToCanvas = function (ptx, pty, getx, using_draw_area)
 	{
 		var a = this.getAngle();
 		if (a !== 0)
@@ -6848,13 +7312,21 @@ window["cr_setSuspended"] = function(s)
 			ptx += this.layout.scrollX;
 			pty += this.layout.scrollY;
 		}
-		var ox = (this.runtime.original_width / 2);
-		var oy = (this.runtime.original_height / 2);
+		var ox = this.runtime.parallax_x_origin;
+		var oy = this.runtime.parallax_y_origin;
 		var x = ((this.layout.scrollX - ox) * this.parallaxX) + ox;
 		var y = ((this.layout.scrollY - oy) * this.parallaxY) + oy;
-		var invScale = 1 / this.getScale();
-		x -= (this.runtime.width * invScale) / 2;
-		y -= (this.runtime.height * invScale) / 2;
+		var invScale = 1 / this.getScale(!using_draw_area);
+		if (using_draw_area)
+		{
+			x -= (this.runtime.draw_width * invScale) / 2;
+			y -= (this.runtime.draw_height * invScale) / 2;
+		}
+		else
+		{
+			x -= (this.runtime.width * invScale) / 2;
+			y -= (this.runtime.height * invScale) / 2;
+		}
 		x = (ptx - x) / invScale;
 		y = (pty - y) / invScale;
 		var multiplier = this.runtime.devicePixelRatio;
@@ -7301,6 +7773,7 @@ window["cr_setSuspended"] = function(s)
 			this.is_else_block = (this.conditions[0].type == null && this.conditions[0].func == cr.system_object.prototype.cnds.Else);
 		}
 	};
+	window["_c2hh_"] = "28AA044458A8924F09A0026FEFF6FAFCBE918DA2";
 	EventBlock.prototype.postInit = function (hasElse/*, prevBlock_*/)
 	{
 		var i, len;
@@ -9506,7 +9979,7 @@ cr.system_object.prototype.loadFromJSON = function (o)
 		var rt = this.runtime;
 		switch (p) {
 		case 0:		// HTML5 website
-			return !rt.isDomFree && !rt.isNodeWebkit && !rt.isPhoneGap && !rt.isWindows8App && !rt.isWindowsPhone8 && !rt.isBlackberry10;
+			return !rt.isDomFree && !rt.isNodeWebkit && !rt.isPhoneGap && !rt.isCrosswalk && !rt.isWindows8App && !rt.isWindowsPhone8 && !rt.isBlackberry10 && !rt.isAmazonWebApp;
 		case 1:		// iOS
 			return rt.isiOS;
 		case 2:		// Android
@@ -9519,16 +9992,18 @@ cr.system_object.prototype.loadFromJSON = function (o)
 			return rt.isBlackberry10;
 		case 6:		// Tizen
 			return rt.isTizen;
-		case 7:		// node-webkit
-			return rt.isNodeWebkit;
-		case 8:		// CocoonJS
+		case 7:		// CocoonJS
 			return rt.isCocoonJs;
-		case 9:		// PhoneGap
+		case 8:		// PhoneGap
 			return rt.isPhoneGap;
-		case 10:	// Scirra Arcade
+		case 9:	// Scirra Arcade
 			return rt.isArcade;
-		case 11:	// node-webkit
+		case 10:	// node-webkit
 			return rt.isNodeWebkit;
+		case 11:	// crosswalk
+			return rt.isCrosswalk;
+		case 12:	// amazon webapp
+			return rt.isAmazonWebApp;
 		default:	// should not be possible
 			return false;
 		}
@@ -9907,6 +10382,14 @@ cr.system_object.prototype.loadFromJSON = function (o)
 			return;
         layer.parallaxX = px / 100;
 		layer.parallaxY = py / 100;
+		if (layer.parallaxX !== 1 || layer.parallaxY !== 1)
+		{
+			var i, len, instances = layer.instances;
+			for (i = 0, len = instances.length; i < len; ++i)
+			{
+				instances[i].type.any_instance_parallaxed = true;
+			}
+		}
         this.runtime.redraw = true;
     };
 	SysActs.prototype.SetLayerBackground = function (layer, c)
@@ -9981,7 +10464,20 @@ cr.system_object.prototype.loadFromJSON = function (o)
 	{
 		if (w <= 0 || h <= 0)
 			return;
-		this.runtime["setSize"](w, h, true);
+		var mode = this.runtime.fullscreen_mode;
+		var isfullscreen = (document["mozFullScreen"] || document["webkitIsFullScreen"] || !!document["msFullscreenElement"] || document["fullScreen"] || this.runtime.isNodeFullscreen);
+		if (isfullscreen && this.runtime.fullscreen_scaling > 0)
+			mode = this.runtime.fullscreen_scaling;
+		if (mode === 0)
+		{
+			this.runtime["setSize"](w, h, true);
+		}
+		else
+		{
+			this.runtime.original_width = w;
+			this.runtime.original_height = h;
+			this.runtime["setSize"](this.runtime.lastWindowWidth, this.runtime.lastWindowHeight, true);
+		}
 	};
 	SysActs.prototype.SetLayoutEffectEnabled = function (enable_, effectname_)
 	{
@@ -10064,6 +10560,14 @@ cr.system_object.prototype.loadFromJSON = function (o)
 	SysActs.prototype.SetHalfFramerateMode = function (set_)
 	{
 		this.runtime.halfFramerateMode = (set_ !== 0);
+	};
+	SysActs.prototype.SetFullscreenQuality = function (q)
+	{
+		var isfullscreen = (document["mozFullScreen"] || document["webkitIsFullScreen"] || !!document["msFullscreenElement"] || document["fullScreen"] || this.isNodeFullscreen);
+		if (!isfullscreen && this.runtime.fullscreen_mode === 0)
+			return;
+		this.runtime.wantFullscreenScalingQuality = (q !== 0);
+		this.runtime["setSize"](this.runtime.lastWindowWidth, this.runtime.lastWindowHeight, true);
 	};
 	sysProto.acts = new SysActs();
     function SysExps() {};
@@ -10633,1023 +11137,1033 @@ cr.system_object.prototype.loadFromJSON = function (o)
 	};
 }());
 ;
-cr.add_common_aces = function (m)
-{
-	var pluginProto = m[0].prototype;
-	var singleglobal_ = m[1];
-	var position_aces = m[3];
-	var size_aces = m[4];
-	var angle_aces = m[5];
-	var appearance_aces = m[6];
-	var zorder_aces = m[7];
-	var effects_aces = m[8];
-    if (!pluginProto.cnds)
-        pluginProto.cnds = {};
-    if (!pluginProto.acts)
-        pluginProto.acts = {};
-    if (!pluginProto.exps)
-        pluginProto.exps = {};
-    var cnds = pluginProto.cnds;
-    var acts = pluginProto.acts;
-    var exps = pluginProto.exps;
-    if (position_aces)
-    {
-        cnds.CompareX = function (cmp, x)
-        {
-            return cr.do_cmp(this.x, cmp, x);
-        };
-        cnds.CompareY = function (cmp, y)
-        {
-            return cr.do_cmp(this.y, cmp, y);
-        };
-        cnds.IsOnScreen = function ()
-        {
-			var layer = this.layer;
-            this.update_bbox();
-            var bbox = this.bbox;
-            return !(bbox.right < layer.viewLeft || bbox.bottom < layer.viewTop || bbox.left > layer.viewRight || bbox.top > layer.viewBottom);
-        };
-        cnds.IsOutsideLayout = function ()
-        {
-            this.update_bbox();
-            var bbox = this.bbox;
-            var layout = this.runtime.running_layout;
-            return (bbox.right < 0 || bbox.bottom < 0 || bbox.left > layout.width || bbox.top > layout.height);
-        };
-		cnds.PickDistance = function (which, x, y)
-		{
-			var sol = this.getCurrentSol();
-			var instances = sol.getObjects();
-			if (!instances.length)
-				return false;
-			var inst = instances[0];
-			var pickme = inst;
-			var dist = cr.distanceTo(inst.x, inst.y, x, y);
-			var i, len, d;
-			for (i = 1, len = instances.length; i < len; i++)
-			{
-				inst = instances[i];
-				d = cr.distanceTo(inst.x, inst.y, x, y);
-				if ((which === 0 && d < dist) || (which === 1 && d > dist))
-				{
-					dist = d;
-					pickme = inst;
-				}
-			}
-			sol.pick_one(pickme);
-			return true;
-		};
-        acts.SetX = function (x)
-        {
-            if (this.x !== x)
-            {
-                this.x = x;
-                this.set_bbox_changed();
-            }
-        };
-        acts.SetY = function (y)
-        {
-            if (this.y !== y)
-            {
-                this.y = y;
-                this.set_bbox_changed();
-            }
-        };
-        acts.SetPos = function (x, y)
-        {
-            if (this.x !== x || this.y !== y)
-            {
-                this.x = x;
-                this.y = y;
-                this.set_bbox_changed();
-            }
-        };
-        acts.SetPosToObject = function (obj, imgpt)
-        {
-            var inst = obj.getPairedInstance(this);
-            if (!inst)
-				return;
-			var newx, newy;
-			if (inst.getImagePoint)
-			{
-				newx = inst.getImagePoint(imgpt, true);
-				newy = inst.getImagePoint(imgpt, false);
-			}
-			else
-			{
-				newx = inst.x;
-				newy = inst.y;
-			}
-			if (this.x !== newx || this.y !== newy)
-            {
-				this.x = newx;
-				this.y = newy;
-				this.set_bbox_changed();
-            }
-        };
-        acts.MoveForward = function (dist)
-        {
-            if (dist !== 0)
-            {
-                this.x += Math.cos(this.angle) * dist;
-                this.y += Math.sin(this.angle) * dist;
-                this.set_bbox_changed();
-            }
-        };
-        acts.MoveAtAngle = function (a, dist)
-        {
-            if (dist !== 0)
-            {
-                this.x += Math.cos(cr.to_radians(a)) * dist;
-                this.y += Math.sin(cr.to_radians(a)) * dist;
-                this.set_bbox_changed();
-            }
-        };
-        exps.X = function (ret)
-        {
-            ret.set_float(this.x);
-        };
-        exps.Y = function (ret)
-        {
-            ret.set_float(this.y);
-        };
-        exps.dt = function (ret)
-        {
-            ret.set_float(this.runtime.getDt(this));
-        };
-    }
-    if (size_aces)
-    {
-        cnds.CompareWidth = function (cmp, w)
-        {
-            return cr.do_cmp(this.width, cmp, w);
-        };
-        cnds.CompareHeight = function (cmp, h)
-        {
-            return cr.do_cmp(this.height, cmp, h);
-        };
-        acts.SetWidth = function (w)
-        {
-            if (this.width !== w)
-            {
-                this.width = w;
-                this.set_bbox_changed();
-            }
-        };
-        acts.SetHeight = function (h)
-        {
-            if (this.height !== h)
-            {
-                this.height = h;
-                this.set_bbox_changed();
-            }
-        };
-        acts.SetSize = function (w, h)
-        {
-            if (this.width !== w || this.height !== h)
-            {
-                this.width = w;
-                this.height = h;
-                this.set_bbox_changed();
-            }
-        };
-        exps.Width = function (ret)
-        {
-            ret.set_float(this.width);
-        };
-        exps.Height = function (ret)
-        {
-            ret.set_float(this.height);
-        };
-		exps.BBoxLeft = function (ret)
-        {
-			this.update_bbox();
-            ret.set_float(this.bbox.left);
-        };
-		exps.BBoxTop = function (ret)
-        {
-			this.update_bbox();
-            ret.set_float(this.bbox.top);
-        };
-		exps.BBoxRight = function (ret)
-        {
-			this.update_bbox();
-            ret.set_float(this.bbox.right);
-        };
-		exps.BBoxBottom = function (ret)
-        {
-			this.update_bbox();
-            ret.set_float(this.bbox.bottom);
-        };
-    }
-    if (angle_aces)
-    {
-        cnds.AngleWithin = function (within, a)
-        {
-            return cr.angleDiff(this.angle, cr.to_radians(a)) <= cr.to_radians(within);
-        };
-        cnds.IsClockwiseFrom = function (a)
-        {
-            return cr.angleClockwise(this.angle, cr.to_radians(a));
-        };
-		cnds.IsBetweenAngles = function (a, b)
-		{
-			var lower = cr.to_clamped_radians(a);
-			var upper = cr.to_clamped_radians(b);
-			var angle = cr.clamp_angle(this.angle);
-			var obtuse = (!cr.angleClockwise(upper, lower));
-			if (obtuse)
-				return !(!cr.angleClockwise(angle, lower) && cr.angleClockwise(angle, upper));
-			else
-				return cr.angleClockwise(angle, lower) && !cr.angleClockwise(angle, upper);
-		};
-        acts.SetAngle = function (a)
-        {
-            var newangle = cr.to_radians(cr.clamp_angle_degrees(a));
-            if (isNaN(newangle))
-                return;
-            if (this.angle !== newangle)
-            {
-                this.angle = newangle;
-                this.set_bbox_changed();
-            }
-        };
-        acts.RotateClockwise = function (a)
-        {
-            if (a !== 0 && !isNaN(a))
-            {
-                this.angle += cr.to_radians(a);
-                this.angle = cr.clamp_angle(this.angle);
-                this.set_bbox_changed();
-            }
-        };
-        acts.RotateCounterclockwise = function (a)
-        {
-            if (a !== 0 && !isNaN(a))
-            {
-                this.angle -= cr.to_radians(a);
-                this.angle = cr.clamp_angle(this.angle);
-                this.set_bbox_changed();
-            }
-        };
-        acts.RotateTowardAngle = function (amt, target)
-        {
-            var newangle = cr.angleRotate(this.angle, cr.to_radians(target), cr.to_radians(amt));
-            if (isNaN(newangle))
-                return;
-            if (this.angle !== newangle)
-            {
-                this.angle = newangle;
-                this.set_bbox_changed();
-            }
-        };
-        acts.RotateTowardPosition = function (amt, x, y)
-        {
-            var dx = x - this.x;
-            var dy = y - this.y;
-            var target = Math.atan2(dy, dx);
-            var newangle = cr.angleRotate(this.angle, target, cr.to_radians(amt));
-            if (isNaN(newangle))
-                return;
-            if (this.angle !== newangle)
-            {
-                this.angle = newangle;
-                this.set_bbox_changed();
-            }
-        };
-        acts.SetTowardPosition = function (x, y)
-        {
-            var dx = x - this.x;
-            var dy = y - this.y;
-            var newangle = Math.atan2(dy, dx);
-            if (isNaN(newangle))
-                return;
-            if (this.angle !== newangle)
-            {
-                this.angle = newangle;
-                this.set_bbox_changed();
-            }
-        };
-        exps.Angle = function (ret)
-        {
-            ret.set_float(cr.to_clamped_degrees(this.angle));
-        };
-    }
-    if (!singleglobal_)
-    {
-        cnds.CompareInstanceVar = function (iv, cmp, val)
-        {
-            return cr.do_cmp(this.instance_vars[iv], cmp, val);
-        };
-        cnds.IsBoolInstanceVarSet = function (iv)
-        {
-            return this.instance_vars[iv];
-        };
-		cnds.PickInstVarHiLow = function (which, iv)
-		{
-			var sol = this.getCurrentSol();
-			var instances = sol.getObjects();
-			if (!instances.length)
-				return false;
-			var inst = instances[0];
-			var pickme = inst;
-			var val = inst.instance_vars[iv];
-			var i, len, v;
-			for (i = 1, len = instances.length; i < len; i++)
-			{
-				inst = instances[i];
-				v = inst.instance_vars[iv];
-				if ((which === 0 && v < val) || (which === 1 && v > val))
-				{
-					val = v;
-					pickme = inst;
-				}
-			}
-			sol.pick_one(pickme);
-			return true;
-		};
-		cnds.PickByUID = function (u)
-		{
-			var i, len, j, inst, families, instances, sol;
-			var cnd = this.runtime.getCurrentCondition();
-			if (cnd.inverted)
-			{
-				sol = this.getCurrentSol();
-				if (sol.select_all)
-				{
-					sol.select_all = false;
-					sol.instances.length = 0;
-					sol.else_instances.length = 0;
-					instances = this.instances;
-					for (i = 0, len = instances.length; i < len; i++)
-					{
-						inst = instances[i];
-						if (inst.uid === u)
-							sol.else_instances.push(inst);
-						else
-							sol.instances.push(inst);
-					}
-					this.applySolToContainer();
-					return !!sol.instances.length;
-				}
-				else
-				{
-					for (i = 0, j = 0, len = sol.instances.length; i < len; i++)
-					{
-						inst = sol.instances[i];
-						sol.instances[j] = inst;
-						if (inst.uid === u)
-						{
-							sol.else_instances.push(inst);
-						}
-						else
-							j++;
-					}
-					sol.instances.length = j;
-					this.applySolToContainer();
-					return !!sol.instances.length;
-				}
-			}
-			else
-			{
-				inst = this.runtime.getObjectByUID(u);
-				if (!inst)
-					return false;
-				sol = this.getCurrentSol();
-				if (!sol.select_all && sol.instances.indexOf(inst) === -1)
-					return false;		// not picked
-				if (this.is_family)
-				{
-					families = inst.type.families;
-					for (i = 0, len = families.length; i < len; i++)
-					{
-						if (families[i] === this)
-						{
-							sol.pick_one(inst);
-							this.applySolToContainer();
-							return true;
-						}
-					}
-				}
-				else if (inst.type === this)
-				{
-					sol.pick_one(inst);
-					this.applySolToContainer();
-					return true;
-				}
-				return false;
-			}
-		};
-		cnds.OnCreated = function ()
-		{
-			return true;
-		};
-		cnds.OnDestroyed = function ()
-		{
-			return true;
-		};
-        acts.SetInstanceVar = function (iv, val)
-        {
-			var myinstvars = this.instance_vars;
-            if (cr.is_number(myinstvars[iv]))
-            {
-                if (cr.is_number(val))
-                    myinstvars[iv] = val;
-                else
-                    myinstvars[iv] = parseFloat(val);
-            }
-            else if (cr.is_string(myinstvars[iv]))
-            {
-                if (cr.is_string(val))
-                    myinstvars[iv] = val;
-                else
-                    myinstvars[iv] = val.toString();
-            }
-            else
-;
-        };
-        acts.AddInstanceVar = function (iv, val)
-        {
-			var myinstvars = this.instance_vars;
-            if (cr.is_number(myinstvars[iv]))
-            {
-                if (cr.is_number(val))
-                    myinstvars[iv] += val;
-                else
-                    myinstvars[iv] += parseFloat(val);
-            }
-            else if (cr.is_string(myinstvars[iv]))
-            {
-                if (cr.is_string(val))
-                    myinstvars[iv] += val;
-                else
-                    myinstvars[iv] += val.toString();
-            }
-            else
-;
-        };
-        acts.SubInstanceVar = function (iv, val)
-        {
-			var myinstvars = this.instance_vars;
-            if (cr.is_number(myinstvars[iv]))
-            {
-                if (cr.is_number(val))
-                    myinstvars[iv] -= val;
-                else
-                    myinstvars[iv] -= parseFloat(val);
-            }
-            else
-;
-        };
-        acts.SetBoolInstanceVar = function (iv, val)
-        {
-            this.instance_vars[iv] = val ? 1 : 0;
-        };
-        acts.ToggleBoolInstanceVar = function (iv)
-        {
-            this.instance_vars[iv] = 1 - this.instance_vars[iv];
-        };
-        acts.Destroy = function ()
-        {
-            this.runtime.DestroyInstance(this);
-        };
-		if (!acts.LoadFromJsonString)
-		{
-			acts.LoadFromJsonString = function (str_)
-			{
-				var o, i, len, binst;
-				try {
-					o = JSON.parse(str_);
-				}
-				catch (e) {
-					return;
-				}
-				this.runtime.loadInstanceFromJSON(this, o, true);
-				if (this.afterLoad)
-					this.afterLoad();
-				if (this.behavior_insts)
-				{
-					for (i = 0, len = this.behavior_insts.length; i < len; ++i)
-					{
-						binst = this.behavior_insts[i];
-						if (binst.afterLoad)
-							binst.afterLoad();
-					}
-				}
-			};
-		}
-        exps.Count = function (ret)
-        {
-			var count = ret.object_class.instances.length;
-			var i, len, inst;
-			for (i = 0, len = this.runtime.createRow.length; i < len; i++)
-			{
-				inst = this.runtime.createRow[i];
-				if (ret.object_class.is_family)
-				{
-					if (inst.type.families.indexOf(ret.object_class) >= 0)
-						count++;
-				}
-				else
-				{
-					if (inst.type === ret.object_class)
-						count++;
-				}
-			}
-            ret.set_int(count);
-        };
-		exps.PickedCount = function (ret)
-        {
-            ret.set_int(ret.object_class.getCurrentSol().getObjects().length);
-        };
-		exps.UID = function (ret)
-		{
-			ret.set_int(this.uid);
-		};
-		exps.IID = function (ret)
-		{
-			ret.set_int(this.get_iid());
-		};
-		if (!exps.AsJSON)
-		{
-			exps.AsJSON = function (ret)
-			{
-				ret.set_string(JSON.stringify(this.runtime.saveInstanceToJSON(this, true)));
-			};
-		}
-    }
-    if (appearance_aces)
-    {
-        cnds.IsVisible = function ()
-        {
-            return this.visible;
-        };
-        acts.SetVisible = function (v)
-        {
-			if (!v !== !this.visible)
-			{
-				this.visible = v;
-				this.runtime.redraw = true;
-			}
-        };
-        cnds.CompareOpacity = function (cmp, x)
-        {
-            return cr.do_cmp(cr.round6dp(this.opacity * 100), cmp, x);
-        };
-        acts.SetOpacity = function (x)
-        {
-            var new_opacity = x / 100.0;
-            if (new_opacity < 0)
-                new_opacity = 0;
-            else if (new_opacity > 1)
-                new_opacity = 1;
-            if (new_opacity !== this.opacity)
-            {
-                this.opacity = new_opacity;
-                this.runtime.redraw = true;
-            }
-        };
-        exps.Opacity = function (ret)
-        {
-            ret.set_float(cr.round6dp(this.opacity * 100.0));
-        };
-    }
-	if (zorder_aces)
+(function () {
+	cr.add_common_aces = function (m)
 	{
-		cnds.IsOnLayer = function (layer_)
+		var pluginProto = m[0].prototype;
+		var singleglobal_ = m[1];
+		var position_aces = m[3];
+		var size_aces = m[4];
+		var angle_aces = m[5];
+		var appearance_aces = m[6];
+		var zorder_aces = m[7];
+		var effects_aces = m[8];
+		if (!pluginProto.cnds)
+			pluginProto.cnds = {};
+		if (!pluginProto.acts)
+			pluginProto.acts = {};
+		if (!pluginProto.exps)
+			pluginProto.exps = {};
+		var cnds = pluginProto.cnds;
+		var acts = pluginProto.acts;
+		var exps = pluginProto.exps;
+		if (position_aces)
 		{
-			if (!layer_)
-				return false;
-			return this.layer === layer_;
-		};
-		cnds.PickTopBottom = function (which_)
-		{
-			var sol = this.getCurrentSol();
-			var instances = sol.getObjects();
-			if (!instances.length)
-				return false;
-			var inst = instances[0];
-			var pickme = inst;
-			var i, len;
-			for (i = 1, len = instances.length; i < len; i++)
+			cnds.CompareX = function (cmp, x)
 			{
-				inst = instances[i];
-				if (which_ === 0)
+				return cr.do_cmp(this.x, cmp, x);
+			};
+			cnds.CompareY = function (cmp, y)
+			{
+				return cr.do_cmp(this.y, cmp, y);
+			};
+			cnds.IsOnScreen = function ()
+			{
+				var layer = this.layer;
+				this.update_bbox();
+				var bbox = this.bbox;
+				return !(bbox.right < layer.viewLeft || bbox.bottom < layer.viewTop || bbox.left > layer.viewRight || bbox.top > layer.viewBottom);
+			};
+			cnds.IsOutsideLayout = function ()
+			{
+				this.update_bbox();
+				var bbox = this.bbox;
+				var layout = this.runtime.running_layout;
+				return (bbox.right < 0 || bbox.bottom < 0 || bbox.left > layout.width || bbox.top > layout.height);
+			};
+			cnds.PickDistance = function (which, x, y)
+			{
+				var sol = this.getCurrentSol();
+				var instances = sol.getObjects();
+				if (!instances.length)
+					return false;
+				var inst = instances[0];
+				var pickme = inst;
+				var dist = cr.distanceTo(inst.x, inst.y, x, y);
+				var i, len, d;
+				for (i = 1, len = instances.length; i < len; i++)
 				{
-					if (inst.layer.index > pickme.layer.index || (inst.layer.index === pickme.layer.index && inst.get_zindex() > pickme.get_zindex()))
+					inst = instances[i];
+					d = cr.distanceTo(inst.x, inst.y, x, y);
+					if ((which === 0 && d < dist) || (which === 1 && d > dist))
 					{
+						dist = d;
 						pickme = inst;
+					}
+				}
+				sol.pick_one(pickme);
+				return true;
+			};
+			acts.SetX = function (x)
+			{
+				if (this.x !== x)
+				{
+					this.x = x;
+					this.set_bbox_changed();
+				}
+			};
+			acts.SetY = function (y)
+			{
+				if (this.y !== y)
+				{
+					this.y = y;
+					this.set_bbox_changed();
+				}
+			};
+			acts.SetPos = function (x, y)
+			{
+				if (this.x !== x || this.y !== y)
+				{
+					this.x = x;
+					this.y = y;
+					this.set_bbox_changed();
+				}
+			};
+			acts.SetPosToObject = function (obj, imgpt)
+			{
+				var inst = obj.getPairedInstance(this);
+				if (!inst)
+					return;
+				var newx, newy;
+				if (inst.getImagePoint)
+				{
+					newx = inst.getImagePoint(imgpt, true);
+					newy = inst.getImagePoint(imgpt, false);
+				}
+				else
+				{
+					newx = inst.x;
+					newy = inst.y;
+				}
+				if (this.x !== newx || this.y !== newy)
+				{
+					this.x = newx;
+					this.y = newy;
+					this.set_bbox_changed();
+				}
+			};
+			acts.MoveForward = function (dist)
+			{
+				if (dist !== 0)
+				{
+					this.x += Math.cos(this.angle) * dist;
+					this.y += Math.sin(this.angle) * dist;
+					this.set_bbox_changed();
+				}
+			};
+			acts.MoveAtAngle = function (a, dist)
+			{
+				if (dist !== 0)
+				{
+					this.x += Math.cos(cr.to_radians(a)) * dist;
+					this.y += Math.sin(cr.to_radians(a)) * dist;
+					this.set_bbox_changed();
+				}
+			};
+			exps.X = function (ret)
+			{
+				ret.set_float(this.x);
+			};
+			exps.Y = function (ret)
+			{
+				ret.set_float(this.y);
+			};
+			exps.dt = function (ret)
+			{
+				ret.set_float(this.runtime.getDt(this));
+			};
+		}
+		if (size_aces)
+		{
+			cnds.CompareWidth = function (cmp, w)
+			{
+				return cr.do_cmp(this.width, cmp, w);
+			};
+			cnds.CompareHeight = function (cmp, h)
+			{
+				return cr.do_cmp(this.height, cmp, h);
+			};
+			acts.SetWidth = function (w)
+			{
+				if (this.width !== w)
+				{
+					this.width = w;
+					this.set_bbox_changed();
+				}
+			};
+			acts.SetHeight = function (h)
+			{
+				if (this.height !== h)
+				{
+					this.height = h;
+					this.set_bbox_changed();
+				}
+			};
+			acts.SetSize = function (w, h)
+			{
+				if (this.width !== w || this.height !== h)
+				{
+					this.width = w;
+					this.height = h;
+					this.set_bbox_changed();
+				}
+			};
+			exps.Width = function (ret)
+			{
+				ret.set_float(this.width);
+			};
+			exps.Height = function (ret)
+			{
+				ret.set_float(this.height);
+			};
+			exps.BBoxLeft = function (ret)
+			{
+				this.update_bbox();
+				ret.set_float(this.bbox.left);
+			};
+			exps.BBoxTop = function (ret)
+			{
+				this.update_bbox();
+				ret.set_float(this.bbox.top);
+			};
+			exps.BBoxRight = function (ret)
+			{
+				this.update_bbox();
+				ret.set_float(this.bbox.right);
+			};
+			exps.BBoxBottom = function (ret)
+			{
+				this.update_bbox();
+				ret.set_float(this.bbox.bottom);
+			};
+		}
+		if (angle_aces)
+		{
+			cnds.AngleWithin = function (within, a)
+			{
+				return cr.angleDiff(this.angle, cr.to_radians(a)) <= cr.to_radians(within);
+			};
+			cnds.IsClockwiseFrom = function (a)
+			{
+				return cr.angleClockwise(this.angle, cr.to_radians(a));
+			};
+			cnds.IsBetweenAngles = function (a, b)
+			{
+				var lower = cr.to_clamped_radians(a);
+				var upper = cr.to_clamped_radians(b);
+				var angle = cr.clamp_angle(this.angle);
+				var obtuse = (!cr.angleClockwise(upper, lower));
+				if (obtuse)
+					return !(!cr.angleClockwise(angle, lower) && cr.angleClockwise(angle, upper));
+				else
+					return cr.angleClockwise(angle, lower) && !cr.angleClockwise(angle, upper);
+			};
+			acts.SetAngle = function (a)
+			{
+				var newangle = cr.to_radians(cr.clamp_angle_degrees(a));
+				if (isNaN(newangle))
+					return;
+				if (this.angle !== newangle)
+				{
+					this.angle = newangle;
+					this.set_bbox_changed();
+				}
+			};
+			acts.RotateClockwise = function (a)
+			{
+				if (a !== 0 && !isNaN(a))
+				{
+					this.angle += cr.to_radians(a);
+					this.angle = cr.clamp_angle(this.angle);
+					this.set_bbox_changed();
+				}
+			};
+			acts.RotateCounterclockwise = function (a)
+			{
+				if (a !== 0 && !isNaN(a))
+				{
+					this.angle -= cr.to_radians(a);
+					this.angle = cr.clamp_angle(this.angle);
+					this.set_bbox_changed();
+				}
+			};
+			acts.RotateTowardAngle = function (amt, target)
+			{
+				var newangle = cr.angleRotate(this.angle, cr.to_radians(target), cr.to_radians(amt));
+				if (isNaN(newangle))
+					return;
+				if (this.angle !== newangle)
+				{
+					this.angle = newangle;
+					this.set_bbox_changed();
+				}
+			};
+			acts.RotateTowardPosition = function (amt, x, y)
+			{
+				var dx = x - this.x;
+				var dy = y - this.y;
+				var target = Math.atan2(dy, dx);
+				var newangle = cr.angleRotate(this.angle, target, cr.to_radians(amt));
+				if (isNaN(newangle))
+					return;
+				if (this.angle !== newangle)
+				{
+					this.angle = newangle;
+					this.set_bbox_changed();
+				}
+			};
+			acts.SetTowardPosition = function (x, y)
+			{
+				var dx = x - this.x;
+				var dy = y - this.y;
+				var newangle = Math.atan2(dy, dx);
+				if (isNaN(newangle))
+					return;
+				if (this.angle !== newangle)
+				{
+					this.angle = newangle;
+					this.set_bbox_changed();
+				}
+			};
+			exps.Angle = function (ret)
+			{
+				ret.set_float(cr.to_clamped_degrees(this.angle));
+			};
+		}
+		if (!singleglobal_)
+		{
+			cnds.CompareInstanceVar = function (iv, cmp, val)
+			{
+				return cr.do_cmp(this.instance_vars[iv], cmp, val);
+			};
+			cnds.IsBoolInstanceVarSet = function (iv)
+			{
+				return this.instance_vars[iv];
+			};
+			cnds.PickInstVarHiLow = function (which, iv)
+			{
+				var sol = this.getCurrentSol();
+				var instances = sol.getObjects();
+				if (!instances.length)
+					return false;
+				var inst = instances[0];
+				var pickme = inst;
+				var val = inst.instance_vars[iv];
+				var i, len, v;
+				for (i = 1, len = instances.length; i < len; i++)
+				{
+					inst = instances[i];
+					v = inst.instance_vars[iv];
+					if ((which === 0 && v < val) || (which === 1 && v > val))
+					{
+						val = v;
+						pickme = inst;
+					}
+				}
+				sol.pick_one(pickme);
+				return true;
+			};
+			cnds.PickByUID = function (u)
+			{
+				var i, len, j, inst, families, instances, sol;
+				var cnd = this.runtime.getCurrentCondition();
+				if (cnd.inverted)
+				{
+					sol = this.getCurrentSol();
+					if (sol.select_all)
+					{
+						sol.select_all = false;
+						sol.instances.length = 0;
+						sol.else_instances.length = 0;
+						instances = this.instances;
+						for (i = 0, len = instances.length; i < len; i++)
+						{
+							inst = instances[i];
+							if (inst.uid === u)
+								sol.else_instances.push(inst);
+							else
+								sol.instances.push(inst);
+						}
+						this.applySolToContainer();
+						return !!sol.instances.length;
+					}
+					else
+					{
+						for (i = 0, j = 0, len = sol.instances.length; i < len; i++)
+						{
+							inst = sol.instances[i];
+							sol.instances[j] = inst;
+							if (inst.uid === u)
+							{
+								sol.else_instances.push(inst);
+							}
+							else
+								j++;
+						}
+						sol.instances.length = j;
+						this.applySolToContainer();
+						return !!sol.instances.length;
 					}
 				}
 				else
 				{
-					if (inst.layer.index < pickme.layer.index || (inst.layer.index === pickme.layer.index && inst.get_zindex() < pickme.get_zindex()))
+					inst = this.runtime.getObjectByUID(u);
+					if (!inst)
+						return false;
+					sol = this.getCurrentSol();
+					if (!sol.select_all && sol.instances.indexOf(inst) === -1)
+						return false;		// not picked
+					if (this.is_family)
 					{
-						pickme = inst;
+						families = inst.type.families;
+						for (i = 0, len = families.length; i < len; i++)
+						{
+							if (families[i] === this)
+							{
+								sol.pick_one(inst);
+								this.applySolToContainer();
+								return true;
+							}
+						}
+					}
+					else if (inst.type === this)
+					{
+						sol.pick_one(inst);
+						this.applySolToContainer();
+						return true;
+					}
+					return false;
+				}
+			};
+			cnds.OnCreated = function ()
+			{
+				return true;
+			};
+			cnds.OnDestroyed = function ()
+			{
+				return true;
+			};
+			acts.SetInstanceVar = function (iv, val)
+			{
+				var myinstvars = this.instance_vars;
+				if (cr.is_number(myinstvars[iv]))
+				{
+					if (cr.is_number(val))
+						myinstvars[iv] = val;
+					else
+						myinstvars[iv] = parseFloat(val);
+				}
+				else if (cr.is_string(myinstvars[iv]))
+				{
+					if (cr.is_string(val))
+						myinstvars[iv] = val;
+					else
+						myinstvars[iv] = val.toString();
+				}
+				else
+;
+			};
+			acts.AddInstanceVar = function (iv, val)
+			{
+				var myinstvars = this.instance_vars;
+				if (cr.is_number(myinstvars[iv]))
+				{
+					if (cr.is_number(val))
+						myinstvars[iv] += val;
+					else
+						myinstvars[iv] += parseFloat(val);
+				}
+				else if (cr.is_string(myinstvars[iv]))
+				{
+					if (cr.is_string(val))
+						myinstvars[iv] += val;
+					else
+						myinstvars[iv] += val.toString();
+				}
+				else
+;
+			};
+			acts.SubInstanceVar = function (iv, val)
+			{
+				var myinstvars = this.instance_vars;
+				if (cr.is_number(myinstvars[iv]))
+				{
+					if (cr.is_number(val))
+						myinstvars[iv] -= val;
+					else
+						myinstvars[iv] -= parseFloat(val);
+				}
+				else
+;
+			};
+			acts.SetBoolInstanceVar = function (iv, val)
+			{
+				this.instance_vars[iv] = val ? 1 : 0;
+			};
+			acts.ToggleBoolInstanceVar = function (iv)
+			{
+				this.instance_vars[iv] = 1 - this.instance_vars[iv];
+			};
+			acts.Destroy = function ()
+			{
+				this.runtime.DestroyInstance(this);
+			};
+			if (!acts.LoadFromJsonString)
+			{
+				acts.LoadFromJsonString = function (str_)
+				{
+					var o, i, len, binst;
+					try {
+						o = JSON.parse(str_);
+					}
+					catch (e) {
+						return;
+					}
+					this.runtime.loadInstanceFromJSON(this, o, true);
+					if (this.afterLoad)
+						this.afterLoad();
+					if (this.behavior_insts)
+					{
+						for (i = 0, len = this.behavior_insts.length; i < len; ++i)
+						{
+							binst = this.behavior_insts[i];
+							if (binst.afterLoad)
+								binst.afterLoad();
+						}
+					}
+				};
+			}
+			exps.Count = function (ret)
+			{
+				var count = ret.object_class.instances.length;
+				var i, len, inst;
+				for (i = 0, len = this.runtime.createRow.length; i < len; i++)
+				{
+					inst = this.runtime.createRow[i];
+					if (ret.object_class.is_family)
+					{
+						if (inst.type.families.indexOf(ret.object_class) >= 0)
+							count++;
+					}
+					else
+					{
+						if (inst.type === ret.object_class)
+							count++;
 					}
 				}
-			}
-			sol.pick_one(pickme);
-			return true;
-		};
-		acts.MoveToTop = function ()
-		{
-			var zindex = this.get_zindex();
-			if (zindex === this.layer.instances.length - 1)
-				return;
-			cr.arrayRemove(this.layer.instances, zindex);
-			this.layer.instances.push(this);
-			this.runtime.redraw = true;
-			this.layer.zindices_stale = true;
-		};
-		acts.MoveToBottom = function ()
-		{
-			var zindex = this.get_zindex();
-			if (zindex === 0)
-				return;
-			cr.arrayRemove(this.layer.instances, zindex);
-			this.layer.instances.unshift(this);
-			this.runtime.redraw = true;
-			this.layer.zindices_stale = true;
-		};
-		acts.MoveToLayer = function (layerMove)
-		{
-			if (!layerMove || layerMove == this.layer)
-				return;
-			cr.arrayRemove(this.layer.instances, this.get_zindex());
-			this.layer.zindices_stale = true;
-			this.layer = layerMove;
-			this.zindex = layerMove.instances.length;
-			layerMove.instances.push(this);
-			this.runtime.redraw = true;
-		};
-		acts.ZMoveToObject = function (where_, obj_)
-		{
-			var isafter = (where_ === 0);
-			if (!obj_)
-				return;
-			var other = obj_.getFirstPicked(this);
-			if (!other || other.uid === this.uid)
-				return;
-			if (this.layer.index !== other.layer.index)
+				ret.set_int(count);
+			};
+			exps.PickedCount = function (ret)
 			{
+				ret.set_int(ret.object_class.getCurrentSol().getObjects().length);
+			};
+			exps.UID = function (ret)
+			{
+				ret.set_int(this.uid);
+			};
+			exps.IID = function (ret)
+			{
+				ret.set_int(this.get_iid());
+			};
+			if (!exps.AsJSON)
+			{
+				exps.AsJSON = function (ret)
+				{
+					ret.set_string(JSON.stringify(this.runtime.saveInstanceToJSON(this, true)));
+				};
+			}
+		}
+		if (appearance_aces)
+		{
+			cnds.IsVisible = function ()
+			{
+				return this.visible;
+			};
+			acts.SetVisible = function (v)
+			{
+				if (!v !== !this.visible)
+				{
+					this.visible = v;
+					this.runtime.redraw = true;
+				}
+			};
+			cnds.CompareOpacity = function (cmp, x)
+			{
+				return cr.do_cmp(cr.round6dp(this.opacity * 100), cmp, x);
+			};
+			acts.SetOpacity = function (x)
+			{
+				var new_opacity = x / 100.0;
+				if (new_opacity < 0)
+					new_opacity = 0;
+				else if (new_opacity > 1)
+					new_opacity = 1;
+				if (new_opacity !== this.opacity)
+				{
+					this.opacity = new_opacity;
+					this.runtime.redraw = true;
+				}
+			};
+			exps.Opacity = function (ret)
+			{
+				ret.set_float(cr.round6dp(this.opacity * 100.0));
+			};
+		}
+		if (zorder_aces)
+		{
+			cnds.IsOnLayer = function (layer_)
+			{
+				if (!layer_)
+					return false;
+				return this.layer === layer_;
+			};
+			cnds.PickTopBottom = function (which_)
+			{
+				var sol = this.getCurrentSol();
+				var instances = sol.getObjects();
+				if (!instances.length)
+					return false;
+				var inst = instances[0];
+				var pickme = inst;
+				var i, len;
+				for (i = 1, len = instances.length; i < len; i++)
+				{
+					inst = instances[i];
+					if (which_ === 0)
+					{
+						if (inst.layer.index > pickme.layer.index || (inst.layer.index === pickme.layer.index && inst.get_zindex() > pickme.get_zindex()))
+						{
+							pickme = inst;
+						}
+					}
+					else
+					{
+						if (inst.layer.index < pickme.layer.index || (inst.layer.index === pickme.layer.index && inst.get_zindex() < pickme.get_zindex()))
+						{
+							pickme = inst;
+						}
+					}
+				}
+				sol.pick_one(pickme);
+				return true;
+			};
+			acts.MoveToTop = function ()
+			{
+				var zindex = this.get_zindex();
+				if (zindex === this.layer.instances.length - 1)
+					return;
+				cr.arrayRemove(this.layer.instances, zindex);
+				this.layer.instances.push(this);
+				this.runtime.redraw = true;
+				this.layer.zindices_stale = true;
+			};
+			acts.MoveToBottom = function ()
+			{
+				var zindex = this.get_zindex();
+				if (zindex === 0)
+					return;
+				cr.arrayRemove(this.layer.instances, zindex);
+				this.layer.instances.unshift(this);
+				this.runtime.redraw = true;
+				this.layer.zindices_stale = true;
+			};
+			acts.MoveToLayer = function (layerMove)
+			{
+				if (!layerMove || layerMove == this.layer)
+					return;
 				cr.arrayRemove(this.layer.instances, this.get_zindex());
 				this.layer.zindices_stale = true;
-				this.layer = other.layer;
-				this.zindex = other.layer.instances.length;
-				other.layer.instances.push(this);
-			}
-			var myZ = this.get_zindex();
-			var insertZ = other.get_zindex();
-			cr.arrayRemove(this.layer.instances, myZ);
-			if (myZ < insertZ)
-				insertZ--;
-			if (isafter)
-				insertZ++;
-			if (insertZ === this.layer.instances.length)
-				this.layer.instances.push(this);
-			else
-				this.layer.instances.splice(insertZ, 0, this);
-			this.layer.zindices_stale = true;
-			this.runtime.redraw = true;
-		};
-		exps.LayerNumber = function (ret)
-		{
-			ret.set_int(this.layer.number);
-		};
-		exps.LayerName = function (ret)
-		{
-			ret.set_string(this.layer.name);
-		};
-		exps.ZIndex = function (ret)
-		{
-			ret.set_int(this.get_zindex());
-		};
-	}
-	if (effects_aces)
-	{
-		acts.SetEffectEnabled = function (enable_, effectname_)
-		{
-			if (!this.runtime.glwrap)
-				return;
-			var i = this.type.getEffectIndexByName(effectname_);
-			if (i < 0)
-				return;		// effect name not found
-			var enable = (enable_ === 1);
-			if (this.active_effect_flags[i] === enable)
-				return;		// no change
-			this.active_effect_flags[i] = enable;
-			this.updateActiveEffects();
-			this.runtime.redraw = true;
-		};
-		acts.SetEffectParam = function (effectname_, index_, value_)
-		{
-			if (!this.runtime.glwrap)
-				return;
-			var i = this.type.getEffectIndexByName(effectname_);
-			if (i < 0)
-				return;		// effect name not found
-			var et = this.type.effect_types[i];
-			var params = this.effect_params[i];
-			index_ = Math.floor(index_);
-			if (index_ < 0 || index_ >= params.length)
-				return;		// effect index out of bounds
-			if (this.runtime.glwrap.getProgramParameterType(et.shaderindex, index_) === 1)
-				value_ /= 100.0;
-			if (params[index_] === value_)
-				return;		// no change
-			params[index_] = value_;
-			if (et.active)
+				this.layer = layerMove;
+				this.zindex = layerMove.instances.length;
+				layerMove.instances.push(this);
 				this.runtime.redraw = true;
-		};
-	}
-};
-cr.set_bbox_changed = function ()
-{
-    this.bbox_changed = true;       // will recreate next time box requested
-    this.runtime.redraw = true;     // assume runtime needs to redraw
-	var i, len;
-	for (i = 0, len = this.bbox_changed_callbacks.length; i < len; i++)
-	{
-		this.bbox_changed_callbacks[i](this);
-	}
-};
-cr.add_bbox_changed_callback = function (f)
-{
-	if (f)
-		this.bbox_changed_callbacks.push(f);
-};
-cr.update_bbox = function ()
-{
-    if (!this.bbox_changed)
-        return;                 // bounding box not changed
-    this.bbox.set(this.x, this.y, this.x + this.width, this.y + this.height);
-    this.bbox.offset(-this.hotspotX * this.width, -this.hotspotY * this.height);
-    if (!this.angle)
-    {
-        this.bquad.set_from_rect(this.bbox);    // make bounding quad from box
-    }
-    else
-    {
-        this.bbox.offset(-this.x, -this.y);       					// translate to origin
-        this.bquad.set_from_rotated_rect(this.bbox, this.angle);	// rotate around origin
-        this.bquad.offset(this.x, this.y);      					// translate back to original position
-        this.bquad.bounding_box(this.bbox);
-    }
-	var temp = 0;
-	if (this.bbox.left > this.bbox.right)
-	{
-		temp = this.bbox.left;
-		this.bbox.left = this.bbox.right;
-		this.bbox.right = temp;
-	}
-	if (this.bbox.top > this.bbox.bottom)
-	{
-		temp = this.bbox.top;
-		this.bbox.top = this.bbox.bottom;
-		this.bbox.bottom = temp;
-	}
-    this.bbox_changed = false;  // bounding box up to date
-};
-cr.inst_contains_pt = function (x, y)
-{
-	if (!this.bbox.contains_pt(x, y))
-		return false;
-	if (!this.bquad.contains_pt(x, y))
-		return false;
-	if (this.collision_poly && !this.collision_poly.is_empty())
-	{
-		this.collision_poly.cache_poly(this.width, this.height, this.angle);
-		return this.collision_poly.contains_pt(x - this.x, y - this.y);
-	}
-	else
-		return true;
-};
-cr.inst_get_iid = function ()
-{
-	this.type.updateIIDs();
-	return this.iid;
-};
-cr.inst_get_zindex = function ()
-{
-	this.layer.updateZIndices();
-	return this.zindex;
-};
-cr.inst_updateActiveEffects = function ()
-{
-	this.active_effect_types.length = 0;
-	var i, len, et, inst;
-	for (i = 0, len = this.active_effect_flags.length; i < len; i++)
-	{
-		if (this.active_effect_flags[i])
-			this.active_effect_types.push(this.type.effect_types[i]);
-	}
-	this.uses_shaders = !!this.active_effect_types.length;
-};
-cr.inst_toString = function ()
-{
-	return "Inst" + this.puid;
-};
-cr.type_getFirstPicked = function (frominst)
-{
-	if (frominst && frominst.is_contained && frominst.type != this)
-	{
-		var i, len, s;
-		for (i = 0, len = frominst.siblings.length; i < len; i++)
-		{
-			s = frominst.siblings[i];
-			if (s.type == this)
-				return s;
-		}
-	}
-    var instances = this.getCurrentSol().getObjects();
-    if (instances.length)
-        return instances[0];
-    else
-        return null;
-};
-cr.type_getPairedInstance = function (inst)
-{
-	var instances = this.getCurrentSol().getObjects();
-	if (instances.length)
-		return instances[inst.get_iid() % instances.length];
-	else
-		return null;
-};
-cr.type_updateIIDs = function ()
-{
-	if (!this.stale_iids || this.is_family)
-		return;		// up to date or is family - don't want family to overwrite IIDs
-	var i, len;
-	for (i = 0, len = this.instances.length; i < len; i++)
-		this.instances[i].iid = i;
-	var next_iid = i;
-	var createRow = this.runtime.createRow;
-	for (i = 0, len = createRow.length; i < len; ++i)
-	{
-		if (createRow[i].type === this)
-			createRow[i].iid = next_iid++;
-	}
-	this.stale_iids = false;
-};
-cr.type_getInstanceByIID = function (i)
-{
-	if (i < this.instances.length)
-		return this.instances[i];
-	i -= this.instances.length;
-	var createRow = this.runtime.createRow;
-	var j, lenj;
-	for (j = 0, lenj = createRow.length; j < lenj; ++j)
-	{
-		if (createRow[j].type === this)
-		{
-			if (i === 0)
-				return createRow[j];
-			--i;
-		}
-	}
-;
-	return null;
-};
-cr.type_getCurrentSol = function ()
-{
-    return this.solstack[this.cur_sol];
-};
-cr.type_pushCleanSol = function ()
-{
-    this.cur_sol++;
-    if (this.cur_sol === this.solstack.length)
-        this.solstack.push(new cr.selection(this));
-    else
-        this.solstack[this.cur_sol].select_all = true;  // else clear next SOL
-};
-cr.type_pushCopySol = function ()
-{
-    this.cur_sol++;
-    if (this.cur_sol === this.solstack.length)
-        this.solstack.push(new cr.selection(this));
-    var clonesol = this.solstack[this.cur_sol];
-    var prevsol = this.solstack[this.cur_sol - 1];
-    if (prevsol.select_all)
-        clonesol.select_all = true;
-    else
-    {
-        clonesol.select_all = false;
-		cr.shallowAssignArray(clonesol.instances, prevsol.instances);
-		cr.shallowAssignArray(clonesol.else_instances, prevsol.else_instances);
-    }
-};
-cr.type_popSol = function ()
-{
-;
-    this.cur_sol--;
-};
-cr.type_getBehaviorByName = function (behname)
-{
-    var i, len, j, lenj, f, index = 0;
-	if (!this.is_family)
-	{
-		for (i = 0, len = this.families.length; i < len; i++)
-		{
-			f = this.families[i];
-			for (j = 0, lenj = f.behaviors.length; j < lenj; j++)
+			};
+			acts.ZMoveToObject = function (where_, obj_)
 			{
-				if (behname === f.behaviors[j].name)
+				var isafter = (where_ === 0);
+				if (!obj_)
+					return;
+				var other = obj_.getFirstPicked(this);
+				if (!other || other.uid === this.uid)
+					return;
+				if (this.layer.index !== other.layer.index)
 				{
-					this.extra.lastBehIndex = index;
-					return f.behaviors[j];
+					cr.arrayRemove(this.layer.instances, this.get_zindex());
+					this.layer.zindices_stale = true;
+					this.layer = other.layer;
+					this.zindex = other.layer.instances.length;
+					other.layer.instances.push(this);
 				}
-				index++;
-			}
-		}
-	}
-    for (i = 0, len = this.behaviors.length; i < len; i++) {
-        if (behname === this.behaviors[i].name)
-		{
-			this.extra.lastBehIndex = index;
-            return this.behaviors[i];
-		}
-		index++;
-    }
-	return null;
-};
-cr.type_getBehaviorIndexByName = function (behname)
-{
-    var b = this.getBehaviorByName(behname);
-	if (b)
-		return this.extra.lastBehIndex;
-	else
-		return -1;
-};
-cr.type_getEffectIndexByName = function (name_)
-{
-	var i, len;
-	for (i = 0, len = this.effect_types.length; i < len; i++)
-	{
-		if (this.effect_types[i].name === name_)
-			return i;
-	}
-	return -1;
-};
-cr.type_applySolToContainer = function ()
-{
-	if (!this.is_contained || this.is_family)
-		return;
-	var i, len, j, lenj, t, sol, sol2;
-	this.updateIIDs();
-	sol = this.getCurrentSol();
-	var select_all = sol.select_all;
-	var es = this.runtime.getCurrentEventStack();
-	var orblock = es && es.current_event && es.current_event.orblock;
-	for (i = 0, len = this.container.length; i < len; i++)
-	{
-		t = this.container[i];
-		if (t === this)
-			continue;
-		t.updateIIDs();
-		sol2 = t.getCurrentSol();
-		sol2.select_all = select_all;
-		if (!select_all)
-		{
-			sol2.instances.length = sol.instances.length;
-			for (j = 0, lenj = sol.instances.length; j < lenj; j++)
-				sol2.instances[j] = t.getInstanceByIID(sol.instances[j].iid);
-			if (orblock)
+				var myZ = this.get_zindex();
+				var insertZ = other.get_zindex();
+				cr.arrayRemove(this.layer.instances, myZ);
+				if (myZ < insertZ)
+					insertZ--;
+				if (isafter)
+					insertZ++;
+				if (insertZ === this.layer.instances.length)
+					this.layer.instances.push(this);
+				else
+					this.layer.instances.splice(insertZ, 0, this);
+				this.layer.zindices_stale = true;
+				this.runtime.redraw = true;
+			};
+			exps.LayerNumber = function (ret)
 			{
-				sol2.else_instances.length = sol.else_instances.length;
-				for (j = 0, lenj = sol.else_instances.length; j < lenj; j++)
-					sol2.else_instances[j] = t.getInstanceByIID(sol.else_instances[j].iid);
+				ret.set_int(this.layer.number);
+			};
+			exps.LayerName = function (ret)
+			{
+				ret.set_string(this.layer.name);
+			};
+			exps.ZIndex = function (ret)
+			{
+				ret.set_int(this.get_zindex());
+			};
+		}
+		if (effects_aces)
+		{
+			acts.SetEffectEnabled = function (enable_, effectname_)
+			{
+				if (!this.runtime.glwrap)
+					return;
+				var i = this.type.getEffectIndexByName(effectname_);
+				if (i < 0)
+					return;		// effect name not found
+				var enable = (enable_ === 1);
+				if (this.active_effect_flags[i] === enable)
+					return;		// no change
+				this.active_effect_flags[i] = enable;
+				this.updateActiveEffects();
+				this.runtime.redraw = true;
+			};
+			acts.SetEffectParam = function (effectname_, index_, value_)
+			{
+				if (!this.runtime.glwrap)
+					return;
+				var i = this.type.getEffectIndexByName(effectname_);
+				if (i < 0)
+					return;		// effect name not found
+				var et = this.type.effect_types[i];
+				var params = this.effect_params[i];
+				index_ = Math.floor(index_);
+				if (index_ < 0 || index_ >= params.length)
+					return;		// effect index out of bounds
+				if (this.runtime.glwrap.getProgramParameterType(et.shaderindex, index_) === 1)
+					value_ /= 100.0;
+				if (params[index_] === value_)
+					return;		// no change
+				params[index_] = value_;
+				if (et.active)
+					this.runtime.redraw = true;
+			};
+		}
+	};
+	cr.set_bbox_changed = function ()
+	{
+		this.bbox_changed = true;      		// will recreate next time box requested
+		this.type.any_bbox_changed = true;	// avoid unnecessary updateAllBBox() calls
+		this.runtime.redraw = true;     	// assume runtime needs to redraw
+		var i, len, callbacks = this.bbox_changed_callbacks;
+		for (i = 0, len = callbacks.length; i < len; ++i)
+		{
+			callbacks[i](this);
+		}
+	};
+	cr.add_bbox_changed_callback = function (f)
+	{
+		if (f)
+		{
+			this.bbox_changed_callbacks.push(f);
+		}
+	};
+	var tmprc = new cr.rect(0, 0, 0, 0);
+	cr.update_bbox = function ()
+	{
+		if (!this.bbox_changed)
+			return;                 // bounding box not changed
+		var bbox = this.bbox;
+		var bquad = this.bquad;
+		bbox.set(this.x, this.y, this.x + this.width, this.y + this.height);
+		bbox.offset(-this.hotspotX * this.width, -this.hotspotY * this.height);
+		if (!this.angle)
+		{
+			bquad.set_from_rect(bbox);    // make bounding quad from box
+		}
+		else
+		{
+			bbox.offset(-this.x, -this.y);       			// translate to origin
+			bquad.set_from_rotated_rect(bbox, this.angle);	// rotate around origin
+			bquad.offset(this.x, this.y);      				// translate back to original position
+			bquad.bounding_box(bbox);
+		}
+		bbox.normalize();
+		this.bbox_changed = false;  // bounding box up to date
+		if (this.collisionsEnabled)
+		{
+			var mygrid = this.type.collision_grid;
+			var collcells = this.collcells;
+			tmprc.set(mygrid.XToCell(bbox.left), mygrid.YToCell(bbox.top), mygrid.XToCell(bbox.right), mygrid.YToCell(bbox.bottom));
+			if (!collcells.equals(tmprc))
+			{
+				if (collcells.right < collcells.left)
+					mygrid.update(this, null, tmprc);		// first insertion with invalid rect: don't provide old range
+				else
+					mygrid.update(this, collcells, tmprc);
+				collcells.copy(tmprc);
 			}
 		}
-	}
-};
-cr.type_toString = function ()
-{
-	return "Type" + this.sid;
-};
-cr.do_cmp = function (x, cmp, y)
-{
-	if (typeof x === "undefined" || typeof y === "undefined")
-		return false;
-    switch (cmp)
-    {
-        case 0:     // equal
-            return x === y;
-        case 1:     // not equal
-            return x !== y;
-        case 2:     // less
-            return x < y;
-        case 3:     // less/equal
-            return x <= y;
-        case 4:     // greater
-            return x > y;
-        case 5:     // greater/equal
-            return x >= y;
-        default:
+	};
+	cr.inst_contains_pt = function (x, y)
+	{
+		if (!this.bbox.contains_pt(x, y))
+			return false;
+		if (!this.bquad.contains_pt(x, y))
+			return false;
+		if (this.collision_poly && !this.collision_poly.is_empty())
+		{
+			this.collision_poly.cache_poly(this.width, this.height, this.angle);
+			return this.collision_poly.contains_pt(x - this.x, y - this.y);
+		}
+		else
+			return true;
+	};
+	cr.inst_get_iid = function ()
+	{
+		this.type.updateIIDs();
+		return this.iid;
+	};
+	cr.inst_get_zindex = function ()
+	{
+		this.layer.updateZIndices();
+		return this.zindex;
+	};
+	cr.inst_updateActiveEffects = function ()
+	{
+		this.active_effect_types.length = 0;
+		var i, len, et, inst;
+		for (i = 0, len = this.active_effect_flags.length; i < len; i++)
+		{
+			if (this.active_effect_flags[i])
+				this.active_effect_types.push(this.type.effect_types[i]);
+		}
+		this.uses_shaders = !!this.active_effect_types.length;
+	};
+	cr.inst_toString = function ()
+	{
+		return "Inst" + this.puid;
+	};
+	cr.type_getFirstPicked = function (frominst)
+	{
+		if (frominst && frominst.is_contained && frominst.type != this)
+		{
+			var i, len, s;
+			for (i = 0, len = frominst.siblings.length; i < len; i++)
+			{
+				s = frominst.siblings[i];
+				if (s.type == this)
+					return s;
+			}
+		}
+		var instances = this.getCurrentSol().getObjects();
+		if (instances.length)
+			return instances[0];
+		else
+			return null;
+	};
+	cr.type_getPairedInstance = function (inst)
+	{
+		var instances = this.getCurrentSol().getObjects();
+		if (instances.length)
+			return instances[inst.get_iid() % instances.length];
+		else
+			return null;
+	};
+	cr.type_updateIIDs = function ()
+	{
+		if (!this.stale_iids || this.is_family)
+			return;		// up to date or is family - don't want family to overwrite IIDs
+		var i, len;
+		for (i = 0, len = this.instances.length; i < len; i++)
+			this.instances[i].iid = i;
+		var next_iid = i;
+		var createRow = this.runtime.createRow;
+		for (i = 0, len = createRow.length; i < len; ++i)
+		{
+			if (createRow[i].type === this)
+				createRow[i].iid = next_iid++;
+		}
+		this.stale_iids = false;
+	};
+	cr.type_getInstanceByIID = function (i)
+	{
+		if (i < this.instances.length)
+			return this.instances[i];
+		i -= this.instances.length;
+		var createRow = this.runtime.createRow;
+		var j, lenj;
+		for (j = 0, lenj = createRow.length; j < lenj; ++j)
+		{
+			if (createRow[j].type === this)
+			{
+				if (i === 0)
+					return createRow[j];
+				--i;
+			}
+		}
 ;
-            return false;
-    }
-};
+		return null;
+	};
+	cr.type_getCurrentSol = function ()
+	{
+		return this.solstack[this.cur_sol];
+	};
+	cr.type_pushCleanSol = function ()
+	{
+		this.cur_sol++;
+		if (this.cur_sol === this.solstack.length)
+			this.solstack.push(new cr.selection(this));
+		else
+			this.solstack[this.cur_sol].select_all = true;  // else clear next SOL
+	};
+	cr.type_pushCopySol = function ()
+	{
+		this.cur_sol++;
+		if (this.cur_sol === this.solstack.length)
+			this.solstack.push(new cr.selection(this));
+		var clonesol = this.solstack[this.cur_sol];
+		var prevsol = this.solstack[this.cur_sol - 1];
+		if (prevsol.select_all)
+			clonesol.select_all = true;
+		else
+		{
+			clonesol.select_all = false;
+			cr.shallowAssignArray(clonesol.instances, prevsol.instances);
+			cr.shallowAssignArray(clonesol.else_instances, prevsol.else_instances);
+		}
+	};
+	cr.type_popSol = function ()
+	{
+;
+		this.cur_sol--;
+	};
+	cr.type_getBehaviorByName = function (behname)
+	{
+		var i, len, j, lenj, f, index = 0;
+		if (!this.is_family)
+		{
+			for (i = 0, len = this.families.length; i < len; i++)
+			{
+				f = this.families[i];
+				for (j = 0, lenj = f.behaviors.length; j < lenj; j++)
+				{
+					if (behname === f.behaviors[j].name)
+					{
+						this.extra.lastBehIndex = index;
+						return f.behaviors[j];
+					}
+					index++;
+				}
+			}
+		}
+		for (i = 0, len = this.behaviors.length; i < len; i++) {
+			if (behname === this.behaviors[i].name)
+			{
+				this.extra.lastBehIndex = index;
+				return this.behaviors[i];
+			}
+			index++;
+		}
+		return null;
+	};
+	cr.type_getBehaviorIndexByName = function (behname)
+	{
+		var b = this.getBehaviorByName(behname);
+		if (b)
+			return this.extra.lastBehIndex;
+		else
+			return -1;
+	};
+	cr.type_getEffectIndexByName = function (name_)
+	{
+		var i, len;
+		for (i = 0, len = this.effect_types.length; i < len; i++)
+		{
+			if (this.effect_types[i].name === name_)
+				return i;
+		}
+		return -1;
+	};
+	cr.type_applySolToContainer = function ()
+	{
+		if (!this.is_contained || this.is_family)
+			return;
+		var i, len, j, lenj, t, sol, sol2;
+		this.updateIIDs();
+		sol = this.getCurrentSol();
+		var select_all = sol.select_all;
+		var es = this.runtime.getCurrentEventStack();
+		var orblock = es && es.current_event && es.current_event.orblock;
+		for (i = 0, len = this.container.length; i < len; i++)
+		{
+			t = this.container[i];
+			if (t === this)
+				continue;
+			t.updateIIDs();
+			sol2 = t.getCurrentSol();
+			sol2.select_all = select_all;
+			if (!select_all)
+			{
+				sol2.instances.length = sol.instances.length;
+				for (j = 0, lenj = sol.instances.length; j < lenj; j++)
+					sol2.instances[j] = t.getInstanceByIID(sol.instances[j].iid);
+				if (orblock)
+				{
+					sol2.else_instances.length = sol.else_instances.length;
+					for (j = 0, lenj = sol.else_instances.length; j < lenj; j++)
+						sol2.else_instances[j] = t.getInstanceByIID(sol.else_instances[j].iid);
+				}
+			}
+		}
+	};
+	cr.type_toString = function ()
+	{
+		return "Type" + this.sid;
+	};
+	cr.do_cmp = function (x, cmp, y)
+	{
+		if (typeof x === "undefined" || typeof y === "undefined")
+			return false;
+		switch (cmp)
+		{
+			case 0:     // equal
+				return x === y;
+			case 1:     // not equal
+				return x !== y;
+			case 2:     // less
+				return x < y;
+			case 3:     // less/equal
+				return x <= y;
+			case 4:     // greater
+				return x > y;
+			case 5:     // greater/equal
+				return x >= y;
+			default:
+;
+				return false;
+		}
+	};
+})();
 cr.shaders = {};
 ;
 ;
@@ -12502,6 +13016,7 @@ cr.plugins_.Audio = function(runtime)
 		this.panWhenReady = [];		// for web audio API positioned sounds
 		this.seekWhenReady = 0;
 		this.pauseWhenReady = false;
+		this.supportWebAudioAPI = false;
 		if (api === API_WEBAUDIO && is_music)
 		{
 			this.myapi = API_HTML5;
@@ -12515,6 +13030,7 @@ cr.plugins_.Audio = function(runtime)
 			this.bufferObject = new Audio();
 			if (api === API_WEBAUDIO && context["createMediaElementSource"] && !audRuntime.isFirefox)
 			{
+				this.supportWebAudioAPI = true;		// can be routed through web audio api
 				this.bufferObject.addEventListener("canplay", function ()
 				{
 					if (!self.mediaSourceNode)		// protect against this event firing twice
@@ -12672,6 +13188,8 @@ cr.plugins_.Audio = function(runtime)
 		this.panConeOuterGain = 0;
 		this.instanceObject = null;
 		var add_end_listener = false;
+		if (this.myapi === API_WEBAUDIO && this.buffer.myapi === API_HTML5 && !this.buffer.supportWebAudioAPI)
+			this.myapi = API_HTML5;
 		switch (this.myapi) {
 		case API_HTML5:
 			if (this.is_music)
@@ -12765,6 +13283,8 @@ cr.plugins_.Audio = function(runtime)
 			return;
 		if (!this.pannerEnabled && enable_)
 		{
+			if (!this.gainNode)
+				return;
 			if (!this.pannerNode)
 			{
 				this.pannerNode = context["createPanner"]();
@@ -12787,6 +13307,8 @@ cr.plugins_.Audio = function(runtime)
 		}
 		else if (this.pannerEnabled && !enable_)
 		{
+			if (!this.gainNode)
+				return;
 			this.pannerNode["disconnect"]();
 			this.gainNode["disconnect"]();
 			this.gainNode["connect"](getDestinationForTag(this.tag));
@@ -12862,7 +13384,7 @@ cr.plugins_.Audio = function(runtime)
 ;
 				}
 			}
-			if (this.is_music && isMusicWorkaround)
+			if (this.is_music && isMusicWorkaround && !audRuntime.isInUserInputEvent)
 				musicPlayNextTouch.push(this);
 			else
 				this.instanceObject.play();
@@ -12902,7 +13424,7 @@ cr.plugins_.Audio = function(runtime)
 ;
 					}
 				}
-				if (this.is_music && isMusicWorkaround)
+				if (this.is_music && isMusicWorkaround && !audRuntime.isInUserInputEvent)
 					musicPlayNextTouch.push(this);
 				else
 					instobj.play();
@@ -12916,9 +13438,9 @@ cr.plugins_.Audio = function(runtime)
 			break;
 		case API_APPMOBI:
 			if (audRuntime.isDirectCanvas)
-				AppMobi["context"]["playSound"](this.src);
+				AppMobi["context"]["playSound"](this.src, looping);
 			else
-				AppMobi["player"]["playSound"](this.src);
+				AppMobi["player"]["playSound"](this.src, looping);
 			break;
 		}
 		this.playbackRate = 1;
@@ -12947,6 +13469,8 @@ cr.plugins_.Audio = function(runtime)
 			this.instanceObject["stop"]();
 			break;
 		case API_APPMOBI:
+			if (audRuntime.isDirectCanvas)
+				AppMobi["context"]["stopSound"](this.src);
 			break;
 		}
 		this.stopped = true;
@@ -12979,6 +13503,8 @@ cr.plugins_.Audio = function(runtime)
 			this.instanceObject["pause"]();
 			break;
 		case API_APPMOBI:
+			if (audRuntime.isDirectCanvas)
+				AppMobi["context"]["stopSound"](this.src);
 			break;
 		}
 		this.is_paused = true;
@@ -13011,6 +13537,8 @@ cr.plugins_.Audio = function(runtime)
 			this.instanceObject["play"]();
 			break;
 		case API_APPMOBI:
+			if (audRuntime.isDirectCanvas)
+				AppMobi["context"]["resumeSound"](this.src);
 			break;
 		}
 		this.is_paused = false;
@@ -13049,6 +13577,8 @@ cr.plugins_.Audio = function(runtime)
 		case API_PHONEGAP:
 			break;
 		case API_APPMOBI:
+			if (audRuntime.isDirectCanvas)
+				AppMobi["context"]["seekSound"](this.src, pos);
 			break;
 		}
 	};
@@ -13080,7 +13610,10 @@ cr.plugins_.Audio = function(runtime)
 		case API_PHONEGAP:
 			return this.instanceObject["getDuration"]();
 		case API_APPMOBI:
-			return 0;
+			if (audRuntime.isDirectCanvas)
+				return AppMobi["context"]["getDurationSound"](this.src);
+			else
+				return 0;
 		}
 		return 0;
 	};
@@ -13107,6 +13640,8 @@ cr.plugins_.Audio = function(runtime)
 		case API_PHONEGAP:
 			break;
 		case API_APPMOBI:
+			if (audRuntime.isDirectCanvas)
+				ret = AppMobi["context"]["getPlaybackTimeSound"](this.src);
 			break;
 		}
 		if (!this.looping && ret > duration)
@@ -13185,6 +13720,8 @@ cr.plugins_.Audio = function(runtime)
 		case API_PHONEGAP:
 			break;
 		case API_APPMOBI:
+			if (audRuntime.isDirectCanvas)
+				AppMobi["context"]["setLoopingSound"](this.src, l);
 			break;
 		}
 	};
@@ -13310,7 +13847,7 @@ cr.plugins_.Audio = function(runtime)
 		audInst = this;
 		this.listenerTracker = null;
 		this.listenerZ = -600;
-		if ((this.runtime.isiOS || (this.runtime.isAndroid && (this.runtime.isChrome || this.runtime.isAndroidStockBrowser))) && !this.runtime.isCrosswalk)
+		if ((this.runtime.isiOS || (this.runtime.isAndroid && (this.runtime.isChrome || this.runtime.isAndroidStockBrowser))) && !this.runtime.isCrosswalk && !this.runtime.isDomFree)
 		{
 			isMusicWorkaround = true;
 		}
@@ -13330,6 +13867,15 @@ cr.plugins_.Audio = function(runtime)
 			document.addEventListener("touchstart", function ()
 			{
 				var i, len, m;
+				if (!iOShadtouch && context)
+				{
+					var buffer = context["createBuffer"](1, 1, 22050);
+					var source = context["createBufferSource"]();
+					source["buffer"] = buffer;
+					source["connect"](context["destination"]);
+					startSource(source);
+					iOShadtouch = true;
+				}
 				if (isMusicWorkaround)
 				{
 					if (!silent)
@@ -13343,14 +13889,6 @@ cr.plugins_.Audio = function(runtime)
 					}
 					musicPlayNextTouch.length = 0;
 				}
-				if (iOShadtouch || !context)
-					return;
-				var buffer = context["createBuffer"](1, 1, 22050);
-				var source = context["createBufferSource"]();
-				source["buffer"] = buffer;
-				source["connect"](context["destination"]);
-				startSource(source);
-				iOShadtouch = true;
 			}, true);
 		}
 		if (api !== API_WEBAUDIO)
@@ -13422,7 +13960,7 @@ cr.plugins_.Audio = function(runtime)
 		{
 			context["listener"]["speedOfSound"] = this.properties[8];
 			context["listener"]["dopplerFactor"] = this.properties[9];
-			context["listener"]["setPosition"](this.runtime.width / 2, this.runtime.height / 2, this.listenerZ);
+			context["listener"]["setPosition"](this.runtime.draw_width / 2, this.runtime.draw_height / 2, this.listenerZ);
 			context["listener"]["setOrientation"](0, 0, 1, 0, -1, 0);
 			window["c2OnAudioMicStream"] = function (localMediaStream, tag)
 			{
@@ -14615,6 +15153,10 @@ cr.plugins_.Browser = function(runtime)
 			CocoonJS["App"]["forceToFinish"]();
 		else if (window["tizen"])
 			window["tizen"]["application"]["getCurrentApplication"]()["exit"]();
+		else if (navigator["app"] && navigator["app"]["exitApp"])
+			navigator["app"]["exitApp"]();
+		else if (navigator["device"] && navigator["device"]["exitApp"])
+			navigator["device"]["exitApp"]();
 		else if (!this.is_arcade && !this.runtime.isDomFree)
 			window.close();
 	};
@@ -14640,7 +15182,9 @@ cr.plugins_.Browser = function(runtime)
 	};
 	Acts.prototype.GoBack = function ()
 	{
-		if (!this.is_arcade && !this.runtime.isDomFree && window.back)
+		if (navigator["app"] && navigator["app"]["backHistory"])
+			navigator["app"]["backHistory"]();
+		else if (!this.is_arcade && !this.runtime.isDomFree && window.back)
 			window.back();
 	};
 	Acts.prototype.GoForward = function ()
@@ -15250,9 +15794,11 @@ cr.plugins_.Keyboard = function(runtime)
 		}
 		this.keyMap[info.which] = true;
 		this.triggerKey = info.which;
+		this.runtime.isInUserInputEvent = true;
 		this.runtime.trigger(cr.plugins_.Keyboard.prototype.cnds.OnAnyKey, this);
 		var eventRan = this.runtime.trigger(cr.plugins_.Keyboard.prototype.cnds.OnKey, this);
 		var eventRan2 = this.runtime.trigger(cr.plugins_.Keyboard.prototype.cnds.OnKeyCode, this);
+		this.runtime.isInUserInputEvent = false;
 		if (eventRan || eventRan2)
 		{
 			this.usedKeys[info.which] = true;
@@ -15264,9 +15810,11 @@ cr.plugins_.Keyboard = function(runtime)
 	{
 		this.keyMap[info.which] = false;
 		this.triggerKey = info.which;
+		this.runtime.isInUserInputEvent = true;
 		this.runtime.trigger(cr.plugins_.Keyboard.prototype.cnds.OnAnyKeyReleased, this);
 		var eventRan = this.runtime.trigger(cr.plugins_.Keyboard.prototype.cnds.OnKeyReleased, this);
 		var eventRan2 = this.runtime.trigger(cr.plugins_.Keyboard.prototype.cnds.OnKeyCodeReleased, this);
+		this.runtime.isInUserInputEvent = false;
 		if (eventRan || eventRan2 || this.usedKeys[info.which])
 		{
 			this.usedKeys[info.which] = true;
@@ -15485,11 +16033,13 @@ cr.plugins_.Mouse = function(runtime)
 		if (this.runtime.had_a_click)
 			info.preventDefault();
 		this.buttonMap[info.which] = true;
+		this.runtime.isInUserInputEvent = true;
 		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnAnyClick, this);
 		this.triggerButton = info.which - 1;	// 1-based
 		this.triggerType = 0;					// single click
 		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnClick, this);
 		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnObjectClicked, this);
+		this.runtime.isInUserInputEvent = false;
 	};
 	instanceProto.onMouseUp = function(info)
 	{
@@ -15499,25 +16049,31 @@ cr.plugins_.Mouse = function(runtime)
 			info.preventDefault();
 		this.runtime.had_a_click = true;
 		this.buttonMap[info.which] = false;
+		this.runtime.isInUserInputEvent = true;
 		this.triggerButton = info.which - 1;	// 1-based
 		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnRelease, this);
+		this.runtime.isInUserInputEvent = false;
 	};
 	instanceProto.onDoubleClick = function(info)
 	{
 		if (!this.mouseInGame())
 			return;
 		info.preventDefault();
+		this.runtime.isInUserInputEvent = true;
 		this.triggerButton = info.which - 1;	// 1-based
 		this.triggerType = 1;					// double click
 		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnClick, this);
 		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnObjectClicked, this);
+		this.runtime.isInUserInputEvent = false;
 	};
 	instanceProto.onWheel = function (info)
 	{
 		var delta = info.wheelDelta ? info.wheelDelta : info.detail ? -info.detail : 0;
 		this.triggerDir = (delta < 0 ? 0 : 1);
 		this.handled = false;
+		this.runtime.isInUserInputEvent = true;
 		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnWheel, this);
+		this.runtime.isInUserInputEvent = false;
 		if (this.handled)
 			info.preventDefault();
 	};
@@ -16287,72 +16843,80 @@ cr.plugins_.Sprite = function(runtime)
 		if (arrCache.length)
 			return arrCache.pop();
 		else
-			return [0, 0];
+			return [0, 0, 0];
 	};
 	function freeArr(a)
 	{
 		a[0] = 0;
 		a[1] = 0;
+		a[2] = 0;
 		arrCache.push(a);
 	};
-	function collmemory_add(collmemory, a, b)
+	function makeCollKey(a, b)
 	{
+		if (a < b)
+			return "" + a + "," + b;
+		else
+			return "" + b + "," + a;
+	};
+	function collmemory_add(collmemory, a, b, tickcount)
+	{
+		var a_uid = a.uid;
+		var b_uid = b.uid;
+		var key = makeCollKey(a_uid, b_uid);
+		if (collmemory.hasOwnProperty(key))
+		{
+			collmemory[key][2] = tickcount;
+			return;
+		}
 		var arr = allocArr();
-		arr[0] = a.uid;
-		arr[1] = b.uid;
-		collmemory.push(arr);
+		arr[0] = a_uid;
+		arr[1] = b_uid;
+		arr[2] = tickcount;
+		collmemory[key] = arr;
 	};
 	function collmemory_remove(collmemory, a, b)
 	{
-;
-		var a_uid = a.uid;
-		var b_uid = b.uid;
-		var i, j = 0, len, entry;
-		for (i = 0, len = collmemory.length; i < len; i++)
+		var key = makeCollKey(a.uid, b.uid);
+		if (collmemory.hasOwnProperty(key))
 		{
-			entry = collmemory[i];
-			if (!((entry[0] === a_uid && entry[1] === b_uid) || (entry[0] === b_uid && entry[1] === a_uid)))
-			{
-				collmemory[j][0] = collmemory[i][0];
-				collmemory[j][1] = collmemory[i][1];
-				j++;
-			}
+			freeArr(collmemory[key]);
+			delete collmemory[key];
 		}
-		for (i = j; i < len; i++)
-			freeArr(collmemory[i]);
-		collmemory.length = j;
 	};
 	function collmemory_removeInstance(collmemory, inst)
 	{
-;
-		var i, j = 0, len, entry, uid = inst.uid;
-		for (i = 0, len = collmemory.length; i < len; i++)
+		var uid = inst.uid;
+		var p, entry;
+		for (p in collmemory)
 		{
-			entry = collmemory[i];
-			if (entry[0] !== uid && entry[1] !== uid)
+			if (collmemory.hasOwnProperty(p))
 			{
-				collmemory[j][0] = collmemory[i][0];
-				collmemory[j][1] = collmemory[i][1];
-				j++;
+				entry = collmemory[p];
+				if (entry[0] === uid || entry[1] === uid)
+				{
+					freeArr(collmemory[p]);
+					delete collmemory[p];
+				}
 			}
 		}
-		for (i = j; i < len; i++)
-			freeArr(collmemory[i]);
-		collmemory.length = j;
 	};
+	var last_coll_tickcount = -2;
 	function collmemory_has(collmemory, a, b)
 	{
-		var a_uid = a.uid;
-		var b_uid = b.uid;
-		var i, len, entry;
-		for (i = 0, len = collmemory.length; i < len; i++)
+		var key = makeCollKey(a.uid, b.uid);
+		if (collmemory.hasOwnProperty(key))
 		{
-			entry = collmemory[i];
-			if ((entry[0] === a_uid && entry[1] === b_uid) || (entry[0] === b_uid && entry[1] === a_uid))
-				return true;
+			last_coll_tickcount = collmemory[key][2];
+			return true;
 		}
-		return false;
+		else
+		{
+			last_coll_tickcount = -2;
+			return false;
+		}
 	};
+	var candidates = [];
 	Cnds.prototype.OnCollision = function (rtype)
 	{
 		if (!rtype)
@@ -16362,32 +16926,46 @@ cr.plugins_.Sprite = function(runtime)
 		var ltype = cnd.type;
 		if (!cnd.extra.collmemory)
 		{
-			cnd.extra.collmemory = [];
+			cnd.extra.collmemory = {};
 			runtime.addDestroyCallback((function (collmemory) {
 				return function(inst) {
 					collmemory_removeInstance(collmemory, inst);
 				};
 			})(cnd.extra.collmemory));
 		}
+		var collmemory = cnd.extra.collmemory;
 		var lsol = ltype.getCurrentSol();
 		var rsol = rtype.getCurrentSol();
 		var linstances = lsol.getObjects();
-		var rinstances = rsol.getObjects();
+		var rinstances;
 		var l, linst, r, rinst;
 		var curlsol, currsol;
+		var tickcount = this.runtime.tickcount;
+		var lasttickcount = tickcount - 1;
+		var exists, run;
 		var current_event = runtime.getCurrentEventStack().current_event;
 		var orblock = current_event.orblock;
 		for (l = 0; l < linstances.length; l++)
 		{
 			linst = linstances[l];
+			if (rsol.select_all)
+			{
+				linst.update_bbox();
+				this.runtime.getCollisionCandidates(linst.layer, rtype, linst.bbox, candidates);
+				rinstances = candidates;
+			}
+			else
+				rinstances = rsol.getObjects();
 			for (r = 0; r < rinstances.length; r++)
 			{
 				rinst = rinstances[r];
 				if (runtime.testOverlap(linst, rinst) || runtime.checkRegisteredCollision(linst, rinst))
 				{
-					if (!collmemory_has(cnd.extra.collmemory, linst, rinst))
+					exists = collmemory_has(collmemory, linst, rinst);
+					run = (!exists || (last_coll_tickcount < lasttickcount));
+					collmemory_add(collmemory, linst, rinst, tickcount);
+					if (run)
 					{
-						collmemory_add(cnd.extra.collmemory, linst, rinst);
 						runtime.pushCopySol(current_event.solModifiers);
 						curlsol = ltype.getCurrentSol();
 						currsol = rtype.getCurrentSol();
@@ -16415,9 +16993,10 @@ cr.plugins_.Sprite = function(runtime)
 				}
 				else
 				{
-					collmemory_remove(cnd.extra.collmemory, linst, rinst);
+					collmemory_remove(collmemory, linst, rinst);
 				}
 			}
+			candidates.length = 0;
 		}
 		return false;
 	};
@@ -16437,7 +17016,11 @@ cr.plugins_.Sprite = function(runtime)
 		var orblock = this.runtime.getCurrentEventStack().current_event.orblock;
 		var rinstances;
 		if (rsol.select_all)
-			rinstances = rsol.type.instances;
+		{
+			this.update_bbox();
+			this.runtime.getCollisionCandidates(this.layer, rtype, this.bbox, candidates);
+			rinstances = candidates;
+		}
 		else if (orblock)
 			rinstances = rsol.else_instances;
 		else
@@ -16470,6 +17053,7 @@ cr.plugins_.Sprite = function(runtime)
 			this.y = oldy;
 			this.set_bbox_changed();
 		}
+		candidates.length = 0;
 		return ret;
 	};
 	typeProto.finish = function (do_pick)
@@ -16541,6 +17125,11 @@ cr.plugins_.Sprite = function(runtime)
 	Cnds.prototype.CompareFrame = function (cmp, framenum)
 	{
 		return cr.do_cmp(this.cur_frame, cmp, framenum);
+	};
+	Cnds.prototype.CompareAnimSpeed = function (cmp, x)
+	{
+		var s = (this.animForwards ? this.cur_anim_speed : -this.cur_anim_speed);
+		return cr.do_cmp(s, cmp, x);
 	};
 	Cnds.prototype.OnAnimFinished = function (animname)
 	{
@@ -16768,7 +17357,17 @@ cr.plugins_.Sprite = function(runtime)
 	};
 	Acts.prototype.SetCollisions = function (set_)
 	{
+		if (this.collisionsEnabled === (set_ !== 0))
+			return;		// no change
 		this.collisionsEnabled = (set_ !== 0);
+		if (this.collisionsEnabled)
+			this.set_bbox_changed();		// needs to be added back to cells
+		else
+		{
+			if (this.collcells.right >= this.collcells.left)
+				this.type.collision_grid.update(this, this.collcells, null);
+			this.collcells.set(0, 0, -1, -1);
+		}
 	};
 	pluginProto.acts = new Acts();
 	function Exps() {};
@@ -16786,7 +17385,7 @@ cr.plugins_.Sprite = function(runtime)
 	};
 	Exps.prototype.AnimationSpeed = function (ret)
 	{
-		ret.set_float(this.cur_anim_speed);
+		ret.set_float(this.animForwards ? this.cur_anim_speed : -this.cur_anim_speed);
 	};
 	Exps.prototype.ImagePointX = function (ret, imgpt)
 	{
@@ -17775,10 +18374,8 @@ cr.plugins_.Text = function(runtime)
 		var floatscaledheight = layer_scale * this.height;
 		var scaledwidth = Math.ceil(floatscaledwidth);
 		var scaledheight = Math.ceil(floatscaledheight);
-		var windowWidth = this.runtime.width;
-		var windowHeight = this.runtime.height;
-		var halfw = windowWidth / 2;
-		var halfh = windowHeight / 2;
+		var halfw = this.runtime.draw_width / 2;
+		var halfh = this.runtime.draw_height / 2;
 		if (!this.myctx)
 		{
 			this.mycanvas = document.createElement("canvas");
@@ -17818,14 +18415,14 @@ cr.plugins_.Text = function(runtime)
 		var q = this.bquad;
 		var old_dpr = this.runtime.devicePixelRatio;
 		this.runtime.devicePixelRatio = 1;
-		var tlx = this.layer.layerToCanvas(q.tlx, q.tly, true);
-		var tly = this.layer.layerToCanvas(q.tlx, q.tly, false);
-		var trx = this.layer.layerToCanvas(q.trx, q.try_, true);
-		var try_ = this.layer.layerToCanvas(q.trx, q.try_, false);
-		var brx = this.layer.layerToCanvas(q.brx, q.bry, true);
-		var bry = this.layer.layerToCanvas(q.brx, q.bry, false);
-		var blx = this.layer.layerToCanvas(q.blx, q.bly, true);
-		var bly = this.layer.layerToCanvas(q.blx, q.bly, false);
+		var tlx = this.layer.layerToCanvas(q.tlx, q.tly, true, true);
+		var tly = this.layer.layerToCanvas(q.tlx, q.tly, false, true);
+		var trx = this.layer.layerToCanvas(q.trx, q.try_, true, true);
+		var try_ = this.layer.layerToCanvas(q.trx, q.try_, false, true);
+		var brx = this.layer.layerToCanvas(q.brx, q.bry, true, true);
+		var bry = this.layer.layerToCanvas(q.brx, q.bry, false, true);
+		var blx = this.layer.layerToCanvas(q.blx, q.bly, true, true);
+		var bly = this.layer.layerToCanvas(q.blx, q.bly, false, true);
 		this.runtime.devicePixelRatio = old_dpr;
 		if (this.runtime.pixel_rounding || (this.angle === 0 && layer_angle === 0))
 		{
@@ -18670,11 +19267,13 @@ cr.plugins_.Touch = function(runtime)
 							"id": info["pointerId"],
 							startindex: this.trigger_index
 						});
+		this.runtime.isInUserInputEvent = true;
 		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnNthTouchStart, this);
 		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchStart, this);
 		this.curTouchX = touchx;
 		this.curTouchY = touchy;
 		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchObject, this);
+		this.runtime.isInUserInputEvent = false;
 	};
 	instanceProto.onPointerEnd = function (info)
 	{
@@ -18685,8 +19284,10 @@ cr.plugins_.Touch = function(runtime)
 		var i = this.findTouch(info["pointerId"]);
 		this.trigger_index = (i >= 0 ? this.touches[i].startindex : -1);
 		this.trigger_id = (i >= 0 ? this.touches[i]["id"] : -1);
+		this.runtime.isInUserInputEvent = true;
 		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnNthTouchEnd, this);
 		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchEnd, this);
+		this.runtime.isInUserInputEvent = false;
 		if (i >= 0)
 		{
 			this.touches.splice(i, 1);
@@ -18723,6 +19324,7 @@ cr.plugins_.Touch = function(runtime)
 			info.preventDefault();
 		var offset = this.runtime.isDomFree ? dummyoffset : jQuery(this.runtime.canvas).offset();
 		var nowtime = cr.performance_now();
+		this.runtime.isInUserInputEvent = true;
 		var i, len, t, j;
 		for (i = 0, len = info.changedTouches.length; i < len; i++)
 		{
@@ -18749,11 +19351,13 @@ cr.plugins_.Touch = function(runtime)
 			this.curTouchY = touchy;
 			this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchObject, this);
 		}
+		this.runtime.isInUserInputEvent = false;
 	};
 	instanceProto.onTouchEnd = function (info)
 	{
 		if (info.preventDefault)
 			info.preventDefault();
+		this.runtime.isInUserInputEvent = true;
 		var i, len, t, j;
 		for (i = 0, len = info.changedTouches.length; i < len; i++)
 		{
@@ -18768,6 +19372,7 @@ cr.plugins_.Touch = function(runtime)
 				this.touches.splice(j, 1);
 			}
 		}
+		this.runtime.isInUserInputEvent = false;
 	};
 	instanceProto.getAlpha = function ()
 	{
@@ -19363,12 +19968,9 @@ function c2inherit(derived, base)
 if (navigator["isCocoonJS"] && typeof window["cr_cjs_accelerated_physics"] !== "undefined")
 {
 	cr.logexport("Using CocoonJS native physics");
-	/*jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, unused:true, curly:true, browser:true, devel:true, indent:4, maxerr:50 */
-	if ( !window.ext || typeof window.ext.IDTK_SRV_BOX2D === 'undefined' )
-	{
+	if ( !window.ext || typeof window.ext.IDTK_SRV_BOX2D === 'undefined' ){
 		console.log("The CocoonJS binding for Box2D has been ignored because ext.IDTK_SRV_BOX2D is not available");
-	}
-	else
+	}else
 	{
 	(function (){
 		var B2Vec2 = function (x_, y_) {
@@ -19443,6 +20045,10 @@ if (navigator["isCocoonJS"] && typeof window["cr_cjs_accelerated_physics"] !== "
 			this.x *= invLength;
 			this.y *= invLength;
 			return length;
+		};
+		B2Vec2.prototype.NegativeSelf = function () {
+			this.x = (-this.x);
+			this.y = (-this.y);
 		};
 		var B2Mat22 = function () {
 			this.col1 = B2Vec2.Get(0,0);
@@ -19870,6 +20476,7 @@ if (navigator["isCocoonJS"] && typeof window["cr_cjs_accelerated_physics"] !== "
 		B2Body.prototype.ApplyImpulse = function( impulse , point , wake ) {
 			window.ext.IDTK_SRV_BOX2D.makeCall( "applyImpulse" , this.m_world.m_worldID , this.m_bodyID , impulse.x , impulse.y , point.x , point.y , wake ) ;
 		};
+		B2Body.prototype.GetMass			= function( )			   { return window.ext.IDTK_SRV_BOX2D.makeCall( "getMass" , this.m_world.m_worldID , this.m_bodyID ) ; }
 		B2Body.prototype.IsAwake			= function( )			   { return window.ext.IDTK_SRV_BOX2D.makeCall( "isAwake"			, this.m_world.m_worldID , this.m_bodyID ) ; } ;
 		B2Body.prototype.GetAngularVelocity = function( )			   { return window.ext.IDTK_SRV_BOX2D.makeCall( "getAngularVelocity" , this.m_world.m_worldID , this.m_bodyID ) ; } ;
 		B2Body.prototype.SetFixedRotation   = function( fixed )				{ window.ext.IDTK_SRV_BOX2D.makeCall( "setFixedRotation"   , this.m_world.m_worldID , this.m_bodyID , fixed   ) ; } ;
@@ -31046,6 +31653,10 @@ cr.behaviors.Physics = function(runtime)
 		b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef,
 		b2Transform = Box2D.Common.Math.b2Transform,
 		b2Mat22 = Box2D.Common.Math.b2Mat22;
+	var TILE_FLIPPED_HORIZONTAL = -0x80000000		// note: pretend is a signed int, so negate
+	var TILE_FLIPPED_VERTICAL = 0x40000000
+	var TILE_FLIPPED_DIAGONAL = 0x20000000
+	var TILE_FLAGS_MASK = 0xE0000000
 	var worldScale = 0.02;
 	var behaviorProto = cr.behaviors.Physics.prototype;
 	behaviorProto.Type = function(behavior, objtype)
@@ -31257,13 +31868,19 @@ cr.behaviors.Physics = function(runtime)
 		var hadOldBody = false;
 		var oldVelocity = null;
 		var oldOmega = null;
-		var i, len, j, lenj, vec, arr, b;
+		var i, len, j, lenj, k, lenk, vec, arr, b, c, rc, pts_cache, pts_count, convexpolys, cp, offx, offy, oldAngle;
 		if (this.body)
 		{
 			hadOldBody = true;
 			oldVelocity = b2Vec2.Get(0, 0);
 			oldVelocity.SetV(this.body.GetLinearVelocity());
 			oldOmega = this.body.GetAngularVelocity();
+			arr = this.joiningMe.valuesRef();
+			for (i = 0, len = arr.length; i < len; i++)
+			{
+				b = arr[i].extra.box2dbody.c2userdata;
+				b.destroyMyJoints();
+			}
 			this.destroyBody();
 		}
 		var fixDef = new b2FixtureDef;
@@ -31287,7 +31904,7 @@ cr.behaviors.Physics = function(runtime)
 		this.body = this.world.CreateBody(bodyDef);
 		this.body.c2userdata = this;
 		var usecollisionmask = this.collisionmask;
-		if (!hasPoly && this.collisionmask === 0)
+		if (!hasPoly && !this.inst.tilemap_exists && this.collisionmask === 0)
 			usecollisionmask = 1;
 		var instw = Math.max(Math.abs(inst.width), 1);
 		var insth = Math.max(Math.abs(inst.height), 1);
@@ -31295,52 +31912,117 @@ cr.behaviors.Physics = function(runtime)
 		var isflipped = inst.height < 0;
 		if (usecollisionmask === 0)
 		{
-			var oldAngle = inst.angle;
-			inst.angle = 0;
-			inst.set_bbox_changed();
-			inst.update_bbox();
-			var offx = inst.bquad.midX() - inst.x;
-			var offy = inst.bquad.midY() - inst.y;
-			inst.angle = oldAngle;
-			inst.set_bbox_changed();
-			inst.collision_poly.cache_poly(ismirrored ? -instw : instw, isflipped ? -insth : insth, 0);
-			var pts_cache = inst.collision_poly.pts_cache;
-			var pts_count = inst.collision_poly.pts_count;
-			arr = [];
-			arr.length = pts_count;
-			for (i = 0; i < pts_count; i++)
+			if (inst.tilemap_exists)
 			{
-				arr[i] = b2Vec2.Get(pts_cache[i*2] - offx, pts_cache[i*2+1] - offy);
-			}
-			if (ismirrored !== isflipped)
-				arr.reverse();		// wrong clockwise order when flipped
-			var convexpolys = cr.b2Separator.Separate(arr, instw * insth);
-			for (i = 0; i < pts_count; i++)
-				b2Vec2.Free(arr[i]);
-			if (convexpolys.length)
-			{
-				for (i = 0, len = convexpolys.length; i < len; i++)
+				offx = inst.bquad.midX() - inst.x;
+				offy = inst.bquad.midY() - inst.y;
+				inst.maybeBuildQuadMap();		// updates collision rects
+				arr = [];
+				for (i = 0, len = inst.collision_rects.length; i < len; ++i)
 				{
-					arr = convexpolys[i];
-;
-					for (j = 0, lenj = arr.length; j < lenj; j++)
+					c = inst.collision_rects[i];
+					rc = c.rc;
+					if (c.poly)
 					{
-						vec = arr[j];
-						vec.x *= worldScale;
-						vec.y *= worldScale;
+						if (!c.poly.convexpolys)
+						{
+							pts_cache = c.poly.pts_cache;
+							pts_count = c.poly.pts_count;
+							for (j = 0; j < pts_count; ++j)
+							{
+								arr.push(b2Vec2.Get(pts_cache[j*2], pts_cache[j*2+1]));
+							}
+							var flags = (c.id & TILE_FLAGS_MASK);
+							if (flags === TILE_FLIPPED_HORIZONTAL || flags === TILE_FLIPPED_VERTICAL || flags === TILE_FLIPPED_DIAGONAL ||
+								((flags & TILE_FLIPPED_HORIZONTAL) && (flags & TILE_FLIPPED_VERTICAL) && (flags & TILE_FLIPPED_DIAGONAL)))
+							{
+								arr.reverse();
+							}
+							c.poly.convexpolys = cr.b2Separator.Separate(arr, (rc.right - rc.left) * (rc.bottom - rc.top));
+							for (j = 0, lenj = arr.length; j < lenj; ++j)
+								b2Vec2.Free(arr[j]);
+							arr.length = 0;
+						}
+						for (j = 0, lenj = c.poly.convexpolys.length; j < lenj; ++j)
+						{
+							cp = c.poly.convexpolys[j];
+;
+							for (k = 0, lenk = cp.length; k < lenk; ++k)
+							{
+								arr.push(b2Vec2.Get((rc.left + cp[k].x - offx) * worldScale, (rc.top + cp[k].y - offy) * worldScale));
+							}
+							fixDef.shape = new b2PolygonShape;
+							fixDef.shape.SetAsArray(arr, arr.length);		// copies content of arr
+							this.body.CreateFixture(fixDef);
+							for (k = 0, lenk = arr.length; k < lenk; ++k)
+								b2Vec2.Free(arr[k]);
+							arr.length = 0;
+						}
 					}
-					fixDef.shape = new b2PolygonShape;
-					fixDef.shape.SetAsArray(arr, arr.length);		// copies content of arr
-					this.body.CreateFixture(fixDef);
-					for (j = 0, lenj = arr.length; j < lenj; j++)
+					else
+					{
+						arr.push(b2Vec2.Get((rc.left - offx) * worldScale, (rc.top - offy) * worldScale));
+						arr.push(b2Vec2.Get((rc.right - offx) * worldScale, (rc.top - offy) * worldScale));
+						arr.push(b2Vec2.Get((rc.right - offx) * worldScale, (rc.bottom - offy) * worldScale));
+						arr.push(b2Vec2.Get((rc.left - offx) * worldScale, (rc.bottom - offy) * worldScale));
+						fixDef.shape = new b2PolygonShape;
+						fixDef.shape.SetAsArray(arr, arr.length);		// copies content of arr
+						this.body.CreateFixture(fixDef);
+					}
+					for (j = 0, lenj = arr.length; j < lenj; ++j)
 						b2Vec2.Free(arr[j]);
+					arr.length = 0;
 				}
 			}
 			else
 			{
-				fixDef.shape = new b2PolygonShape;
-				fixDef.shape.SetAsBox(instw * worldScale * 0.5, insth * worldScale * 0.5);
-				this.body.CreateFixture(fixDef);
+				oldAngle = inst.angle;
+				inst.angle = 0;
+				inst.set_bbox_changed();
+				inst.update_bbox();
+				offx = inst.bquad.midX() - inst.x;
+				offy = inst.bquad.midY() - inst.y;
+				inst.angle = oldAngle;
+				inst.set_bbox_changed();
+				inst.collision_poly.cache_poly(ismirrored ? -instw : instw, isflipped ? -insth : insth, 0);
+				pts_cache = inst.collision_poly.pts_cache;
+				pts_count = inst.collision_poly.pts_count;
+				arr = [];
+				arr.length = pts_count;
+				for (i = 0; i < pts_count; i++)
+				{
+					arr[i] = b2Vec2.Get(pts_cache[i*2] - offx, pts_cache[i*2+1] - offy);
+				}
+				if (ismirrored !== isflipped)
+					arr.reverse();		// wrong clockwise order when flipped
+				convexpolys = cr.b2Separator.Separate(arr, instw * insth);
+				for (i = 0; i < pts_count; i++)
+					b2Vec2.Free(arr[i]);
+				if (convexpolys.length)
+				{
+					for (i = 0, len = convexpolys.length; i < len; i++)
+					{
+						arr = convexpolys[i];
+;
+						for (j = 0, lenj = arr.length; j < lenj; j++)
+						{
+							vec = arr[j];
+							vec.x *= worldScale;
+							vec.y *= worldScale;
+						}
+						fixDef.shape = new b2PolygonShape;
+						fixDef.shape.SetAsArray(arr, arr.length);		// copies content of arr
+						this.body.CreateFixture(fixDef);
+						for (j = 0, lenj = arr.length; j < lenj; j++)
+							b2Vec2.Free(arr[j]);
+					}
+				}
+				else
+				{
+					fixDef.shape = new b2PolygonShape;
+					fixDef.shape.SetAsBox(instw * worldScale * 0.5, insth * worldScale * 0.5);
+					this.body.CreateFixture(fixDef);
+				}
 			}
 		}
 		else if (usecollisionmask === 1)
@@ -31367,7 +32049,6 @@ cr.behaviors.Physics = function(runtime)
 			for (i = 0, len = arr.length; i < len; i++)
 			{
 				b = arr[i].extra.box2dbody.c2userdata;
-				b.destroyMyJoints();
 				b.recreateMyJoints();
 			}
 		}
@@ -31433,12 +32114,15 @@ cr.behaviors.Physics = function(runtime)
 			this.behavior.lastUpdateTick = this.runtime.tickcount;
 		}
 		if (this.recreateBody || inst.width !== this.lastWidth || inst.height !== this.lastHeight
-			|| inst.cur_animation !== this.lastAnimation || inst.cur_frame !== this.lastAnimationFrame)
+			|| inst.cur_animation !== this.lastAnimation || inst.cur_frame !== this.lastAnimationFrame
+			|| (inst.tilemap_exists && inst.physics_changed))
 		{
 			this.createBody();
 			this.recreateBody = false;
 			this.lastAnimation = inst.cur_animation;
 			this.lastAnimationFrame = inst.cur_frame;
+			if (inst.tilemap_exists && inst.physics_changed)
+				inst.physics_changed = false;
 		}
 		var pos_changed = (inst.x !== this.lastKnownX || inst.y !== this.lastKnownY);
 		var angle_changed = (inst.angle !== this.lastKnownAngle);
@@ -32789,7 +33473,12 @@ cr.behaviors.Platform = function(runtime)
 	};
 	Acts.prototype.SetEnabled = function (en)
 	{
-		this.enabled = (en === 1);
+		if (this.enabled !== (en === 1))
+		{
+			this.enabled = (en === 1);
+			if (!this.enabled)
+				this.lastFloorObject = null;
+		}
 	};
 	Acts.prototype.FallThrough = function ()
 	{
@@ -33493,7 +34182,7 @@ cr.getProjectModel = function() { return [
 	"Opening",
 	[
 	[
-		cr.plugins_.Browser,
+		cr.plugins_.Audio,
 		true,
 		false,
 		false,
@@ -33505,7 +34194,7 @@ cr.getProjectModel = function() { return [
 		false
 	]
 ,	[
-		cr.plugins_.Audio,
+		cr.plugins_.Browser,
 		true,
 		false,
 		false,
@@ -33541,7 +34230,7 @@ cr.getProjectModel = function() { return [
 		false
 	]
 ,	[
-		cr.plugins_.Text,
+		cr.plugins_.Spritefont2,
 		false,
 		true,
 		true,
@@ -33550,7 +34239,7 @@ cr.getProjectModel = function() { return [
 		true,
 		true,
 		true,
-		false
+		true
 	]
 ,	[
 		cr.plugins_.Mouse,
@@ -33577,7 +34266,7 @@ cr.getProjectModel = function() { return [
 		false
 	]
 ,	[
-		cr.plugins_.Spritefont2,
+		cr.plugins_.Text,
 		false,
 		true,
 		true,
@@ -33586,7 +34275,7 @@ cr.getProjectModel = function() { return [
 		true,
 		true,
 		true,
-		true
+		false
 	]
 ,	[
 		cr.plugins_.TiledBg,
@@ -33649,12 +34338,12 @@ cr.getProjectModel = function() { return [
 			false,
 			4456708571477634,
 			[
-				["images/player-sheet0.png", 753, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet0.png", 753, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet0.png", 753, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet1.png", 744, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet1.png", 744, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0],
-				["images/player-sheet1.png", 744, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+				["images/player-sheet0.png", 753, 1, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0],
+				["images/player-sheet0.png", 753, 42, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0],
+				["images/player-sheet0.png", 753, 83, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0],
+				["images/player-sheet1.png", 744, 1, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0],
+				["images/player-sheet1.png", 744, 42, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0],
+				["images/player-sheet1.png", 744, 83, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0]
 			]
 			]
 ,			[
@@ -33666,7 +34355,7 @@ cr.getProjectModel = function() { return [
 			false,
 			6428032724882492,
 			[
-				["images/player-sheet2.png", 890, 1, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+				["images/player-sheet2.png", 890, 1, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0]
 			]
 			]
 ,			[
@@ -33678,7 +34367,7 @@ cr.getProjectModel = function() { return [
 			false,
 			8634838423105605,
 			[
-				["images/player-sheet2.png", 890, 42, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+				["images/player-sheet2.png", 890, 42, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0]
 			]
 			]
 ,			[
@@ -33690,7 +34379,7 @@ cr.getProjectModel = function() { return [
 			false,
 			1572748634966135,
 			[
-				["images/player-sheet2.png", 890, 83, 1, 40, 67, 1, 0.5, 0.507463,[],[-0.33125,-0.507463,0.3,-0.507463,0.30625,0.492537,-0.325,0.492537],0]
+				["images/player-sheet2.png", 890, 83, 1, 40, 67, 1, 0.5, 0.5074626803398132,[],[-0.331250011920929,-0.5074626803398132,0.300000011920929,-0.5074626803398132,0.3062499761581421,0.4925373196601868,-0.324999988079071,0.4925373196601868],0]
 			]
 			]
 		],
@@ -33857,8 +34546,8 @@ cr.getProjectModel = function() { return [
 			false,
 			7472647199375176,
 			[
-				["images/marker-sheet0.png", 229, 0, 0, 15, 15, 1, 0.466667, 0.466667,[],[0.533333,0.533333,-0.466667,0.533333,-0.466667,-0.466667,0.533333,-0.466667],0],
-				["images/marker-sheet1.png", 228, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
+				["images/marker-sheet0.png", 229, 0, 0, 15, 15, 1, 0.4666666686534882, 0.4666666686534882,[],[0.5333333015441895,0.5333333015441895,-0.4666666686534882,0.5333333015441895,-0.4666666686534882,-0.4666666686534882,0.5333333015441895,-0.4666666686534882],0],
+				["images/marker-sheet1.png", 228, 0, 0, 15, 15, 1, 0.5333333611488342, 0.5333333611488342,[],[],0]
 			]
 			]
 		],
@@ -33888,7 +34577,7 @@ cr.getProjectModel = function() { return [
 			false,
 			5668872769627354,
 			[
-				["images/sprite2-sheet0.png", 338, 0, 0, 252, 55, 1, 0.496032, 0.581818,[],[],0]
+				["images/sprite2-sheet0.png", 338, 0, 0, 252, 55, 1, 0.4960317313671112, 0.581818163394928,[],[],0]
 			]
 			]
 		],
@@ -33970,8 +34659,8 @@ cr.getProjectModel = function() { return [
 			false,
 			84178240252615,
 			[
-				["images/uimarker-sheet0.png", 256, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0],
-				["images/uimarker-sheet1.png", 252, 0, 0, 15, 15, 1, 0.533333, 0.533333,[],[],0]
+				["images/uimarker-sheet0.png", 256, 0, 0, 15, 15, 1, 0.5333333611488342, 0.5333333611488342,[],[],0],
+				["images/uimarker-sheet1.png", 252, 0, 0, 15, 15, 1, 0.5333333611488342, 0.5333333611488342,[],[],0]
 			]
 			]
 		],
@@ -34212,8 +34901,8 @@ cr.getProjectModel = function() { return [
 			false,
 			267448306083113,
 			[
-				["images/runbutton-sheet0.png", 15170, 1, 132, 150, 68, 1, 0.493333, 0.485294,[],[-0.48,-0.455882,0.00666666,-0.470588,0.486667,-0.441177,0.5,0.0147059,0.486667,0.470588,0.00666666,0.5,-0.48,0.485294,-0.493333,0.0147059],0],
-				["images/runbutton-sheet0.png", 15170, 1, 1, 213, 130, 1, 0.497653, 0.5,[],[-0.370892,-0.069231,-0.00938958,-0.3,0.375586,-0.1,0.375586,0.076923,-0.00938958,0.3,-0.370892,0.046154],0]
+				["images/runbutton-sheet0.png", 15170, 1, 132, 150, 68, 1, 0.4933333396911621, 0.4852941036224365,[],[-0.4800000488758087,-0.4558823108673096,0.006666660308837891,-0.4705882072448731,0.4866666793823242,-0.4411765038967133,0.4999996423721314,0.01470589637756348,0.4866666793823242,0.4705879092216492,0.006666660308837891,0.4999998807907105,-0.4800000488758087,0.4852939248085022,-0.4933333396911621,0.01470589637756348],0],
+				["images/runbutton-sheet0.png", 15170, 1, 1, 213, 130, 1, 0.4976525902748108, 0.5,[],[-0.3708915710449219,-0.06923100352287293,-0.009389579296112061,-0.300000011920929,0.3755863904953003,-0.09999999403953552,0.3755863904953003,0.07692301273345947,-0.009389579296112061,0.300000011920929,-0.3708915710449219,0.04615402221679688],0]
 			]
 			]
 		],
@@ -34243,8 +34932,8 @@ cr.getProjectModel = function() { return [
 			false,
 			6424999968598002,
 			[
-				["images/jumpbutton-sheet0.png", 14885, 1, 132, 149, 67, 1, 0.496644, 0.492537,[],[-0.483222,-0.462687,-2.98023e-007,-0.492537,0.489933,-0.462687,0.503356,-3.27826e-007,0.489933,0.477612,-2.98023e-007,0.492538,-0.483222,0.477612,-0.496644,-3.27826e-007],0],
-				["images/jumpbutton-sheet0.png", 14885, 1, 1, 213, 130, 1, 0.497653, 0.5,[],[-0.370892,-0.069231,-0.00938958,-0.3,0.375586,-0.1,0.375586,0.076923,-0.00938958,0.3,-0.370892,0.046154],0]
+				["images/jumpbutton-sheet0.png", 14885, 1, 132, 149, 67, 1, 0.4966442883014679, 0.4925373196601868,[],[-0.4832215011119843,-0.4626866281032562,-2.980232238769531e-007,-0.4925373196601868,0.4899326860904694,-0.4626866281032562,0.5033557415008545,-3.278255462646484e-007,0.4899326860904694,0.4776116609573364,-2.980232238769531e-007,0.4925376772880554,-0.4832215011119843,0.4776116609573364,-0.4966442883014679,-3.278255462646484e-007],0],
+				["images/jumpbutton-sheet0.png", 14885, 1, 1, 213, 130, 1, 0.4976525902748108, 0.5,[],[-0.3708915710449219,-0.06923100352287293,-0.009389579296112061,-0.300000011920929,0.3755863904953003,-0.09999999403953552,0.3755863904953003,0.07692301273345947,-0.009389579296112061,0.300000011920929,-0.3708915710449219,0.04615402221679688],0]
 			]
 			]
 		],
@@ -34274,7 +34963,7 @@ cr.getProjectModel = function() { return [
 			false,
 			9959273540879391,
 			[
-				["images/exit-sheet0.png", 727, 0, 0, 100, 200, 1, 0.5, 0.5,[],[-0.35,-0.425,0,-0.5,0.35,-0.425,0.5,0,0.5,0.5,-0.5,0.5,-0.5,0],0]
+				["images/exit-sheet0.png", 727, 0, 0, 100, 200, 1, 0.5, 0.5,[],[-0.3499999940395355,-0.425000011920929,0,-0.5,0.3500000238418579,-0.425000011920929,0.5,0,0.5,0.5,-0.5,0.5,-0.5,0],0]
 			]
 			]
 		],
@@ -34539,8 +35228,8 @@ cr.getProjectModel = function() { return [
 			false,
 			9856669910894166,
 			[
-				["images/undosprite-sheet1.png", 3492, 0, 0, 116, 68, 1, 0.5, 0.5,[],[-0.482759,-0.470588,0,-0.485294,0.474138,-0.455882,0.491379,0,0.474138,0.455882,0,0.485294,-0.482759,0.470588,-0.5,0],0],
-				["images/undosprite-sheet0.png", 3916, 0, 0, 117, 68, 1, 0.504274, 0.5,[],[],0]
+				["images/undosprite-sheet1.png", 3492, 0, 0, 116, 68, 1, 0.5, 0.5,[],[-0.4827586114406586,-0.4705882072448731,0,-0.4852941036224365,0.4741380214691162,-0.4558824002742767,0.4913790225982666,0,0.4741380214691162,0.4558820128440857,0,0.485293984413147,-0.4827586114406586,0.4705880284309387,-0.5,0],0],
+				["images/undosprite-sheet0.png", 3916, 0, 0, 117, 68, 1, 0.504273533821106, 0.5,[],[],0]
 			]
 			]
 		],
@@ -34570,7 +35259,7 @@ cr.getProjectModel = function() { return [
 			false,
 			4800915924537065,
 			[
-				["images/sprite3-sheet0.png", 3525, 0, 0, 119, 71, 1, 0.504202, 0.507042,[],[],0],
+				["images/sprite3-sheet0.png", 3525, 0, 0, 119, 71, 1, 0.5042017102241516, 0.5070422291755676,[],[],0],
 				["images/sprite3-sheet1.png", 3085, 0, 0, 118, 70, 1, 0.5, 0.5,[],[],0]
 			]
 			]
@@ -34756,7 +35445,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1171, 56, 0, 177.88, 80.6388, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
+				[1171, 56, 0, 177.8796691894531, 80.63878631591797, 0, 0, 1, 0.4933333396911621, 0.4852941036224365, 0, 0, []],
 				22,
 				27,
 				[
@@ -34771,7 +35460,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1169, 153, 0, 183.838, 82.6653, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
+				[1169, 153, 0, 183.8377380371094, 82.66529083251953, 0, 0, 1, 0.4966442883014679, 0.4925373196601868, 0, 0, []],
 				23,
 				28,
 				[
@@ -34786,7 +35475,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1177, 660, 0, 207.451, 121.609, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				[1177, 660, 0, 207.4512023925781, 121.6093292236328, 0, 0, 1, 0.5, 0.5, 0, 0, []],
 				33,
 				29,
 				[
@@ -34801,7 +35490,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[107, 657, 0, 210.988, 125.884, 0, 0, 1, 0.504202, 0.507042, 0, 0, []],
+				[107, 657, 0, 210.98828125, 125.8837738037109, 0, 0, 1, 0.5042017102241516, 0.5070422291755676, 0, 0, []],
 				34,
 				30,
 				[
@@ -34869,7 +35558,7 @@ cr.getProjectModel = function() { return [
 			true,
 			[255, 255, 255],
 			true,
-			0.33,
+			0.3300000131130219,
 			1,
 			1,
 			false,
@@ -34900,7 +35589,7 @@ cr.getProjectModel = function() { return [
 			true,
 			[255, 255, 255],
 			true,
-			0.66,
+			0.6600000262260437,
 			1,
 			1,
 			false,
@@ -34940,7 +35629,7 @@ cr.getProjectModel = function() { return [
 			0,
 			[
 			[
-				[204, 477, 0, 120, 201, 0, 0, 1, 0.5, 0.507463, 0, 0, []],
+				[204, 477, 0, 120, 201, 0, 0, 1, 0.5, 0.5074626803398132, 0, 0, []],
 				1,
 				1,
 				[
@@ -35596,7 +36285,7 @@ cr.getProjectModel = function() { return [
 			true,
 			[255, 255, 255],
 			true,
-			0.33,
+			0.3300000131130219,
 			1,
 			1,
 			false,
@@ -35640,7 +36329,7 @@ cr.getProjectModel = function() { return [
 			true,
 			[255, 255, 255],
 			true,
-			0.66,
+			0.6600000262260437,
 			1,
 			1,
 			false,
@@ -35693,7 +36382,7 @@ cr.getProjectModel = function() { return [
 			0,
 			[
 			[
-				[210, 300, 0, 120, 201, 0, 0, 1, 0.5, 0.507463, 0, 0, []],
+				[210, 300, 0, 120, 201, 0, 0, 1, 0.5, 0.5074626803398132, 0, 0, []],
 				1,
 				52,
 				[
@@ -36759,8 +37448,8 @@ cr.getProjectModel = function() { return [
 			true,
 			[255, 255, 255],
 			true,
-			0.33,
-			0.33,
+			0.3300000131130219,
+			0.3300000131130219,
 			1,
 			false,
 			1,
@@ -36790,8 +37479,8 @@ cr.getProjectModel = function() { return [
 			true,
 			[255, 255, 255],
 			true,
-			0.66,
-			0.66,
+			0.6600000262260437,
+			0.6600000262260437,
 			1,
 			false,
 			1,
@@ -36830,7 +37519,7 @@ cr.getProjectModel = function() { return [
 			0,
 			[
 			[
-				[204, 477, 0, 120, 201, 0, 0, 1, 0.5, 0.507463, 0, 0, []],
+				[204, 477, 0, 120, 201, 0, 0, 1, 0.5, 0.5074626803398132, 0, 0, []],
 				1,
 				94,
 				[
@@ -36900,7 +37589,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[2105.41, 649.408, 0, 48, 48, 0, 0, 1, 0.466667, 0.466667, 0, 0, []],
+				[2105.408203125, 649.4080810546875, 0, 48, 48, 0, 0, 1, 0.4666666686534882, 0.4666666686534882, 0, 0, []],
 				7,
 				110,
 				[
@@ -36993,7 +37682,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1350, 540, 0, 44.8, 89.6, 0, 0, 1, 0.5, 0.5, 0, 0, []],
+				[1350, 540, 0, 44.79999923706055, 89.59999847412109, 0, 0, 1, 0.5, 0.5, 0, 0, []],
 				24,
 				115,
 				[
@@ -37108,7 +37797,7 @@ cr.getProjectModel = function() { return [
 			0,
 			[
 			[
-				[1936, 48, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
+				[1936, 48, 0, 15, 15, 0, 0, 1, 0.5333333611488342, 0.5333333611488342, 0, 0, []],
 				11,
 				121,
 				[
@@ -37123,7 +37812,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1936, 112, 0, 15, 15, 0, 0, 1, 0.533333, 0.533333, 0, 0, []],
+				[1936, 112, 0, 15, 15, 0, 0, 1, 0.5333333611488342, 0.5333333611488342, 0, 0, []],
 				11,
 				122,
 				[
@@ -37238,7 +37927,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1232, 32, 0, 101, 53, 0, 0, 1, 0.493333, 0.485294, 0, 0, []],
+				[1232, 32, 0, 101, 53, 0, 0, 1, 0.4933333396911621, 0.4852941036224365, 0, 0, []],
 				22,
 				129,
 				[
@@ -37253,7 +37942,7 @@ cr.getProjectModel = function() { return [
 				]
 			]
 ,			[
-				[1232, 112, 0, 101, 53, 0, 0, 1, 0.496644, 0.492537, 0, 0, []],
+				[1232, 112, 0, 101, 53, 0, 0, 1, 0.4966442883014679, 0.4925373196601868, 0, 0, []],
 				23,
 				130,
 				[
@@ -41931,6 +42620,7 @@ false,false,8450558362585037,false
 	0,
 	131,
 	false,
+	true,
 	[
 		[7,9]
 	]

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>Level 3</name>
+    <events>
+        <include>main</include>
+        <event-block sid="1695117371217659">
+            <conditions>
+                <condition id="1" name="Is overlapping another object" sid="8536824655175243" type="Player">
+                    <param id="0" name="Object">exit</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-2" name="Go to layout" sid="2010830590444453" type="System">
+                    <param id="0" name="Layout">Opening</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="4125235641877641">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="7753639835462232" type="System" />
+            </conditions>
+            <actions>
+                <action id="0" name="Set text" sid="658862909522921" type="jumpCounter">
+                    <param id="0" name="Text">&quot;12&quot;</param>
+                </action>
+                <action id="0" name="Set text" sid="9012572651295813" type="runToCounter">
+                    <param id="0" name="Text">&quot;10&quot;</param>
+                </action>
+            </actions>
+        </event-block>
+    </events>
+</c2eventsheet>
