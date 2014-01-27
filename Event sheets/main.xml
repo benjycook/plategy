@@ -34,6 +34,22 @@
                     <param id="0" name="Object">Player</param>
                 </action>
             </actions>
+            <sub-events>
+                <event-block sid="425154540066699">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="6828079034785145" type="System">
+                            <param id="0" name="First value">UndoSprite.Count</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-2" name="Go to layout" sid="6161490896342894" type="System">
+                            <param id="0" name="Layout">Opening</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
         </event-block>
         <comment>Use the down arrow to allow the player to deliberately drop down through a jump-thru platform.</comment>
         <comment>If the player falls off the bottom of the layout, restart the level.</comment>
@@ -487,8 +503,8 @@
                         <condition id="4" inverted="1" name="Is touching object" sid="8154965534932897" type="Touch">
                             <param id="0" name="Object">SolidTile</param>
                         </condition>
-                        <condition disabled="1" id="-8" name="Compare two values" sid="5205509417479675" type="System">
-                            <param id="0" name="First value">distance(lastTouchGameX,lastTouchGameY,Touch.X(&quot;UI&quot;),Touch.Y(&quot;UI&quot;) ) </param>
+                        <condition id="-8" name="Compare two values" sid="5205509417479675" type="System">
+                            <param id="0" name="First value">distance(TouchLastX,TouchLastY,Touch.X(&quot;UI&quot;),Touch.Y(&quot;UI&quot;) ) </param>
                             <param id="1" name="Comparison">2</param>
                             <param id="2" name="Second value">5</param>
                         </condition>
