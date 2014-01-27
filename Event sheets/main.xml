@@ -704,5 +704,31 @@
                 </action>
             </actions>
         </event-block>
+        <event-block sid="1701876354493683">
+            <conditions>
+                <condition id="8" name="On mouse wheel" sid="3536344974936637" type="Mouse">
+                    <param id="0" name="Direction">0</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-17" name="Set layer scale" sid="7961530195021936" type="System">
+                    <param id="0" name="Layer">&quot;Game&quot;</param>
+                    <param id="1" name="Scale">max(LayerScale(&quot;Game&quot;)-0.1,ViewportRight(&quot;UI&quot;)/LayoutWidth)</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="1371170238817281">
+            <conditions>
+                <condition id="8" name="On mouse wheel" sid="7467242409272872" type="Mouse">
+                    <param id="0" name="Direction">1</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-17" name="Set layer scale" sid="6573481537058833" type="System">
+                    <param id="0" name="Layer">&quot;Game&quot;</param>
+                    <param id="1" name="Scale">min(LayerScale(&quot;Game&quot;)+0.1,1)</param>
+                </action>
+            </actions>
+        </event-block>
     </events>
 </c2eventsheet>
