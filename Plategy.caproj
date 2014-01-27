@@ -495,13 +495,13 @@
         </object-type>
     </object-folder>
     <families />
-    <layout-folder expanded="1">
+    <layout-folder expanded="0">
         <layout>Opening.xml</layout>
         <layout>Level 1.xml</layout>
         <layout>Level 2.xml</layout>
         <layout>Lab.xml</layout>
     </layout-folder>
-    <event-folder expanded="1">
+    <event-folder expanded="0">
         <event-sheet>main.xml</event-sheet>
         <event-sheet>pan.xml</event-sheet>
         <event-sheet>locomotion.xml</event-sheet>

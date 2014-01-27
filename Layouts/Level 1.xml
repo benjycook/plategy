@@ -21,7 +21,7 @@
                 <x>1</x>
                 <y>1</y>
             </parallax>
-            <zoom-rate>1</zoom-rate>
+            <zoom-rate>0</zoom-rate>
             <opacity>1</opacity>
             <force-own-texture>1</force-own-texture>
             <blend-mode>0</blend-mode>
@@ -36,15 +36,15 @@
                     <effect-fallback>0</effect-fallback>
                     <world>
                         <x>13</x>
-                        <y>529</y>
+                        <y>3</y>
                         <z>0</z>
                         <width>3180</width>
-                        <height>720</height>
+                        <height>1779</height>
                         <depth>0</depth>
                         <hotspotX>0</hotspotX>
                         <hotspotY>0</hotspotY>
                         <angle>0</angle>
-                        <opacity>0</opacity>
+                        <opacity>1</opacity>
                     </world>
                 </instance>
             </instances>
@@ -58,7 +58,7 @@
                 <x>0.33</x>
                 <y>1</y>
             </parallax>
-            <zoom-rate>1</zoom-rate>
+            <zoom-rate>0</zoom-rate>
             <opacity>0</opacity>
             <force-own-texture>0</force-own-texture>
             <blend-mode>0</blend-mode>
@@ -95,7 +95,7 @@
                 <x>0.66</x>
                 <y>1</y>
             </parallax>
-            <zoom-rate>1</zoom-rate>
+            <zoom-rate>0</zoom-rate>
             <opacity>0</opacity>
             <force-own-texture>0</force-own-texture>
             <blend-mode>0</blend-mode>
@@ -921,7 +921,35 @@
             <force-own-texture>0</force-own-texture>
             <blend-mode>0</blend-mode>
             <effect-fallback>0</effect-fallback>
-            <instances />
+            <instances>
+                <instance type="Label" uid="31">
+                    <properties>
+                        <text>Jump</text>
+                        <initial-visibility>Visible</initial-visibility>
+                        <font>Arial,-96,400,0</font>
+                        <color>255,0,0</color>
+                        <horizontal-alignment>Left</horizontal-alignment>
+                        <vertical-alignment>Top</vertical-alignment>
+                        <hotspot>Top-left</hotspot>
+                        <wrapping>Word</wrapping>
+                        <line-height>0</line-height>
+                    </properties>
+                    <blend-mode>0</blend-mode>
+                    <effect-fallback>0</effect-fallback>
+                    <world>
+                        <x>23</x>
+                        <y>-253</y>
+                        <z>0</z>
+                        <width>3049</width>
+                        <height>145</height>
+                        <depth>0</depth>
+                        <hotspotX>0</hotspotX>
+                        <hotspotY>0</hotspotY>
+                        <angle>0</angle>
+                        <opacity>1</opacity>
+                    </world>
+                </instance>
+            </instances>
             <effects />
         </layer>
     </layers>

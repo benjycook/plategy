@@ -135,17 +135,11 @@
                     </actions>
                     <sub-events>
                         <event-block sid="1298238305250438">
-                            <conditions>
-                                <condition id="-8" name="Compare two values" sid="933652222243683" type="System">
-                                    <param id="0" name="First value">InitialScale * (TouchCurrentDistance / TouchStartDistance)</param>
-                                    <param id="1" name="Comparison">4</param>
-                                    <param id="2" name="Second value">WindowWidth/LayoutWidth</param>
-                                </condition>
-                            </conditions>
+                            <conditions />
                             <actions>
                                 <action id="-17" name="Set layer scale" sid="7752267318551568" type="System">
                                     <param id="0" name="Layer">&quot;Game&quot;</param>
-                                    <param id="1" name="Scale">InitialScale * (TouchCurrentDistance / TouchStartDistance)</param>
+                                    <param id="1" name="Scale">max(InitialScale * (TouchCurrentDistance / TouchStartDistance) , ViewportRight(&quot;UI&quot;)/LayoutWidth)</param>
                                 </action>
                             </actions>
                         </event-block>
@@ -246,6 +240,16 @@
                     </actions>
                 </event-block>
             </sub-events>
+        </event-block>
+        <event-block sid="3168172555604769">
+            <conditions>
+                <condition id="-1" name="Every tick" sid="8322353717861155" type="System" />
+            </conditions>
+            <actions>
+                <action id="0" name="Set text" sid="97831739032256" type="Label">
+                    <param id="0" name="Text">LayerScale(&quot;Game&quot;)</param>
+                </action>
+            </actions>
         </event-block>
     </events>
 </c2eventsheet>

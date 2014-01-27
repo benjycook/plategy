@@ -395,8 +395,8 @@
                                 <action id="-3" name="Create object" sid="3783801119860993" type="System">
                                     <param id="0" name="Object to create">Marker</param>
                                     <param id="1" name="Layer">&quot;Game&quot;</param>
-                                    <param id="2" name="X">Touch.X</param>
-                                    <param id="3" name="Y">Touch.Y</param>
+                                    <param id="2" name="X">Touch.X(&quot;Game&quot;)</param>
+                                    <param id="3" name="Y">Touch.Y(&quot;Game&quot;)</param>
                                 </action>
                                 <action id="-10" name="Set value" sid="4806472524906027" type="Marker">
                                     <param id="0" name="Instance variable">id</param>
@@ -436,8 +436,8 @@
                         <action id="-3" name="Create object" sid="5863032560798569" type="System">
                             <param id="0" name="Object to create">Marker</param>
                             <param id="1" name="Layer">&quot;Game&quot;</param>
-                            <param id="2" name="X">Touch.X</param>
-                            <param id="3" name="Y">Touch.Y</param>
+                            <param id="2" name="X">Touch.X(&quot;Game&quot;)</param>
+                            <param id="3" name="Y">Touch.Y(&quot;Game&quot;)</param>
                         </action>
                         <action id="-10" name="Set value" sid="127791555446356" type="Marker">
                             <param id="0" name="Instance variable">id</param>
@@ -487,7 +487,7 @@
                         <condition id="4" inverted="1" name="Is touching object" sid="8154965534932897" type="Touch">
                             <param id="0" name="Object">SolidTile</param>
                         </condition>
-                        <condition id="-8" name="Compare two values" sid="5205509417479675" type="System">
+                        <condition disabled="1" id="-8" name="Compare two values" sid="5205509417479675" type="System">
                             <param id="0" name="First value">distance(lastTouchGameX,lastTouchGameY,Touch.X(&quot;UI&quot;),Touch.Y(&quot;UI&quot;) ) </param>
                             <param id="1" name="Comparison">2</param>
                             <param id="2" name="Second value">5</param>
