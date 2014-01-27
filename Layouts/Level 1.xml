@@ -5,7 +5,7 @@
     <event-sheet>Level 1</event-sheet>
     <size>
         <width>3177</width>
-        <height>720</height>
+        <height>1787</height>
     </size>
     <margins>
         <horizontal>500</horizontal>
@@ -15,7 +15,7 @@
     <layers>
         <layer name="Background_0_P" sid="5010637419905924">
             <initially-visible>1</initially-visible>
-            <background-color>255,255,255</background-color>
+            <background-color>0,0,0</background-color>
             <transparent>0</transparent>
             <parallax>
                 <x>1</x>
@@ -23,7 +23,7 @@
             </parallax>
             <zoom-rate>1</zoom-rate>
             <opacity>1</opacity>
-            <force-own-texture>0</force-own-texture>
+            <force-own-texture>1</force-own-texture>
             <blend-mode>0</blend-mode>
             <effect-fallback>0</effect-fallback>
             <instances>
@@ -35,8 +35,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>0</x>
-                        <y>0</y>
+                        <x>13</x>
+                        <y>529</y>
                         <z>0</z>
                         <width>3180</width>
                         <height>720</height>
@@ -44,7 +44,7 @@
                         <hotspotX>0</hotspotX>
                         <hotspotY>0</hotspotY>
                         <angle>0</angle>
-                        <opacity>1</opacity>
+                        <opacity>0</opacity>
                     </world>
                 </instance>
             </instances>
@@ -59,7 +59,7 @@
                 <y>1</y>
             </parallax>
             <zoom-rate>1</zoom-rate>
-            <opacity>1</opacity>
+            <opacity>0</opacity>
             <force-own-texture>0</force-own-texture>
             <blend-mode>0</blend-mode>
             <effect-fallback>0</effect-fallback>
@@ -72,8 +72,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>-2</x>
-                        <y>242.5</y>
+                        <x>11</x>
+                        <y>772</y>
                         <z>0</z>
                         <width>3180</width>
                         <height>150</height>
@@ -96,7 +96,7 @@
                 <y>1</y>
             </parallax>
             <zoom-rate>1</zoom-rate>
-            <opacity>1</opacity>
+            <opacity>0</opacity>
             <force-own-texture>0</force-own-texture>
             <blend-mode>0</blend-mode>
             <effect-fallback>0</effect-fallback>
@@ -109,8 +109,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>-11</x>
-                        <y>161</y>
+                        <x>2</x>
+                        <y>690</y>
                         <z>0</z>
                         <width>3300</width>
                         <height>300</height>
@@ -182,8 +182,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>204</x>
-                        <y>477</y>
+                        <x>217</x>
+                        <y>1006</y>
                         <z>0</z>
                         <width>120</width>
                         <height>201</height>
@@ -223,8 +223,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>0</x>
-                        <y>600</y>
+                        <x>13</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>422</width>
                         <height>63</height>
@@ -264,8 +264,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>420</x>
-                        <y>600</y>
+                        <x>433</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>420</width>
                         <height>120</height>
@@ -305,8 +305,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>1020</x>
-                        <y>600</y>
+                        <x>1033</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>
@@ -332,8 +332,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>2760</x>
-                        <y>630</y>
+                        <x>2773</x>
+                        <y>1159</y>
                         <z>0</z>
                         <width>48</width>
                         <height>48</height>
@@ -354,8 +354,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>3060</x>
-                        <y>510</y>
+                        <x>3073</x>
+                        <y>1039</y>
                         <z>0</z>
                         <width>90</width>
                         <height>180</height>
@@ -397,95 +397,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>990</x>
-                        <y>690</y>
-                        <z>0</z>
-                        <width>60</width>
-                        <height>60</height>
-                        <depth>0</depth>
-                        <hotspotX>0.5</hotspotX>
-                        <hotspotY>0.5</hotspotY>
-                        <angle>0</angle>
-                        <opacity>1</opacity>
-                    </world>
-                </instance>
-                <instance type="CrumbleBlock" uid="44">
-                    <properties>
-                        <initial-visibility>Visible</initial-visibility>
-                        <initial-animation>Default</initial-animation>
-                        <initial-frame>0</initial-frame>
-                        <collisions>Enabled</collisions>
-                    </properties>
-                    <behavior-instances>
-                        <behavior-instance type="Solid">
-                            <properties>
-                                <initial-state>Enabled</initial-state>
-                            </properties>
-                        </behavior-instance>
-                    </behavior-instances>
-                    <blend-mode>0</blend-mode>
-                    <effect-fallback>0</effect-fallback>
-                    <world>
-                        <x>420</x>
-                        <y>810</y>
-                        <z>0</z>
-                        <width>60</width>
-                        <height>60</height>
-                        <depth>0</depth>
-                        <hotspotX>0.5</hotspotX>
-                        <hotspotY>0.5</hotspotY>
-                        <angle>0</angle>
-                        <opacity>1</opacity>
-                    </world>
-                </instance>
-                <instance type="CrumbleBlock" uid="45">
-                    <properties>
-                        <initial-visibility>Visible</initial-visibility>
-                        <initial-animation>Default</initial-animation>
-                        <initial-frame>0</initial-frame>
-                        <collisions>Enabled</collisions>
-                    </properties>
-                    <behavior-instances>
-                        <behavior-instance type="Solid">
-                            <properties>
-                                <initial-state>Enabled</initial-state>
-                            </properties>
-                        </behavior-instance>
-                    </behavior-instances>
-                    <blend-mode>0</blend-mode>
-                    <effect-fallback>0</effect-fallback>
-                    <world>
-                        <x>750</x>
-                        <y>900</y>
-                        <z>0</z>
-                        <width>60</width>
-                        <height>60</height>
-                        <depth>0</depth>
-                        <hotspotX>0.5</hotspotX>
-                        <hotspotY>0.5</hotspotY>
-                        <angle>0</angle>
-                        <opacity>1</opacity>
-                    </world>
-                </instance>
-                <instance type="CrumbleBlock" uid="46">
-                    <properties>
-                        <initial-visibility>Visible</initial-visibility>
-                        <initial-animation>Default</initial-animation>
-                        <initial-frame>0</initial-frame>
-                        <collisions>Enabled</collisions>
-                    </properties>
-                    <behavior-instances>
-                        <behavior-instance type="Solid">
-                            <properties>
-                                <initial-state>Enabled</initial-state>
-                            </properties>
-                        </behavior-instance>
-                    </behavior-instances>
-                    <blend-mode>0</blend-mode>
-                    <effect-fallback>0</effect-fallback>
-                    <world>
-                        <x>570</x>
-                        <y>870</y>
+                        <x>1003</x>
+                        <y>1219</y>
                         <z>0</z>
                         <width>60</width>
                         <height>60</height>
@@ -527,8 +440,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>870</x>
-                        <y>690</y>
+                        <x>883</x>
+                        <y>1219</y>
                         <z>0</z>
                         <width>60</width>
                         <height>60</height>
@@ -570,8 +483,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>930</x>
-                        <y>690</y>
+                        <x>943</x>
+                        <y>1219</y>
                         <z>0</z>
                         <width>60</width>
                         <height>60</height>
@@ -611,8 +524,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>2100</x>
-                        <y>660</y>
+                        <x>2113</x>
+                        <y>1189</y>
                         <z>0</z>
                         <width>180</width>
                         <height>60</height>
@@ -652,8 +565,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>0</x>
-                        <y>660</y>
+                        <x>13</x>
+                        <y>1189</y>
                         <z>0</z>
                         <width>422</width>
                         <height>63</height>
@@ -693,8 +606,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>1200</x>
-                        <y>600</y>
+                        <x>1213</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>
@@ -734,8 +647,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>1380</x>
-                        <y>600</y>
+                        <x>1393</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>
@@ -775,8 +688,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>2460</x>
-                        <y>600</y>
+                        <x>2473</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>
@@ -816,8 +729,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>2640</x>
-                        <y>600</y>
+                        <x>2653</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>
@@ -857,8 +770,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>2820</x>
-                        <y>600</y>
+                        <x>2833</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>
@@ -898,8 +811,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>3000</x>
-                        <y>600</y>
+                        <x>3013</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>
@@ -939,8 +852,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>1560</x>
-                        <y>600</y>
+                        <x>1573</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>
@@ -980,8 +893,8 @@
                     <blend-mode>0</blend-mode>
                     <effect-fallback>0</effect-fallback>
                     <world>
-                        <x>1740</x>
-                        <y>600</y>
+                        <x>1753</x>
+                        <y>1129</y>
                         <z>0</z>
                         <width>180</width>
                         <height>120</height>

@@ -10,7 +10,7 @@ you probably do not want to add any .uistate.xml files to the repository.-->
         <display name="HTML5" />
     </configurations>
     <open-tabs>
-        <layout>Level 1</layout>
+        <layout active="1">Level 1</layout>
         <layout>Level 2</layout>
         <layout>Lab</layout>
         <layout>Opening</layout>
@@ -19,7 +19,7 @@ you probably do not want to add any .uistate.xml files to the repository.-->
         <event-sheet>Level 3</event-sheet>
         <event-sheet>main</event-sheet>
         <event-sheet>locomotion</event-sheet>
-        <event-sheet active="1">opening</event-sheet>
+        <event-sheet>opening</event-sheet>
         <event-sheet>pan</event-sheet>
     </open-tabs>
     <properties>
